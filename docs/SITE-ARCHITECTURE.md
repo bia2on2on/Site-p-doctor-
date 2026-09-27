@@ -2,7 +2,7 @@
 
 **وضعیت سند:** Baseline برنامه‌ریزی برای بازبینی مالک محصول / بازبینی بصری Milestone A — سند **پیشنهادی** است و هیچ Gate را Passed نمی‌کند.
 
-**تاریخ این نسخه:** 2026-09-27 (UTC) — بازنگری ۲ در PR #3: افزودن §19 (قرارداد سلامت جست‌وجو/ایندکس‌پذیری/عملکرد و پذیرش Search Console) و رفع P-01/P-02
+**تاریخ این نسخه:** 2026-09-27 (UTC) — بازنگری ۲: افزودن §19 (سلامت جست‌وجو/ایندکس‌پذیری/عملکرد، پذیرش Search Console) و رفع P-01/P-02 · **بازنگری ۳:** ثبت مسیر تجاری مکمل طراحی/راه‌اندازی وب‌سایت (§1.6، §4.3، §13.5) و تصحیح/مالکیت intent سئو (§5.4) — CPMS همچنان primary
 
 **نقش این سند:** ترجمۀ تصمیم‌های پذیرفته‌شدۀ استراتژیک به یک **قرارداد اجرایی (concrete) برای صفحات، پیام‌ها و جهت طراحی**؛ به‌گونه‌ای که Slice بعدی (Design System / Foundation و سپس Homepage) بدون کشف مجدد intent تجاری قابل اجرا باشد.
 
@@ -55,6 +55,8 @@
 | **CONDITIONAL ON PRODUCT TRUTH** | جایگاه معماری رزرو می‌شود؛ انتشار/ساخت محتوا مشروط به تأیید شواهد طبق `docs/PRODUCT-TRUTH.md` |
 | **DEFERRED / ONLY WHEN BUSINESS INPUT EXISTS** | تا وجود ورودی واقعی کسب‌وکار ساخته **نمی‌شود**؛ صفحه خالی برای تکمیل Sitemap ممنوع است |
 
+**۰.۳ برچسب‌های ویژهٔ SEO/سرویس (§5.4):** `POTENTIAL COMMERCIAL SERVICE INTENT — REQUIRES DEDICATED KEYWORD VALIDATION` (intent سرویس‌محور که با تصمیم §1.6 ممکن است تجاراً مرتبط باشد؛ نه بی‌ربط، نه هدف قطعی) · `VOLUME NOT RETRIEVED` (حجم جست‌وجو اندازه‌گیری نشده؛ هیچ عددی ابداع نمی‌شود).
+
 **قاعده طلایی:** هر بلوک از یک وضعیت Sitemap و هر کامپوننت متن از یک وضعیت محتوا جداگانه پیروی می‌کند؛ وجود صفحه ≠ مجوز انتشار متن آن صفحه.
 
 ---
@@ -95,6 +97,25 @@ Public launch صرفاً از طریق Publication Gate و Launch Truth Gate د�
 
 معیار موفقیت، Lead واجد شرایط و پیشرفت آن در مسیر فروش است، نه ترافیک خام (ROADMAP بخش ۱۵). سنجه‌سازی پیام‌رسانی، CTAها و اولویت‌بندی صفحات بر همین معیار انجام می‌شود؛ هیچ بلوک یا صفحۀ «ترافیک‌ساز» بدون نقش در مسیر Lead پذیرفته نیست.
 
+**۱.۶ مسیر تجاری مکمل — طراحی/راه‌اندازی وب‌سایت برای پزشک/کلینیک در حال پذیرش CPMS (CONDITIONAL)**
+
+> برچسب برنامه‌ریزی داخلی (فقط INTERNAL؛ کپی فروش نیست): **«Website design/setup for doctors/clinics adopting CPMS»**.
+
+**مبنای تصمیم (ثبت الزام جدید مالک محصول):** در آینده کسب‌وکار **ممکن است** برای پزشک/کلینیکی که وب‌سایت مناسبِ مرتبط با پذیرش CPMS ندارد، سرویس **طراحی/راه‌اندازی وب‌سایت + راه‌اندازی/سرویس مرتبط با CPMS** ارائه کند؛ منطق تجاری این است که پزشک ممکن است CPMS را بخواهد ولی محیط/وب‌سایت مناسب نداشته باشد، پس گفت‌وگوی فروش می‌تواند هر دو نیاز را پوشش دهد.
+
+**قواعد الزامی این قرارداد:**
+
+| قاعده | معنا |
+|---|---|
+| **مکمل، نه جایگزین** | CPMS همچنان **محصول/موضوع اصلی** سایت است؛ مخاطب اصلی تصمیم‌گیر کلینیک و تبدیل اصلی **دمو/مشاوره** بدون تغییر می‌مانند. این مسیر جهت سایت را به «آژانس طراحی وب عمومی» تغییر **نمی‌دهد**. |
+| **مشروط به واجدالشرایط‌سازی (qualification-led)** | فقط prospect با **نیاز پزشکی/کلینیکی + نیاز مرتبط با پذیرش CPMS** وارد این مسیر می‌شود؛ بدون این دو شرط، درخواست سرویس طراحی وب عام **در Scope نیست**. |
+| **نه طراحی وب عمومی** | هیچ بلوک/صفحه/پیام «ساخت وب‌سایت برای همه مشاغل»، نمونه‌کار آژانسی، یا فهرست خدمات عمومی طراحی در این سایت مجاز نیست. |
+| **جزئیات تحویل/تجاری = `BUSINESS INPUT REQUIRED`** | دامنهٔ سرویس، مدل قیمت‌گذاری، بسته، SLA، زمان‌بندی، تیم/ظرفیت، فرآیند تحویل و هر محدودیت **تعریف‌نشده**اند و در این سند **ابداع نمی‌شوند**. |
+| **مجوز انتشار: ندارد** | تا **تأیید صریح مالک محصول** مبنی بر اینکه سرویس واقعاً قابل ارائه است، این مسیر نباید به‌عنوان «سرویس ارائه‌شده» معرفی شود → `TARGET — NOT PUBLICATION-APPROVED`. |
+| **ضد رقیق‌شدن** | ممنوع: صفحۀ شهر/تخصص به‌ازای هر مورد، تکثیر صفحه با جابجایی کلمۀ کلیدی، برند جدا برای خدمات طراحی، دومین مسیر خرید/checkout، و وعدهٔ تحویل پیش از عملیاتی‌شدن سرویس. |
+
+**تفکیک مفهومی (مطابق `PRODUCT-TRUTH §1`):** این یک **فرصت تجاری آینده** است، نه شواهد قابلیت محصول و نه بخشی از ادعاهای CPMS؛ محتوای آیندهٔ این سرویس باید **واقعاً مفید، صادقانه، people-first و جنس‌محتوایی متفاوت از صفحات محصول** باشد (§5.4).
+
 ---
 
 ## 2. قرارداد Positioning
@@ -107,6 +128,7 @@ CPMS باید چنین فهمیده شود:
 
 - **یکپارچگی (Integration) محور اصلی تمایز درک‌شونده است:** نوبت ← پذیرش/صف ← ویزیت ← درمان/نسخه ← مالی/رکورد به‌عنوان یک سیستم واحد فهمیده شوند، نه ابزارهای جدا.
 - این جهت‌گیری **فراتر از Product Truth نمی‌رود**: هیچ گامِ این زنجیره پیش از تأیید، در متن عمومی به‌عنوان قابلیت موجود بیان نمی‌شود (ROADMAP بخش ۳ «تم‌های مالک» + Product Truth Gate؛ `PRODUCT-TRUTH` بخش ۳).
+- **محدودۀ سرویس مکمل:** افزودن مسیر §1.6 **positioning اصلی را تغییر نمی‌دهد**؛ سایت سایتِ محصول CPMS می‌ماند و هر محتوای سرویس در حاشیۀ «برای کلینیکی که CPMS را می‌خواهد» تعریف می‌شود.
 - **عبارت نمونۀ جهت (INTERNAL؛ TARGET — NOT PUBLICATION-APPROVED؛ مجوز انتشار ندارد):** «مدیریت حرفه‌ای کلینیک، ساده و یکپارچه» (متن ثبت‌شده در ROADMAP بخش ۱؛ کپی نهایی در مرحله محتوا ساخته می‌شود، اینجا اختراع نمی‌شود).
 
 **۲.۲ بازشناسی‌پذیری در برابر ادعا**
@@ -195,6 +217,7 @@ Core = کمیتۀ صفحاتی که بدون آن‌ها یک سایت فروش�
 | Pricing (`/pricing/` یا معادل) | **عمداً Core نیست.** فعال‌سازی فقط با تصمیم تجاری Pricing (OPEN BUSINESS DECISION؛ ROADMAP §9/§21). تا آن زمان: هیچ بسته/عدد/مقایسه‌ای؛ مسیر فعلی = توضیح «پیشنهاد از طریق گفت‌وگو» در I/H |
 | Customer Stories | فقط با شواهد واقعی + **اجازهٔ انتشار** (قاعده Social Proof؛ ROADMAP §16) |
 | Search | فقط اگر حجم محتوا (Blog+Feature+Solution) آن را مفید کند — معمولاً **نه در launch اولیه** (ROADMAP §21 سؤال ۱۱)؛ الگوی Empty State از ابتدا طراحی می‌شود، رابط جست‌وجو به زمان لازم‌شدن موکول است |
+| Website Setup / Website Design for Doctors & Clinics (سرویس مکمل — §1.6) | **CONDITIONAL ON BUSINESS READINESS + SERVICE DEFINITION** — جایگاه رزرو می‌شود، نه Core؛ انتشار تنها پس از تأیید صریح مالک مبنی بر قابل‌ارائه‌بودن سرویس (`TARGET — NOT PUBLICATION-APPROVED` تا آن زمان). صفحۀ مستقل فقط اگر محتوای واقعی و متفاوت از صفحات محصول دارد؛ **ممنوع:** صفحۀ شهر/تخصص، service-page farm و صفحات تکراری با جابجایی کلمۀ کلیدی (§5.4) |
 | Refund/Cancellation, Legal Notice, Cookie Policy | در IA رزرو (ROADMAP §16)؛ انتشار فقط با متن واقعی تأییدشده |
 
 **۴.۴ SEGMENTها (زیر Solutions)**
@@ -251,6 +274,48 @@ Core = کمیتۀ صفحاتی که بدون آن‌ها یک سایت فروش�
 - Structured Data: فقط در انطباق با محتوای قابل‌مشاهده و در فاز Hardening؛ **هیچ Schema جعلی (Testimonial/Review/Price)** — و در زمان Staging/غیرایندکس، هیچ تنظیم Indexing انجام نمی‌شود (سیاست ROADMAP §3).
 - هیچ حجم جست‌وجو، امتیاز اولویت یا «کلمۀ کلیدی برنده‌ای» در این سند ذکر نشده و **از حافظه حدس زده نمی‌شود**؛ ستون SEO Intent Category فقط *نوع* intent را می‌گوید — **REQUIRES KEYWORD RESEARCH**.
 - **Keyword-stuffing ممنوع** (ROADMAP §11).
+
+**۵.۴ مالکیت Cluster، تصحیح Intent سرویس مکمل و Backlog اعتبارسنجی**
+
+**۵.۴.۱ تصحیح طبقه‌بندی intent (پس از تصمیم جدید مالک — §1.6)**
+
+تحقیق Read-Only قبلیِ SEO، عبارت‌های **«طراحی سایت نوبت‌گیری» / «طراحی سایت نوبت‌دهی»** را در **دامنۀ تجاری قدیمی** به‌عنوان **intent mismatch** طبقه‌بندی کرده بود — یعنی کاربر به‌دنبال «ساخت سایت» است، نه «نرم‌افزار مدیریت کلینیک». **آن نتیجه حالا مشروط و مقید می‌شود:**
+
+- intent این عبارات **سرویس/طراحی وب‌محور** است، اما با تصمیم تجاری جدید **ممکن است از نظر تجاری برای سرویس مکمل مرتبط باشد**؛
+- وضعیت صحیح: **`POTENTIAL COMMERCIAL SERVICE INTENT — REQUIRES DEDICATED KEYWORD VALIDATION`**؛
+- این intent **خودبه‌خود بی‌ربط نیست** و **خودبه‌خود کلمۀ کلیدی هدف هم نیست** — قضاوت نهایی فقط با اعتبارسنجی اختصاصی (§5.4.2) و با تعریف نهایی سرویس (§1.6).
+
+**۵.۴.۲ Backlog اعتبارسنجی کران‌مند (ثبت‌شده برای تحقیق آینده؛ این فهرست «هدف» نیست)**
+
+| # | عبارت (فقط به‌عنوان ورودی تحقیق) | حجم |
+|---|---|---|
+| 1 | طراحی سایت پزشک | `VOLUME NOT RETRIEVED` |
+| 2 | طراحی سایت پزشکی | `VOLUME NOT RETRIEVED` |
+| 3 | طراحی سایت مطب | `VOLUME NOT RETRIEVED` |
+| 4 | طراحی سایت کلینیک | `VOLUME NOT RETRIEVED` |
+| 5 | طراحی سایت نوبت دهی پزشک | `VOLUME NOT RETRIEVED` |
+| 6 | طراحی سایت نوبت گیری | `VOLUME NOT RETRIEVED` |
+| 7 | طراحی سایت نوبت دهی | `VOLUME NOT RETRIEVED` |
+| 8 | سایت نوبت دهی پزشک | `VOLUME NOT RETRIEVED` |
+| 9 | ساخت سایت پزشک | `VOLUME NOT RETRIEVED` |
+| 10 | طراحی سایت برای مطب | `VOLUME NOT RETRIEVED` |
+
+**هیچ حجم جست‌وجویی در این PR اندازه‌گیری یا تخصیص نیافته است** و عددی ثبت نمی‌شود. تحقیق بعدی (در فاز SEO Foundation، با داده و مستندات جاری) باید برای هر مورد این شش بُعد را تعیین کند: **intent · demand · ambiguity (ابهام محصول/سرویس) · conversion relevance · CPMS-service fit · cannibalization risk**.
+
+**۵.۴.۳ قاعدۀ مالکیت Cluster (ضد هم‌خوری و ضد رقیق‌شدن positioning)**
+
+1. **جداسازی دو cluster:** cluster «طراحی/ساخت وب‌سایت» (سرویس مکمل) **نباید** به **Home**، **Product Overview** یا **Features** داده شود؛ اگر و فقط اگر اعتبارسنجی شد، **صفحۀ سرویس مکمل** مالک آن cluster است (§4.3، §1.6).
+2. **مالکیت head-term محصول:** **دقیقاً یک صفحه** مالک primary commercial software cluster است. **ممنوع:** اینکه Home / Product Overview / Features / Solution کلینیک همگی **عمداً** یک head keyword یکسان را هدف بگیرند.
+3. **تصمیم نهایی قفل‌شده نیست:** این یک **اصل معماری پایدار** است، نه انتخاب نهاییِ keyword map — اینکه «مالک، Product Overview باشد» **تا تأیید brief رسمی keyword** فریز **نمی‌شود**؛ brief می‌تواند مالک را به صفحه‌ای دیگر از همان مجموعهٔ محصول بدهد، ولی **مالک یکی می‌ماند**.
+4. **ممنوعیت‌های محتوایی/فنی سرویس (§19 هم اعمال می‌کند):** صفحه‌های انبوه «طراحی سایت پزشک در [شهر]»؛ ده‌ها صفحه‌ِ doorway تخصص‌محور؛ صفحات duplicate با جابجایی کلمۀ کلیدی؛ **وانمود به ارائهٔ طراحی وب پیش از عملیاتی‌شدن سرویس**. هر محتوای آیندهٔ سرویس باید **واقعاً مفید، قابل‌تفاوت‌سازی از صفحات محصول، صادقانه و people-first** باشد.
+
+**۵.۴.۴ الزام مرجع‌سازی Google (هیچ‌چیز از حافظهٔ مدل)**
+
+هر SEO content brief و هر تصمیم cluster/مالکیت باید بر پایهٔ: **راهنمای رسمی جاری Google Search Central** · **سیاست‌های اسپم جاری Google** · **راهنمای authoritative جاری عملکرد** (هرجا مربوط است — §19.4) · و **شواهد تازهٔ تقاضای کلمات کلیدی** باشد. Context7/ابزار فقط برای retrieval است و مرجع نهایی مستندات رسمی خود Google است (`AGENT-TOOLING §4.1`). **بازبینی راهنما حداقل دو بار:** پیش از پیاده‌سازی عمدهٔ SEO و مجدداً پیش از launch. **هیچ تضمین رتبه‌ای داده نمی‌شود.**
+
+**۵.۴.۵ سند تحقیق SEO در این PR ساخته نمی‌شود**
+
+این PR **فقط دلایل معماری** را ثبت می‌کند. سند کران‌مند «SEO Content Brief» (آینده) نگهدارندۀ این موارد خواهد بود: keyword clusters · evidence · **صفحۀ مالک هر cluster** · content opportunities · مشاهدات SERP/رقبا. وضعیت در این Slice: **NOT CREATED (by design)** — نه کمبود، نه blocker پنهان.
 
 ---
 
@@ -451,6 +516,17 @@ Core = کمیتۀ صفحاتی که بدون آن‌ها یک سایت فروش�
 
 validation (server-side + پیام‌های دسترس‌پذیر)، spam protection (متناسب با privacy؛ انتخاب ابزار = فاز محیط)، privacy disclosure + رضایت (LEGAL REVIEW REQUIRED؛ Consent مبنای صریح می‌خواهد)، success state، failure state + مسیر جایگزین، مقصد Lead/مالک پیگیری/retention (BUSINESS INPUT REQUIRED). الزامات فنی فرم ROADMAP §8 بدون تغییر حاکم است.
 
+**۱۳.۵ مسیر دومِ واجدالشرایط‌سازی — نیاز هم‌زمان به وب‌سایت (مکمل، بدون مسیر خرید دوم)**
+
+جریان مجاز (§1.6):
+
+`Prospect نیاز به CPMS دارد + وب‌سایت مناسب ندارد → مشاوره → تعیین fit → در صورت صلاحدید: پیشنهاد طراحی/راه‌اندازی وب‌سایت + راه‌اندازی CPMS`
+
+- **همان مسیر مشاوره‌محور** استفاده می‌شود: **بدون فرم دوم، بدون checkout دوم، بدون صف/مسیر فروش موازی**؛
+- **هیچ قیمت، بسته، SLA، بازۀ زمانی یا تعهد تحویلی ابداع نمی‌شود** (`BUSINESS INPUT REQUIRED`)؛
+- در صفحۀ Demo/Contact **حداکثر** یک پرسش اختیاری تک‌خطی برای شناسایی نیاز وب‌سایت قابل‌تصور است (به‌عنوان **کاندید** در brief فرم، نه تصمیم) و **هیچ فیلد اصلی را جابه‌جا یا پررنگ‌تر از نیاز CPMS نمی‌کند**؛
+- اولویت پیام در همان صفحه **CPMS** می‌ماند و سرویس مکمل **پس از** تعیین fit در گفت‌وگوی انسانی مطرح می‌شود — نه به‌عنوان آفر عمومی وب‌سایت (§1.6، §5.4.۳).
+
 **۱۳.۴ صریحاً تعلیق‌شده:** انتخاب CRM، ابزار Analytics/event schema، اتوماسیون — **Do NOT choose CRM/analytics now** (ROADMAP §15: DECIDED برای عدم انتخاب در این مرحله).
 
 ---
@@ -471,6 +547,8 @@ validation (server-side + پیام‌های دسترس‌پذیر)، spam protec
 10. **Legal/Utility** (Privacy/Terms پس از legal review؛ 404؛ sitemap/robots در فاز محیط)
 
 قواعد: عدم ساخت همهٔ صفحات در یک PR؛ هر slice DoD متناسب با نوعش (ROADMAP §19)؛ تغییر ترتیب = تصمیم Website Director با ثبت در مستندات، نه silent drift.
+
+**موضع سرویس مکمل در این ترتیب:** صفحۀ §4.3 («Web-Design/Setup Service») **در اولویت‌های بالا جایی ندارد** و فقط پس از تأیید کسب‌وکاری و تعریف سرویس (§1.6) به‌عنوان **slice مستقل و پس از صفحات محصول** قابل‌بررسی است؛ هرگز پیش از Homepage/Product/Demo ساخته یا منتشر نمی‌شود.
 
 ---
 
@@ -558,6 +636,7 @@ validation (server-side + پیام‌های دسترس‌پذیر)، spam protec
 - اجرای checklist SEO/عملکرد روی production و شواهد Core Web Vitals field — **الزام انتشار، نه آغاز طراحی** (§19.2/§19.4/§19.6)
 - محتوای حقوقی تأییدشده (Privacy/Terms قبل از انتشار)
 - Media واقعی محصول (قبل از انتشار صفحات evidence-محور)
+- **تأیید عملیاتی‌بودن سرویس مکمل + تعریف جزئیات تجاری/تحویل آن** (§1.6، §4.3) — تا قبل از انتشار آن صفحه؛ **blocker شروع طراحی/زیرساخت نیست**
 
 **۱۸.۴ نتیجه‌گیری خوان (بدون اغراق):**
 
@@ -609,7 +688,7 @@ validation (server-side + پیام‌های دسترس‌پذیر)، spam protec
 |---|---|---|
 | **۱. Indexability / Robots / Sitemap** | indexability عمدی production؛ robots policy؛ XML sitemap؛ نبود noindex تصادفی باقی‌مانده از staging؛ Search Console ownership/verification؛ sitemap submission | تصمیم **«ایندکس شو» در launch باید عمدی و مستند** باشد، نه پیش‌فرض فراموش‌شده. robots.txt تولید درست و متناظر با sitemap؛ sitemap فقط شامل URLهای **canonical، 200 و indexable** (بدون noindex/redirect/404/ staging host). هر noindex باقی‌مانده = `ACTIONABLE SITE DEFECT` مگر مستند به‌عنوان تصمیم عمدی. **مالکیت property و ارسال sitemap عملیاتِ launch هستند** (§19.7) — در زمان staging انجام نمی‌شوند. |
 | **۲. Canonical / Duplicate / URL integrity** | canonical URLs؛ clean & stable URLs؛ duplicate & thin archive control؛ pagination/indexing rules؛ launch-domain consistency؛ نشتی host | یک canonical self-consistent در هر صفحه، هم‌جهت با دامنهٔ launch. الگوی URL طبق §5.1 و **پایدار**. کنترل archiveهای کم‌محتوا/duplicate (taxonomy/tag/`?orderby`/pagination) — تصمیم index/noindex + canonical هر نوع archive **در فاز محیط و بر پایهٔ مستندات جاری Google** گرفته می‌شود، نه از حافظه. یک host نهایی (protocol / www-non-www / trailing slash) تصمیم‌گرفته و یکسان در canonical، sitemap، internal link و OG. **Audit نشتی محیط:** هیچ URL مربوط به staging/dev نباید در canonical، sitemap، لینک داخلی یا متادیتای social ظاهر شود. |
-| **۳. Metadata / Semantic content / Structured data** | title & meta handling؛ semantic headings & content؛ Open Graph/social metadata؛ truthful structured data؛ structured-data validation؛ alt-text process | عنوان/توضیح اختصاصی بدون duplicate (copy نهایی ← فاز SEO Foundation، `REQUIRES KEYWORD RESEARCH`). یک H1 + سلسله‌مراتب H2/H3 مطابق §5.3/§8. OG/social برای صفحات اصلی با تصویرِ واقعیِ مجاز (**placeholder در متادیتا ممنوع**). Structured data **فقط مطابق محتوای قابل‌مشاهده**؛ بدون Review/AggregateRating/Price/JobPosting یا هر نوع ساختگی. اعتبارسنجی structured data در فاز انتشار انجام و نتیجه **ثبت** می‌شود (`NOT RUN ≠ PASS`). فرآیند alt-text فارسی طبق §11.6 (توصیفی، بدون alt تهی انبوه). |
+| **۳. Metadata / Semantic content / Structured data** | title & meta handling؛ semantic headings & content؛ Open Graph/social metadata؛ truthful structured data؛ structured-data validation؛ alt-text process | عنوان/توضیح اختصاصی بدون duplicate (copy نهایی ← فاز SEO Foundation، `REQUIRES KEYWORD RESEARCH`). یک H1 + سلسله‌مراتب H2/H3 مطابق §5.3/§8. OG/social برای صفحات اصلی با تصویرِ واقعیِ مجاز (**placeholder در متادیتا ممنوع**). Structured data **فقط مطابق محتوای قابل‌مشاهده**؛ بدون Review/AggregateRating/Price/JobPosting یا هر نوع ساختگی. اعتبارسنجی structured data در فاز انتشار انجام و نتیجه **ثبت** می‌شود (`NOT RUN ≠ PASS`). فرآیند alt-text فارسی طبق §11.6 (توصیفی، بدون alt تهی انبوه). **در صفحۀ سرویس مکمل احتمالی (§1.6/§4.3):** صفحۀ شهر/تخصص انبوه، doorway و صفحهٔ duplicate با جابجایی کلمۀ کلیدی ممنوع (§5.4.۳)؛ وانمود به ارائهٔ سرویس پیش از عملیاتی‌شدنش یک نقص محتوایی محسوب می‌شود. |
 | **۴. Links / Redirects / Error states** | internal linking؛ redirects؛ 404 behavior؛ no accidental soft-404؛ crawlable navigation & content | بدون orphan page؛ هدف لینک‌ها canonical و 200 (ROADMAP §4.3). هر تغییر عمدی URL → **301** بدون chain بیش از یک hop و بدون loop؛ 302 به‌عنوان حالت دائمی ممنوع. صفحۀ ناموجود → **status 404 واقعی** + مسیر بازیابی (§4.2). **Soft-404 تصادفی ممنوع:** صفحه/فیلتر/تگِ بی‌محتوا نباید 200 ایندکس‌پذیر بدهد (ترکیب noindex عمدی + consolidate، تصمیم فاز محیط). ناوبری و محتوا باید **با لینک‌های واقعی و قابل‌خزش** باشند؛ محتوای حیاتی نه با click-to-reveal تنها، نه با JS-only render که بدون خزش JS ناپدید شود (Elementor-native-friendly). |
 | **۵. Mobile usability / Transport** | mobile usability؛ HTTPS | viewport صحیح، tap targets، اندازهٔ خوانا، **هیچ سرریز افقی** (§10.2)، RTL در موبایل مستقل (§9.11). HTTPS معتبر، بدون mixed content، بدون redirect loop بین http/https. |
 
@@ -685,7 +764,9 @@ coverage/indexing · پردازش sitemap · enhancement/structured-data finding
 | Open PRs پیش از شروع | هیچ (#1, #2 MERGED) — بدون کار موازی تکراری |
 | Working tree پیش از شروع | clean، بدون untracked |
 | اسناد خوانده‌شده در revision زنده | `AGENTS.md`, `docs/ROADMAP.md`, `docs/PRODUCT-TRUTH.md`, `docs/AGENT-TOOLING.md` |
+| بازنگری ۳ (SEO/سرویس) | افزودن §1.6 (سرویس مکمل، CONDITIONAL)، ردیف صفحۀ سرویس در §4.3، §13.5 (مسیر دوم واجدالشرایط‌سازی)، §5.4 (تصحیح intent + backlog کران‌مند + مالکیت cluster + الزام مرجع‌سازی Google)، §0.۳، قید §19.۲ و ردیف §18.۳ — **بدون تغییر در positioning اصلی، بدون قیمت، بدون صفحۀ شهر/تخصص، بدون سند تحقیق SEO** |
 | تغییرات (بازنگری ۲) | `docs/SITE-ARCHITECTURE.md`: افزودن §19 و شفاف‌سازی §3.1/§10.1/§16/§17/§18 + شماره‌گذاری مجدد Evidence به §20 · `docs/ROADMAP.md`: علامت‌گذاری مشروط Pricing Preview در §7.10 (P-02) + یک ارجاع حداقلی پس از جدول فازها — **هیچ فاز/Gate/تصمیمی بازنویسی نشد** |
+| سند SEO Research | **عمداً ساخته نشد** (این PR فقط دلایل معماری را ثبت می‌کند؛ brief کران‌مند آینده: cluster/evidence/مالکیت فرصت‌ها/SERP) — `NOT CREATED (by design)`، نه کمکاری |
 | ابزار Google | هیچ نصب/پیکربندی/حساب/property/verification token/analytics انجام **نشده**؛ فقط الزامات آینده در §19 ثبت شد |
 | پیش از این بازنگری | PR #3 باز و MERGEABLE؛ head مرورشده `a0c4c1a4d0ea9277372959d60d4cab6ab24e01cc` — SHA gate PASS (تطابق با مقدار مورد انتظار)؛ amendment روی همان branch، بدون rebase/force/duplicate PR |
 | NOT RUN | هر browser/Playwright/security/runtime بررسی، و هر اندازه‌گیری CWV/Lighthouse/SEO audit — به‌دلیل نوع Slice مستنداتی و نبود محیط؛ **هیچ عدد یا نتیجه‌ای ابداع نشد**؛ هیچ‌کدام به PASS تبدیل نشده |
@@ -695,5 +776,6 @@ coverage/indexing · پردازش sitemap · enhancement/structured-data finding
 
 | تاریخ (UTC) | محرک | خلاصه |
 |---|---|---|
+| 2026-09-27 | تصمیم جدید مالک: مسیر مکمل «طراحی/راه‌اندازی وب‌سایت برای پزشک/کلینیک در حال پذیرش CPMS» + بازخوانی طبقه‌بندی intent وب‌سایت | افزودن §1.6، ردیف CONDITIONAL صفحۀ سرویس در §4.3، §13.5، §5.۴ (تصحیح `intent mismatch` به `POTENTIAL COMMERCIAL SERVICE INTENT`، backlog ۱۰ عبارتی با `VOLUME NOT RETRIEVED`، قاعدۀ «دقیقاً یک صفحۀ مالک head-term محصول»، ممنوعیت doorway/city/specialty، الزام بازبینی راهنمای جاری Google)، برچسب‌های §0.۳ و شفاف‌سازی‌های §18.۳/§19.۲؛ **CPMS primary می‌ماند؛ conversion اصلی دمو/مشاوره است؛ هیچ پیاده‌سازی، قیمت یا وعدهٔ رتبه‌ای اضافه نشد** |
 | 2026-09-27 | الزام جدید مالک دربارهٔ کیفیت جست‌وجو/عملکرد + رفع findings مرور PR (P-01، P-02) | افزودن §19 (search health / indexability / CWV / Search Console acceptance + staging/launch تفکیک)، افزودن R7 به §18.۲، شفاف‌سازی حاکمیت R1/Milestone A (P-01)، هم‌راستاسازی تعلیق Pricing با ROADMAP §7.10 (P-02)؛ بدون پیاده‌سازی، بدون ابزار، بدون عدد ابداعی |
 | 2026-09-27 | دستور «یک PR مستندات محدود: قرارداد IA + Messaging + Design Direction» | اولین نسخه: §0 واژگان، §1 مدل تجاری، §2 Positioning، §3 Home A–I، §4 Sitemap سه‌وضعیتی، §5 URL/SEO-intent، §6 Navigation، §7–8 Design، §9 RTL، §10 Responsive، §11 Media، §12 Trust، §13 Journey، §14–16 Priority/Status/Milestones، §17 Tooling routing، §18 Readiness (NOT PASSED)، §19 شواهد |
