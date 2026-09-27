@@ -2,7 +2,7 @@
 
 **وضعیت سند:** Baseline برنامه‌ریزی برای بازبینی مالک محصول / بازبینی بصری Milestone A — سند **پیشنهادی** است و هیچ Gate را Passed نمی‌کند.
 
-**تاریخ این نسخه:** 2026-09-27 (UTC) — بازنگری ۲: افزودن §19 (سلامت جست‌وجو/ایندکس‌پذیری/عملکرد، پذیرش Search Console) و رفع P-01/P-02 · **بازنگری ۳:** ثبت مسیر تجاری مکمل طراحی/راه‌اندازی وب‌سایت (§1.6، §4.3، §13.5) و تصحیح/مالکیت intent سئو (§5.4) — CPMS همچنان primary
+**تاریخ این نسخه:** 2026-09-27 (UTC) — بازنگری ۲: افزودن §19 (سلامت جست‌وجو/ایندکس‌پذیری/عملکرد، پذیرش Search Console) و رفع P-01/P-02 · **بازنگری ۳:** ثبت مسیر تجاری مکمل طراحی/راه‌اندازی وب‌سایت (§1.6، §4.3، §13.5) و تصحیح/مالکیت intent سئو (§5.4) — CPMS همچنان primary · **بازنگری ۴ (رفع D-01):** افزودن برچسب گمشدهٔ `CONDITIONAL ON BUSINESS READINESS + SERVICE DEFINITION` به جدول واژگان §0.2 برای هم‌خوانی کامل با کاربرد آن در §4.3 — بدون تغییر محتوایی/تصمیمی دیگر
 
 **نقش این سند:** ترجمۀ تصمیم‌های پذیرفته‌شدۀ استراتژیک به یک **قرارداد اجرایی (concrete) برای صفحات، پیام‌ها و جهت طراحی**؛ به‌گونه‌ای که Slice بعدی (Design System / Foundation و سپس Homepage) بدون کشف مجدد intent تجاری قابل اجرا باشد.
 
@@ -53,6 +53,7 @@
 |---|---|
 | **CORE AT LAUNCH** | بدون آن سایت از نظر تجاری کامل نیست؛ در Staging از همان ابتدا معماری‌اش ساخته می‌شود |
 | **CONDITIONAL ON PRODUCT TRUTH** | جایگاه معماری رزرو می‌شود؛ انتشار/ساخت محتوا مشروط به تأیید شواهد طبق `docs/PRODUCT-TRUTH.md` |
+| **CONDITIONAL ON BUSINESS READINESS + SERVICE DEFINITION** | جایگاه معماری رزرو می‌شود، نه Core؛ این برچسب مخصوص کاندیدایی است که مانع آن **شواهد قابلیت محصول (`PRODUCT-TRUTH`) نیست**، بلکه **دو پیش‌نیاز تجاری/عملیاتی** است: (۱) تأیید صریح مالک محصول مبنی بر آماده و قابل‌ارائه‌بودن سرویس (Business Readiness) و (۲) تعریف مشخص دامنه/تحویل/مدل سرویس (Service Definition — فعلاً `BUSINESS INPUT REQUIRED`). تا برآورده‌شدن هر دو شرط، وضعیت محتوا `TARGET — NOT PUBLICATION-APPROVED` می‌ماند (کاربرد فعلی: ردیف «Website Setup / Website Design for Doctors & Clinics» در §4.3) |
 | **DEFERRED / ONLY WHEN BUSINESS INPUT EXISTS** | تا وجود ورودی واقعی کسب‌وکار ساخته **نمی‌شود**؛ صفحه خالی برای تکمیل Sitemap ممنوع است |
 
 **۰.۳ برچسب‌های ویژهٔ SEO/سرویس (§5.4):** `POTENTIAL COMMERCIAL SERVICE INTENT — REQUIRES DEDICATED KEYWORD VALIDATION` (intent سرویس‌محور که با تصمیم §1.6 ممکن است تجاراً مرتبط باشد؛ نه بی‌ربط، نه هدف قطعی) · `VOLUME NOT RETRIEVED` (حجم جست‌وجو اندازه‌گیری نشده؛ هیچ عددی ابداع نمی‌شود).
@@ -771,11 +772,13 @@ coverage/indexing · پردازش sitemap · enhancement/structured-data finding
 | پیش از این بازنگری | PR #3 باز و MERGEABLE؛ head مرورشده `a0c4c1a4d0ea9277372959d60d4cab6ab24e01cc` — SHA gate PASS (تطابق با مقدار مورد انتظار)؛ amendment روی همان branch، بدون rebase/force/duplicate PR |
 | NOT RUN | هر browser/Playwright/security/runtime بررسی، و هر اندازه‌گیری CWV/Lighthouse/SEO audit — به‌دلیل نوع Slice مستنداتی و نبود محیط؛ **هیچ عدد یا نتیجه‌ای ابداع نشد**؛ هیچ‌کدام به PASS تبدیل نشده |
 | Product claims | هیچ ادعای قابلیت جدید در این سند بیان **نشده**؛ همهٔ ارجاعات capability به snapshot ثبت‌شدهٔ `PRODUCT-TRUTH §2/#3` با همان سقف `REVERIFY BEFORE PUBLIC LAUNCH` |
+| بازنگری ۴ (رفع D-01) | Base/live main در زمان نوشتن: `c410d4640ca1dc97dc1155ee8b46c81ca5c49e21` (merge PR #3)؛ Open PRs پیش از شروع: هیچ؛ Working tree پیش از شروع: clean. یافتهٔ پیگیری D-01: برچسب `CONDITIONAL ON BUSINESS READINESS + SERVICE DEFINITION` در ردیف «Website Setup / Website Design for Doctors & Clinics» (§4.3) استفاده شده بود ولی در جدول واژگان §0.2 تعریف نشده بود. رفع: افزودن همان برچسب با تعریف عملیاتی مختصر به جدول §0.2، بدون تغییر معنایی در §4.3 و بدون تغییر تصمیم/Gate/scope دیگر. این تغییر همراه با اضافه‌شدن `docs/SEO-KEYWORD-MAP.md` (سند مستقل معماری کلمات کلیدی) در همین PR تحویل شد؛ هیچ کد/Theme/Plugin/Elementor/Config تغییر نکرد |
 
 **Change log**
 
 | تاریخ (UTC) | محرک | خلاصه |
 |---|---|---|
+| 2026-09-27 | رفع D-01 (یافتهٔ پیگیری بازبینی): ناهم‌خوانی برچسب §4.3 با جدول واژگان §0.2 | افزودن برچسب گمشدهٔ `CONDITIONAL ON BUSINESS READINESS + SERVICE DEFINITION` به جدول §0.2 با تعریف عملیاتی هم‌خوان با §4.3؛ بدون تغییر تصمیم/Gate/Scope/Positioning دیگر |
 | 2026-09-27 | تصمیم جدید مالک: مسیر مکمل «طراحی/راه‌اندازی وب‌سایت برای پزشک/کلینیک در حال پذیرش CPMS» + بازخوانی طبقه‌بندی intent وب‌سایت | افزودن §1.6، ردیف CONDITIONAL صفحۀ سرویس در §4.3، §13.5، §5.۴ (تصحیح `intent mismatch` به `POTENTIAL COMMERCIAL SERVICE INTENT`، backlog ۱۰ عبارتی با `VOLUME NOT RETRIEVED`، قاعدۀ «دقیقاً یک صفحۀ مالک head-term محصول»، ممنوعیت doorway/city/specialty، الزام بازبینی راهنمای جاری Google)، برچسب‌های §0.۳ و شفاف‌سازی‌های §18.۳/§19.۲؛ **CPMS primary می‌ماند؛ conversion اصلی دمو/مشاوره است؛ هیچ پیاده‌سازی، قیمت یا وعدهٔ رتبه‌ای اضافه نشد** |
 | 2026-09-27 | الزام جدید مالک دربارهٔ کیفیت جست‌وجو/عملکرد + رفع findings مرور PR (P-01، P-02) | افزودن §19 (search health / indexability / CWV / Search Console acceptance + staging/launch تفکیک)، افزودن R7 به §18.۲، شفاف‌سازی حاکمیت R1/Milestone A (P-01)، هم‌راستاسازی تعلیق Pricing با ROADMAP §7.10 (P-02)؛ بدون پیاده‌سازی، بدون ابزار، بدون عدد ابداعی |
 | 2026-09-27 | دستور «یک PR مستندات محدود: قرارداد IA + Messaging + Design Direction» | اولین نسخه: §0 واژگان، §1 مدل تجاری، §2 Positioning، §3 Home A–I، §4 Sitemap سه‌وضعیتی، §5 URL/SEO-intent، §6 Navigation، §7–8 Design، §9 RTL، §10 Responsive، §11 Media، §12 Trust، §13 Journey، §14–16 Priority/Status/Milestones، §17 Tooling routing، §18 Readiness (NOT PASSED)، §19 شواهد |
