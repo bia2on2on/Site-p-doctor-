@@ -193,6 +193,8 @@
 
 ## 4. Scope سایت و Information Architecture
 
+> **ارجاع قرارداد اجرایی:** ترجمۀ تصمیم‌های این بخش به sitemap سه‌وضعیتی (CORE / CONDITIONAL ON PRODUCT TRUTH / DEFERRED)، قرارداد navigation، intent هر صفحه و محدودیت‌های design/RTL در [`docs/SITE-ARCHITECTURE.md`](SITE-ARCHITECTURE.md) آمده است. آن سند جایگزین این بخش نمی‌شود و فازها/تصمیم‌های اینجا را تغییر نمی‌دهد؛ در تعارض، قواعد Product Truth و گیت‌ها (بخش‌های ۳ و ۱۷ این سند و `docs/PRODUCT-TRUTH.md`) مقدم‌اند.
+
 ### 4.1 صفحات اصلی پیشنهادی
 
 صفحات زیر در معماری اولیه پیش‌بینی می‌شوند. وجود نهایی هر صفحه، نام فارسی، Slug و اولویت آن در Phase 2 تأیید می‌شود:
