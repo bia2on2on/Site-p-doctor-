@@ -338,6 +338,32 @@ CTAها باید با مرحله Journey متناسب باشند؛ تکرار ب
 
 SEO باید هم‌زمان با IA و Content طراحی شود، نه پس از اتمام UI.
 
+### 11.1 SEO Foundation — پیش از ساخت صفحات
+
+موارد زیر جزء **SEO Foundation** هستند و باید به‌اندازه‌ای زود انجام شوند که Information Architecture و Content را شکل بدهند؛ یعنی در همان زمانی که Sitemap، URL، Taxonomy و ساختار محتوا تعیین می‌شوند (Phase 2 به‌عنوان SEO Foundation) و نه پس از ساخت صفحات:
+
+- تحقیق Keyword و Search Intent فارسی و کاربران ایرانی؛
+- معماری URL و Sitemap؛
+- نگاشت هر صفحه به Intent و نقش آن در Funnel؛
+- معماری Internal Linking و Breadcrumb؛
+- استراتژی اولیه Title، Meta Description، Canonical و Indexability؛
+- برنامه‌ریزی Schema و Structured Data متناسب با محتوای واقعی؛
+- تصمیم درباره Slug فارسی/انگلیسی و الگوی Canonical.
+
+اصل حاکم: تصمیم‌های SEO Foundation نباید پس از ساخته‌شدن Templateها و صفحات کشف شوند؛ کشف دیرهنگام این تصمیم‌ها به بازکاری IA، Content و Template منجر می‌شود.
+
+### 11.2 SEO Hardening — راستی‌آزمایی و آمادگی انتشار
+
+**SEO Hardening** مرحله‌ای بعدی و محدود به راستی‌آزمایی پیاده‌سازی موارد بالا است، نه کشف معماری سایت:
+
+- بررسی این‌که Metadata، Canonical، Sitemap و Robots همان‌طور که در SEO Foundation تعیین شده در صفحات واقعی پیاده شده‌اند؛
+- بررسی Schema روی محتوای واقعی و انطباق آن با محتوای قابل مشاهده؛
+- بررسی Crawlability، Internal Linkها، Orphan Pageها، Redirectها و شکست‌های Indexing؛
+- بررسی H1/H2/H3، Alt Text و Duplicate/Thin Content؛
+- آمادگی انتشار: Search Console، Sitemap نهایی، Indexability و پایش اولیه.
+
+این مرحله در ترتیب فازها به‌عنوان «9 — SEO Hardening» آورده شده است؛ SEO Foundation بخشی از Phase 2 است و فاز مستقلی برای آن ایجاد نمی‌شود.
+
 ### الزامات فنی و محتوایی
 
 - URLهای کوتاه و پایدار؛
@@ -449,7 +475,7 @@ Responsive نباید فقط کوچک‌کردن Desktop باشد؛ برای Mob
 
 هر صفحه مهم باید حداقل در Mobile، Tablet و Desktop بازبینی شود؛ Safari در صورت فراهم بودن محیط تست اضافه می‌شود.
 
-### Performance به‌عنوان Definition of Done
+### Performance — الزامات کیفی و بودجه
 
 - WebP/AVIF در صورت سازگاری و نیاز؛
 - ابعاد واقعی و مناسب Image؛
@@ -461,6 +487,8 @@ Responsive نباید فقط کوچک‌کردن Desktop باشد؛ برای Mob
 - بهینه‌سازی Elementor و جلوگیری از DOM بیش‌ازحد پیچیده؛
 - Cache/CDN فقط پس از شناخت Hosting؛
 - اندازه‌گیری تجربه واقعی و Core Web Vitals، نه اتکا به امتیاز مصنوعی Lighthouse.
+
+این الزامات **کیفی** هستند، در هر Slice به‌صورت متناسب با همان Slice اعمال می‌شوند (بخش ۱۹) و تا زمان وجود محیط و صفحه نماینده معتبر باقی می‌مانند. هر **Performance Budget عددی** (حد آستانه Payload، Font، Third-party Script، Asset و شاخص‌های Core Web Vitals) فقط پس از وجود محیط نماینده و اندازه‌گیری Baseline قابل تعیین است؛ تا آن زمان این اعداد **Unknown** هستند و نباید حدس زده یا در سند ثبت شوند (به Open Questions).
 
 ### Accessibility
 
@@ -558,17 +586,17 @@ Screenshot باید واقعی، باکیفیت، دارای Context، بهین�
 
 | فاز | فعالیت‌های اصلی | خروجی / Gate |
 |---|---|---|
-| 0 — Discovery & Repository Audit | بررسی وضعیت مخزن، WordPress، Elementor، Theme، Plugin، Asset، محدودیت و Technical Baseline | Discovery Report و ثبت Unknownها |
+| 0 — Discovery & Repository Audit | بررسی وضعیت مخزن، WordPress، Elementor، Theme، Plugin، Asset، محدودیت و Technical Baseline | Discovery Report، ثبت Unknownها و تصمیم‌گیری مستند درباره Theme Architecture بر مبنای شواهد |
 | 1 — Product & Brand Foundation | Positioning، Value Proposition، Persona، Messaging، Content hierarchy، Brand direction و Design principles | Product/Brand Foundation تأییدشده |
-| 2 — Information Architecture | Sitemap، Navigation، Page hierarchy، URL، Feature/Solution/Blog taxonomy و Internal Linking | Approved Information Architecture |
+| 2 — Information Architecture و SEO Foundation | Sitemap، Navigation، Page hierarchy، URL، Feature/Solution/Blog taxonomy، Internal Linking و SEO Foundation: Keyword/Search Intent، نگاشت صفحه به Intent، استراتژی اولیه Title/Meta/Canonical/Indexability و برنامه‌ریزی Schema | Approved Information Architecture و SEO Foundation مستند |
 | 3 — Design System | Typography، Color، Spacing، Button، Card، Form، Icon، Container، Responsive و RTL rules | Design System و states |
 | 4 — Elementor Foundation | Global settings، Header، Footer، Template، Reusable sections و Responsive configuration | Maintainable Elementor Foundation |
 | 5 — Homepage | ساخت معماری کامل Home و بررسی مسیر Conversion | Gate A: Desktop + Mobile visual review |
 | 6 — Core Conversion Pages | Features، Solutions، Pricing، Demo، Contact و FAQ | بررسی Function، Content و Conversion |
 | 7 — Feature Pages | ساخت Feature Landing Pageهای مستقل بر اساس قابلیت‌های تأییدشده | Gate B: Feature/Solution templates |
-| 8 — Content / Blog | Taxonomy، Archive، Article layout، Brief و SEO content structure | Blog architecture و Template |
-| 9 — SEO | Technical/on-page SEO، Schema، Sitemap، Canonical، Metadata، Links و Intent | SEO acceptance checklist |
-| 10 — Performance | Image، Font، CSS، JS، Elementor، Cache و Core Web Vitals | Performance baseline و اصلاحات |
+| 8 — Content / Blog | Taxonomy، Archive، Article layout، Brief و SEO content structure بر اساس SEO Foundation تعیین‌شده در Phase 2 | Blog architecture و Template |
+| 9 — SEO Hardening | راستی‌آزمایی پیاده‌سازی SEO Foundation: Metadata، Canonical، Schema، Sitemap، Robots، Indexing، Internal Links و Orphan Pageها در صفحات ساخته‌شده | SEO acceptance checklist |
+| 10 — Performance | Image، Font، CSS، JS، Elementor، Cache و Core Web Vitals، پس از وجود محیط/صفحه نماینده و بر مبنای Performance Budget تعیین‌شده در همان مرحله | Performance baseline، بودجه عددی مصوب و اصلاحات |
 | 11 — Security & Accessibility | فرم، Validation، Spam، Permission، Keyboard، Contrast، Focus و RTL QA | Security/Accessibility checklist |
 | 12 — QA | Responsive، RTL، Browser، Forms، Links، Navigation، Search، 404، SEO، Accessibility و Performance | Defect list و Regression pass |
 | 13 — Conversion QA | CTA، Demo friction، Pricing clarity، Navigation و User journey | Conversion review بدون تغییر سلیقه‌ای |
@@ -581,7 +609,7 @@ Screenshot باید واقعی، باکیفیت، دارای Context، بهین�
 3. بعد Design System و Templateهای reusable؛
 4. سپس Home برای اعتبارسنجی پیام؛
 5. بعد Feature/Solution و صفحات Conversion؛
-6. سپس Blog، SEO و داده‌های Measurement؛
+6. سپس Blog، Measurement و SEO Hardening؛
 7. در پایان Hardening، QA و Launch Readiness.
 
 ---
@@ -601,20 +629,31 @@ Screenshot باید واقعی، باکیفیت، دارای Context، بهین�
 
 ## 19. Definition of Done
 
-هیچ Slice صرفاً به دلیل ساخته‌شدن صفحه Done نیست. حداقل معیارهای هر Slice:
+هیچ Slice صرفاً به دلیل ساخته‌شدن صفحه Done نیست. Definition of Done **به نسبت دامنه و نوع همان Slice محدود تعریف‌شده اعمال می‌شود**، نه به‌صورت فهرست ثابت برای همه تغییرات. معیاری که به Slice مربوط نیست، برای آن Slice لازم نیست.
 
-- **Functional correctness:** لینک، Form، CTA، Search و رفتارهای تعریف‌شده کار می‌کنند؛
-- **Responsive correctness:** Mobile، Tablet و Desktop بررسی شده‌اند؛
-- **RTL correctness:** جهت، Typography، ترتیب Focus، Form و Table درست است؛
-- **Visual QA:** با Design System و Gate مربوطه سازگار است؛
-- **Accessibility:** Semantic، Keyboard، Focus، Contrast، Label و Error بررسی شده‌اند؛
-- **Performance:** Asset، Font، JS/CSS، DOM و تجربه واقعی بررسی شده‌اند؛
-- **SEO:** H1، Metadata، Canonical، Link، Schema و Crawlability بررسی شده‌اند؛
-- **Security:** Validation، Sanitization، Nonce، Rate Limit، Permission و Data handling بررسی شده‌اند؛
+### 19.1 معیارهای پایه (برای همه Sliceها)
+
+- **Scope:** تغییر محدود به همان Slice تعریف‌شده باقی مانده و خارج از Scope گسترش نیافته است؛
+- **Regression:** تغییر، صفحات، Templateها و رفتارهای مرتبط را خراب نکرده است؛
 - **Content integrity:** ادعاها با Product Fact Sheet و Source تأیید شده‌اند و متن نمونه به‌عنوان واقعیت منتشر نشده است؛
-- **Evidence:** Screenshot، Testimonial، Logo، عدد یا قیمت بدون منبع منتشر نشده است؛
-- **Regression:** تغییر، Templateها و صفحات مرتبط را خراب نکرده است؛
-- **Documentation:** تصمیم‌ها، محدودیت‌ها و موارد Unknown ثبت شده‌اند.
+- **Evidence:** Screenshot، Testimonial، Logo، عدد، آمار یا قیمت بدون منبع منتشر نشده است؛
+- **Documentation:** تصمیم‌ها، محدودیت‌ها، نتیجه Review و موارد Unknown ثبت شده‌اند؛
+- **Reporting:** گزارش Slice مطابق پیوست B ارائه شده است.
+
+### 19.2 معیارهای متناسب با نوع Slice
+
+هر Slice فقط معیارهای متناسب با خودش را می‌گیرد:
+
+- **Slice مستنداتی یا محتوایی:** شواهد مربوط به مستندات و محتوا کافی است؛ یعنی صحت متن، انطباق با Source، نبود ادعای بی‌مدرک و به‌روز بودن این سند. تست مرورگر، Visual QA، Performance و بررسی‌های امنیتی فرم برای این نوع Slice لازم نیست؛
+- **Slice قابلیت مرورگرمحور یا Frontend قابل مشاهده:** شواهد واقعی Responsive و RTL در مرورگر، در محدوده‌ای که محیط اجرا اجازه می‌دهد؛ در صورت نبود محیط اجرایی، محدودیت محیط به‌صراحت به‌عنوان Known Limitation ثبت می‌شود و ذکر «انجام شد» بدون اجرا مجاز نیست؛
+- **Slice مرتبط با SEO:** معیارهای SEO در حدی که به همان صفحه، نوع محتوا یا مورد SEO مربوط است اعمال می‌شود؛
+- **Slice مرتبط با Performance:** اندازه‌گیری فقط روی صفحات/محیط‌های نماینده و قابل اجرا انجام می‌شود؛ تا زمانی که چنین محیطی وجود ندارد، فقط الزامات کیفی بخش ۱۴ اعمال می‌شوند؛
+- **Slice مرتبط با فرم، داده، دسترسی یا ورودی کاربر:** Validation، Sanitization، Nonce، Rate Limit، Permission، Spam و Data handling اعمال می‌شود؛ برای Sliceهای نامرتبط لازم نیست.
+
+### 19.3 سطح Template، Release و Launch
+
+- **Template/Release:** معیارهای کامل Functional، Responsive، RTL، Accessibility، SEO، Performance و Security در سطح Template یا Release اعمال می‌شوند، نه برای هر تغییر کوچک؛
+- **Launch:** معیارهای Launch و Gate D بدون کاهش باقی می‌مانند. تنظیم متناسب DoD با نوع Slice، **سطح کیفیت نهایی انتشار را پایین نمی‌آورد** و بخشی از Gate D را حذف نمی‌کند.
 
 ---
 
@@ -685,9 +724,34 @@ Screenshot باید واقعی، باکیفیت، دارای Context، بهین�
 14. Slug فارسی یا انگلیسی و Canonical strategy برای SEO فارسی کدام است؟
 15. آیا مدل محتوا به Custom Post Type/ACF/Elementor Pro یا ابزار دیگری نیاز دارد؟ این تصمیم بدون Audit نباید گرفته شود.
 
+#### Open Question — Theme Architecture (تصمیم عمداً باز)
+
+انتخاب بین **Lightweight Custom Theme** و **Lightweight Child/Base-Theme Architecture** عمداً پاسخ داده نشده است. این تصمیم باید در Phase 0 — Technical Foundation و **بر مبنای شواهد همان Audit** گرفته شود، نه از پیش و نه به‌صورت ضمنی در Phase 4. هیچ Theme یا رویکردی در این سند پیش‌انتخاب نشده است.
+
+معیارهای ارزیابی تصمیم:
+
+- قابلیت نگهداری و خوانایی ساختار؛
+- عملکرد و وزن Frontend؛
+- قابلیت ویرایش با Elementor؛
+- رفتار به‌روزرسانی (Update) و ریسک از دست رفتن تغییرات؛
+- RTL؛
+- Accessibility؛
+- SEO؛
+- امنیت؛
+- Deployment و فرآیند انتشار؛
+- سازگاری با WooCommerce **فقط در صورتی که Commerce بعداً تأیید شود**.
+
+#### Open Question — Performance Budget (تصمیم عمداً باز)
+
+هیچ عدد مصوبی برای بودجه Performance وجود ندارد. **Performance Budget عددی** باید فقط پس از وجود محیط نماینده (WordPress/Elementor قابل اجرا) و اندازه‌گیری Baseline تعیین شود. تا آن زمان، آستانه‌های عددی Payload، Asset، Font، Third-party Script و Core Web Vitals **Unknown** باقی می‌مانند و نباید حدس زده شوند.
+
+تا زمان تعیین بودجه عددی، الزامات **کیفی** بخش ۱۴ معتبر است: کم‌بودن Payload اولیه، حداقل Third-party Script، Media بهینه و Responsive، تعداد محدود Font Weight، DOM محدود، بارگذاری شرطی Assetها و توجه به Core Web Vitals.
+
+مالک تصمیم: مالک فنی/اجرایی پروژه، با تأیید مالک محصول. زمان تصمیم: پس از Baseline در Phase 0 و به‌روزرسانی بودجه در Phase 10 — Performance.
+
 ---
 
-## 22. Change Control و آینده معماری
+## 22. Change Control، Repository Discipline و آینده معماری
 
 اگر در زمان اجرا نیاز جدیدی پدیدار شد یا معلوم شد Elementor، مدل محتوا، Taxonomy یا SEO Architecture کافی نیست:
 
@@ -699,6 +763,27 @@ Screenshot باید واقعی، باکیفیت، دارای Context، بهین�
 
 Roadmap مرجع معماری است، اما نباید جلوی تغییر ضروری را بگیرد و نباید بهانه ساخت قابلیت خارج از Scope شود.
 
+### 22.1 انضباط Repository، Git و PR (قواعد همه Sliceهای آینده)
+
+این قواعد برای **همه Sliceهای آینده** است، نه فقط PR مستنداتی جاری. محدودیت‌های همین Slice در بخش ۲۳ آمده‌اند و جای این قواعد را نمی‌گیرند. خلاصه و در حد یک Roadmap:
+
+- **پیش از هر Write:** ریشه Repository، Branch، HEAD، وضعیت Working Tree، وضعیت به‌روز `main` و PR فعال مربوطه را بررسی کنید؛
+- **History فقط Forward-only:** تاریخچه منتشرشده بازنویسی نمی‌شود؛
+- **ممنوعیت Reset مخرب:** `reset --hard`، پاک‌کردن تغییرات و حذف کار ناشناس مجاز نیست؛
+- **ممنوعیت `git clean` روی کار ناشناس:** تا زمانی که مالکیت فایل‌های Untracked مشخص نشده، پاک‌سازی مجاز نیست؛
+- **ممنوعیت Rebase تاریخچه مشترک، Force-push و هر نوع Rewrite تاریخچه؛**
+- **Push مستقیم به `main` ممنوع است؛** هر تغییر از طریق PR انجام می‌شود؛
+- **ممنوعیت Commit خالی یا Commit صرفاً برای تحریک CI؛**
+- **یک Task محدود در هر PR**، تا حد امکان؛
+- **شواهد باید به SHA دقیق گره بخورد:** مصرف‌کننده شواهد باید بداند شواهد به کدام Commit تعلق دارد؛
+- **Diff و Status پیش و پس از تغییر بررسی شود** و فقط فایل‌های موردنظر تغییر کرده باشند؛
+- **هیچ Merge بدون شواهد پذیرفته‌شده انجام نمی‌شود؛** Review/Gate مربوطه باید پیش از Merge پذیرفته شده باشد؛
+- **شکل Merge:** Merge Commit، مگر این‌که سیاست Repository در آینده طور دیگری تعیین کند؛
+- **Branch منبع پس از Merge حذف نمی‌شود**، مگر این‌که سیاست Repository در آینده تغییر کند؛
+- **Agent نوشتاری که یک PR را با موفقیت Merge می‌کند، برای همیشه از عملیات نوشتاری بعدی کنار گذاشته می‌شود؛** ادامه کار فقط با Agent/Reviewer تازه انجام می‌شود.
+
+روش اجرایی این قواعد در پیوست B ثبت شده است.
+
 ---
 
 ## 23. وضعیت این Slice مستنداتی
@@ -707,6 +792,7 @@ Roadmap مرجع معماری است، اما نباید جلوی تغییر ض�
 - هیچ Theme، Plugin، Elementor Template، WordPress Configuration، package یا deployment نباید در این Slice تغییر کند.
 - فایل مورد انتظار: `docs/ROADMAP.md`
 - تغییر بعدی باید با وضعیت Repository، Base commit، Scope، تصمیم‌های باز و نتیجه QA همراه باشد.
+- محدودیت‌های بالا فقط مخصوص همین Slice مستنداتی هستند؛ قواعد عمومی Git/Repository برای همه Sliceهای آینده در بخش ۲۲.۱ آمده است.
 - PR مستنداتی پیشنهادی: `docs: add CPMS marketing and sales website roadmap`
 
 ---
@@ -724,6 +810,8 @@ Roadmap مرجع معماری است، اما نباید جلوی تغییر ض�
 - [ ] مدل Pricing و مقصد Demo مشخص شده است یا Unknown صریح دارد.
 - [ ] سیاست Privacy، Consent و Retention برای Lead روشن است.
 - [ ] ابزار Analytics و Event naming تأیید شده است.
+- [ ] معماری Theme بر مبنای شواهد Phase 0 تصمیم‌گیری و ثبت شده است.
+- [ ] Performance Budget عددی پس از وجود Baseline مصوب شده است؛ تا آن زمان الزامات کیفی بخش ۱۴ مرجع است.
 - [ ] معیارهای Performance، Accessibility و Browser/Device مشخص شده است.
 - [ ] Gate A تا D و مالک تأیید هر Gate مشخص شده است.
 - [ ] موارد خارج از Scope به تیم منتقل شده است.
@@ -741,4 +829,6 @@ Roadmap مرجع معماری است، اما نباید جلوی تغییر ض�
 - Screenshot یا Preview مربوط به Gate؛
 - Known limitation و Open Question؛
 - مواردی که عمداً تغییر نکرده‌اند؛
-- ارتباط با Definition of Done.
+- ارتباط با Definition of Done؛
+- Commit SHA دقیقی که شواهد به آن گره خورده است (Exact-SHA Evidence)؛
+- بررسی Repository Root، Branch، HEAD، Working Tree، `main` و PR پیش از Write.
