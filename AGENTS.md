@@ -3,6 +3,7 @@
 This file is the **operational entry point** for any agent (engineering, design, content, review) that is asked to work in this repository. Read it before doing anything, then follow the pointers into `docs/ROADMAP.md` for planning detail.
 
 - **Authoritative planning baseline:** [`docs/ROADMAP.md`](docs/ROADMAP.md) — the detailed roadmap, decisions, open questions and gates live there, not here.
+- **Agent tooling governance:** [`docs/AGENT-TOOLING.md`](docs/AGENT-TOOLING.md) — adoption status and boundaries for approved agent tools (Context7, UI Skills, Strix, Supabase, Playwright CLI). Tooling documentation authorizes no installation, dependencies, architecture change, or website implementation.
 - **This file:** short, durable rules and boundaries that rarely change. It must not duplicate the roadmap or become a second strategy document.
 - **Status of this file:** operational guidance that can go stale, not a source of live truth. See *Live state overrides memory* (section 3).
 
@@ -81,9 +82,11 @@ While planning mode applies, none of the following is authorized:
 
 Planning/documentation work (roadmap, rules, discovery notes, review evidence) is allowed when explicitly directed. Implementation may begin only when the **implementation gate** in section 14 is satisfied — the existence of this file or of `docs/ROADMAP.md` does not open that gate.
 
+**Parallel development (owner decision):** the website and the CPMS plugin are developed **in parallel**. Satisfying the implementation gate may authorize website implementation while product development continues — the website does **not** have to wait for the plugin to be fully finished first. This is **implementation** authorization only; the **publication gate** (section 14.1) remains closed until the product is launch-ready and the final Product Truth re-verification is complete. The website targets the **final marketing/sales presentation of a complete, ready-to-offer product** — it is not an early-access, beta, coming-soon, selected-customer, or pre-launch landing site.
+
 ## 6. Marketing truth
 
-**No unsupported product claims.** Any significant public capability claim requires Product Truth verification before it can be published.
+**No unsupported product claims.** Any significant public capability claim requires Product Truth verification before it can be published. The website's **living Product Truth reference** is [`docs/PRODUCT-TRUTH.md`](docs/PRODUCT-TRUTH.md) — the claim-control document separating verified current product evidence, target launch presentation and publication permission, and carrying the **Launch Truth Gate** that must pass before public launch. Website architecture or intended design is **never** evidence of product capability.
 
 Capability status vocabulary (defined in the roadmap's Product Truth Gate):
 
@@ -158,6 +161,8 @@ State of an agent's write authority is determined **only** as follows:
 - Until it merges a PR, the same active writer may continue **bounded write work on that active PR** when directed.
 - **A new session or token does not restore write authority to a retired writer.**
 
+**Writer numbering:** website write agents may be referred to by the PR they own: **"Write Agent #N"** = the active writer responsible for PR #N. This naming does **not** change authority — retirement remains only after that writer successfully merges a PR (rules above). Read-only agents must not be renamed as writers.
+
 ## 11. Agent-type clarity
 
 | Role | May do | Must not do |
@@ -193,6 +198,20 @@ When reporting failures, use only these classes:
 - **C** = infrastructure / environment
 - **D** = test / harness / fixture defect
 
+(These remain the **only** failure classes. Security finding dispositions — `CONFIRMED` / `FALSE POSITIVE` / `NEEDS INVESTIGATION` / `ACCEPTED RISK` / `OUT OF SCOPE` — are a separate vocabulary, defined in [`docs/AGENT-TOOLING.md`](docs/AGENT-TOOLING.md); a finding may carry one A/B/C/D class and one disposition.)
+
+## 13.1 Bounded diagnosis (no infinite debug loops)
+
+Agents must **not** enter indefinite debug/retry loops. When blocked:
+
+- perform a bounded diagnosis appropriate to the slice;
+- classify the failure A/B/C/D;
+- preserve evidence;
+- fix only if within authorized scope;
+- otherwise report the blocker and the smallest next action.
+
+Repeated retries without new evidence are prohibited. Do not weaken correctness requirements to save time.
+
 ## 14. Implementation gate
 
 Implementation must **not** begin merely because `AGENTS.md` or `docs/ROADMAP.md` exists.
@@ -210,6 +229,23 @@ Before implementation begins, the roadmap's required planning gates must be sati
 - required **Product Truth** verification state.
 
 Do **not** falsely mark the Product Truth Inventory complete — it is only complete when actual product evidence has been reviewed.
+
+## 14.1 Publication gate
+
+The implementation gate and the publication gate are **separate gates**:
+
+- The **implementation gate** (section 14) may open website implementation while the product is still being completed (parallel development); it does not require the full plugin to be finished first.
+- The **publication gate** stays closed until the product is launch-ready and a **fresh Product Truth verification against the exact launch candidate** has passed the **Launch Truth Gate** in [`docs/PRODUCT-TRUTH.md`](docs/PRODUCT-TRUTH.md).
+
+Until the publication gate passes:
+
+- the site remains **development/staging only**;
+- it must not be intentionally publicly launched;
+- it must not be intentionally indexed by search engines;
+- it must not be marketed as a publicly available product;
+- unfinished product claims must not leak into a public environment.
+
+A finished website does **not** by itself authorize publication. Only the verified launch state may become public marketing truth. The technical means (e.g. noindex, authentication) are deliberately **not** prescribed here; implementation details belong to the later environment/deployment phase.
 
 ## 15. Change governance
 
@@ -234,3 +270,17 @@ Do **not** falsely mark the Product Truth Inventory complete — it is only comp
 - [ ] No duplicate in-flight work for the same task.
 - [ ] Acting role confirmed (write / read-only review / product read-only verification).
 - [ ] Planning-mode and implementation-gate status confirmed before any non-documentation work.
+- [ ] Publication-gate status confirmed before any public-launch, indexing, or public-marketing work.
+
+## 17. Authorization windows and report quality
+
+Agent GitHub authorization windows may be short-lived. When an assigned token/session has an approximately one-hour lifetime (recorded as an **operating constraint when applicable** — not a hard assumption that every future platform token lasts exactly one hour):
+
+- tasks must be bounded to fit;
+- the agent should target completion/reporting before expiry;
+- reserve time for evidence retrieval;
+- if completion becomes unlikely, stop safely and report the exact current state before expiry;
+- never rush an unsafe merge/commit merely because a token is expiring;
+- a new Product Owner message/session may provide a new authorization window, but does not override writer-retirement rules.
+
+**Report quality:** keep reports concise but evidence-bound. Prefer exact SHA + action + result + limitation/blocker over long execution narration. Do not remove necessary evidence.
