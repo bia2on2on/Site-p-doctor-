@@ -726,7 +726,7 @@ Screenshot باید واقعی، باکیفیت، دارای Context، بهین�
 
 #### Open Question — Theme Architecture (تصمیم عمداً باز)
 
-انتخاب بین **Lightweight Custom Theme** و **Lightweight Child/Base-Theme Architecture** عمداً پاسخ داده نشده است. این تصمیم باید در Phase 0 — Technical Foundation و **بر مبنای شواهد همان Audit** گرفته شود، نه از پیش و نه به‌صورت ضمنی در Phase 4. هیچ Theme یا رویکردی در این سند پیش‌انتخاب نشده است.
+انتخاب بین **Lightweight Custom Theme** و **Lightweight Child/Base-Theme Architecture** عمداً پاسخ داده نشده است. این تصمیم باید در Phase 0 — Discovery & Repository Audit و **بر مبنای شواهد همان Audit** گرفته شود، نه از پیش و نه به‌صورت ضمنی در Phase 4. هیچ Theme یا رویکردی در این سند پیش‌انتخاب نشده است.
 
 معیارهای ارزیابی تصمیم:
 
