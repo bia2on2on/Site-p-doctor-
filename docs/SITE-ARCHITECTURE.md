@@ -2,7 +2,7 @@
 
 **وضعیت سند:** Baseline برنامه‌ریزی برای بازبینی مالک محصول / بازبینی بصری Milestone A — سند **پیشنهادی** است و هیچ Gate را Passed نمی‌کند.
 
-**تاریخ این نسخه:** 2026-09-27 (UTC)
+**تاریخ این نسخه:** 2026-09-27 (UTC) — بازنگری ۲ در PR #3: افزودن §19 (قرارداد سلامت جست‌وجو/ایندکس‌پذیری/عملکرد و پذیرش Search Console) و رفع P-01/P-02
 
 **نقش این سند:** ترجمۀ تصمیم‌های پذیرفته‌شدۀ استراتژیک به یک **قرارداد اجرایی (concrete) برای صفحات، پیام‌ها و جهت طراحی**؛ به‌گونه‌ای که Slice بعدی (Design System / Foundation و سپس Homepage) بدون کشف مجدد intent تجاری قابل اجرا باشد.
 
@@ -12,7 +12,8 @@
 - فهرست کامل قابلیت‌های تأییدشدۀ CPMS (مرجع ادعا: `docs/PRODUCT-TRUTH.md`)؛
 - کپی نهایی فروش (Final Sales Copy) یا کلمات کلیدی تأییدشده SEO؛
 - انتخاب برند تجاری نهایی، رنگ نهایی برند، یا ابزار Analytics/CRM؛
-- هر نوع نصب/پیکربندی WordPress، Elementor، Theme، Plugin یا ابزار.
+- هر نوع نصب/پیکربندی WordPress، Elementor، Theme، Plugin یا ابزار؛
+- هیچ پیکربندی Google/Search Console، حساب، property، verification token یا analytics (§19.7).
 
 **ارجاعات و تقسیم مسئولیت سند:**
 
@@ -147,7 +148,7 @@ CPMS باید چنین فهمیده شود:
 **۳.۱ قواعد سطح‌کلِ Homepage**
 
 - **پرهیز از دانش‌نامه‌ای‌شدن (anti-encyclopedia):** Homepage روایت است نه فهرست کامل محصول؛ اگر بلوکی به «Feature Grid بلند» تبدیل شد، ادغام در D/E یا حذف.
-- **Pricing:** مطابق ROADMAP §7 بلوک «Pricing Preview» پیش‌بینی شده بود؛ در این قرارداد **تعلیق** است تا تصمیم تجاری Pricing (بخش ۴، CONDITIONAL)؛ روایت «دریافت پیشنهاد از طریق گفت‌وگوی فروش» در همان بلوک‌های H/I و بدون بسته/عدد/مقایسه ادامه می‌یابد. **این یک هم‌راستاسازی آگاهانه با دستورالعمل Pricing است، نه حذف تصمیم مالک؛ ROADMAP در این PR بازنویسی نمی‌شود و هر اصلاح بعدی آن در نوبت بازبینی خودش ثبت می‌شود.**
+- **Pricing:** مطابق ROADMAP §7 بلوک «Pricing Preview» پیش‌بینی شده بود؛ در این قرارداد **تعلیق** است تا تصمیم تجاری Pricing (بخش ۴، CONDITIONAL)؛ روایت «دریافت پیشنهاد از طریق گفت‌وگوی فروش» در همان بلوک‌های H/I و بدون بسته/عدد/مقایسه ادامه می‌یابد. **این یک هم‌راستاسازی آگاهانه با دستورالعمل Pricing است، نه حذف تصمیم مالک.** در همین PR، بند ۱۰ ROADMAP §7 نیز به‌عنوان **بلوک مشروط/معلق** علامت‌گذاری شد تا دو سند یک‌سان خوانده شوند (بدون تصمیم Pricing؛ بدون تغییر ترتیب روایت).
 - **تکرار CTA:** هر CTA باید به مرحلۀ Journey مرتبط باشد؛ تکرار بی‌هدف یک CTA در همهٔ بلوک‌ها ممنوع (ROADMAP §7).
 - **ویدیو:** فقط Product-focused، بدون Autoplay سنگین (بخش ۱۱ این سند).
 - کپی نهایی فروش (final sales copy) در این سند **نوشته نمی‌شود**؛ ستون «قرارداد محتوا» مشخص می‌کند بلوک باید چه منتقل کند، نه جملۀ آن را.
@@ -375,7 +376,7 @@ Core = کمیتۀ صفحاتی که بدون آن‌ها یک سایت فروش�
 
 ## 10. قرارداد Responsive
 
-**۱۰.۱ الزام شواهدی (آینده، هر Slice قابل‌مشاهده):** بازبینی در viewportهای هدف — ~**390×844** (موبایل)، ~**768** (تبلت عمودی)، **1366×768** (لپ‌تاپ/دسکتاپ مرجع) + یک sanity-check دسکتاپ بزرگ؛ ابزار/رویه طبق `docs/AGENT-TOOLING.md` §4.5 (Playwright MANDATORY WHEN APPLICABLE؛ در این Slice مستنداتی: **NOT RUN** — هیچ محیط مرورگر-محور و تغییر قابل‌مشاهده‌ای وجود ندارد؛ این ثبت، نه رد‌شدن یا پذیرش است).
+**۱۰.۱ الزام شواهدی (آینده، هر Slice قابل‌مشاهده):** بازبینی در viewportهای هدف — ~**390×844** (موبایل)، ~**768** (تبلت عمودی)، **1366×768** (لپ‌تاپ/دسکتاپ مرجع) + یک sanity-check دسکتاپ بزرگ؛ ابزار/رویه طبق `docs/AGENT-TOOLING.md` §4.5 (Playwright MANDATORY WHEN APPLICABLE؛ در این Slice مستنداتی: **NOT RUN** — هیچ محیط مرورگر-محور و تغییر قابل‌مشاهده‌ای وجود ندارد؛ این ثبت، نه رد‌شدن یا پذیرش است). **الزام release-quality بودن عملکرد و صفحۀ‌های نمایندۀ اندازه‌گیری: §19.4**.
 
 **۱۰.۲ اصول الزامی:**
 
@@ -491,9 +492,11 @@ validation (server-side + پیام‌های دسترس‌پذیر)، spam protec
 | مایلستون | دامنه | نقش |
 |---|---|---|
 | **Milestone A** | Design System (tokenها، کامپوننت‌ها، states) **+** جهت بصری Homepage (بلوک‌های A–I روی mock/prototype؛ ابزار/محیط مطابق فاز مربوطه) | **اولین بازبینی بصری معنادار مالک محصول**؛ تصمیم‌های کلان جهتِ طراحی در همین نقطه تثبیت می‌شوند |
-| **Milestone B** | بازبینی نهایی بصری سایتِ کامل (major-site) **پیش از Public Launch**؛ منطبق بر Gate D ROADMAP §18 پس از QA/محتوا/SEO/Performance/Accessibility | تأیید انتشار-نزدیک؛ **جایگزین Publication Gate/Launch Truth Gate نیست** (هر دو مستقل باید عبور کنند) |
+| **Milestone B** | بازبینی نهایی بصری سایتِ کامل (major-site) **پیش از Public Launch**؛ منطبق بر Gate D ROADMAP §18 پس از QA/محتوا/SEO/Performance/Accessibility، با پیوست شواهد §19.6 (SEO/عملکرد) | تأیید انتشار-نزدیک؛ **جایگزین Publication Gate/Launch Truth Gate نیست** (هر دو مستقل باید عبور کنند) |
 
 **قاعده عدم‌اذلال:** از مالک خواسته نمی‌شود هر component/هر PR را تأیید کند؛ بازبینی‌های روتین = DoD متناسب Slice + QA تیم (ROADMAP §18: «برای تغییر کوچک، تأیید دستی لازم نیست»). Gateها A–D در ROADMAP §18 به‌عنوان سازوکار بازبینی بصری حاکم‌اند؛ Milestone A در این جدول همان Gate A را با Design System یکی می‌کند و Milestone B معادل Gate D (پیش از launch) است. مایلستون‌ها لایۀ «تأیید مالک» هستند و Gates لایۀ «شواهد QA».
+
+**مرز روشن حاکمیت (P-01):** پذیرش **این سند برنامه‌ریزی** یک gate مدیریت پروژه/حاکمیت است و **به معنای بازبینی بندبه‌بند آن توسط مالک محصول نیست**؛ تصمیم‌های روتین IA/UX/SEO/design/technical با **Website Director** است (`AGENTS §8`، ROADMAP §22). **اولین بازبینی معنادار بصری مالک محصول، ادغام‌شده در Milestone A است** (design system + جهت Homepage). پیش از آن، ارجاع به مالک فقط برای **fork واقعی کسب‌وکاری/محصولی** که با شواهد حل نمی‌شود (`AGENTS §8`). این مرز **از ارزش تأیید بصری معنادار مالک نمی‌کاهد** — Milestone A همچنان الزامی و پیش‌نیاد «پذیرفته‌شدن جهت بصری» است.
 
 ---
 
@@ -508,6 +511,8 @@ validation (server-side + پیام‌های دسترس‌پذیر)، spam protec
 | کار قابل‌مشاهده (صفحه/جریان) | Playwright browser evidence **MANDATORY WHEN APPLICABLE** (§4.5)؛ این Slice: NOT RUN |
 | سطح security-حساس | Review متناسب؛ Strix **فقط با اجازهٔ جداگانه صریح** (§4.3) |
 | داده/architecture جایگزین | Supabase **REFERENCE ONLY**؛ معماری WP+Elementor تغییر نمی‌کند (§4.4) |
+| تعریف/آستانۀ Core Web Vitals و هر metric رسمی Google | **مستندات جاری authoritative Google/web.dev مرجع است**؛ Context7 فقط retrieval-aid (§4.1)؛ عدد از حافظه ثبت نمی‌شود (§19.4) |
+| Search Console / tooling Google | **عملیات فاز انتشار** (§19.7)؛ در این Slice و تا پذیرش دامنهٔ production، نصب/ساخت/پیکربندی **مجاز نیست**؛ Search Console ≠ مجوز analytics/advertising |
 
 **در این PR هیچ ابزاری نصب/پیکربندی نشده و نصب ابزار مجاز نیست.**
 
@@ -529,17 +534,19 @@ validation (server-side + پیام‌های دسترس‌پذیر)، spam protec
 - [x] قرارداد RTL/Persian و responsive/media/trust/journey (§9–13)
 - [x] ترتیب اولویت صفحات و مدل وضعیت محتوا (§14–15)
 - [x] مایلستون‌های تأیید (§16) و routing ابزار (§17)
+- [x] قرارداد سلامت جست‌وجو / ایندکس‌پذیری / عملکرد و قواعد پذیرش Search Console (§19)
 
 **۱۸.۲ الزامات شروع هر slice (بدون این‌ها آن slice شروع نشود) — تفکیک blocker واقعی vs launch-only:**
 
 | # | مورد | وضعیت | نوع |
 |---|---|---|---|
-| R1 | پذیرش این Baseline (جهت‌ها، نه جزئیات) | **OPEN** | **Blocker تا پیش از قفل شدن Milestone A** — تصمیم روتین با Website Director، تأیید جهت با مالک محصول |
+| R1 | پذیرش حاکمیتی این Baseline (جهت‌ها، نه جزئیات) — **gate مدیریت پروژه، نه بازبینی تک‌تک بندها توسط مالک محصول** | **OPEN** | **Blocker تا قفل شدن Milestone A**؛ تصمیم‌های روتین IA/UX/SEO/design/technical با **Website Director** است (`AGENTS §8`، ROADMAP §22) و مالک محصول فقط در fork های واقعی کسب‌وکاری/محصولی درگیر می‌شود (بخش ۱۶) |
 | R2 | Phase 0 — Discovery & Repository Audit واقعی (وضعیت محیط، WordPress/Elementor availability، hosting/staging، Theme architecture decision — ROADMAP §17/§21) | **NOT DONE** | **Blocker برای «WordPress/Elementor architecture decision» و شروع محیطی؛ blocker نیست برای spec-نوشتن design-system** |
 | R3 | استراتژی محیط Staging/غیرعمومی (محل نصب، access، noindex-policy implementation در فاز deployment) | **DEFERRED UNTIL IMPLEMENTATION/ENVIRONMENT** (الزام روشن، ابزار نامشخص) | **Blocker فقط برای شروع پیاده‌سازی روی محیط** — با یک تصمیم کوچک قابل بسته‌شدن |
 | R4 | قواعد placeholder/media internal (این سند §0.1/§11.9 تعریف‌شده؛ asset registry + نحوهٔ مارک‌گذاری در staging) | **READY (قاعده)** / registry = خروجی slice بعدی | — |
 | R5 | Sitemap/hierarchy مصوب (این سند §4 = پیشنهاد؛ تأیید نهایی با R1) | **OPEN تا R1** | Blocker کوچک |
 | R6 | Conversion flow ساختاری (§13) | **READY در حد قرارداد** | — |
+| R7 | الزامات launch-time سلامت جست‌وجو / SEO / عملکرد (§19): اجرای checklist روی production، شواهد CWV، عملیات Search Console | **DEFERRED — launch-time** (هیچ‌کدام الان اجرا نمی‌شود) | **Blocker برای *انتشار*، نه blocker برای شروع طراحی/زیرساخت** — اما باید از همان Slice طراحی لحاظ شوند (§19.5) |
 
 **۱۸.۳ الزامات launch-only (عمداً Blocker شروع پیاده‌سازی نیستند):**
 
@@ -547,17 +554,129 @@ validation (server-side + پیام‌های دسترس‌پذیر)، spam protec
 - Product Truth نهاییِ launch + Launch Truth Gate (`PRODUCT-TRUTH §6`)
 - Testimonials/Customer evidence واقعی
 - تصمیم Pricing و هر صفحهٔ مبتنی‌بر آن
-- Analytics production، Consent، Search Console/indexing (فاز ۹/۱۴؛ تا Publication Gate ممنوع)
+- Analytics production، Consent، و **هر عملیات واقعی Search Console** (verification، submission، monitoring) — فازهای ۹/۱۴ ROADMAP؛ تا Publication Gate ممنوع و در staging اجرا نمی‌شود (§19.1/§19.7)
+- اجرای checklist SEO/عملکرد روی production و شواهد Core Web Vitals field — **الزام انتشار، نه آغاز طراحی** (§19.2/§19.4/§19.6)
 - محتوای حقوقی تأییدشده (Privacy/Terms قبل از انتشار)
 - Media واقعی محصول (قبل از انتشار صفحات evidence-محور)
 
 **۱۸.۴ نتیجه‌گیری خوان (بدون اغراق):**
 
-برای شروع **Design System / Foundation slice (spec-level)**: این سند + چک‌لیست‌های §8، §18.۱ کافی است؛ **R1 (پذیرش baseline) و R2 (نتیجهٔ Phase 0 audit برای تصمیم معماری Theme/محیط)** دو گره واقعی‌اند؛ R3 فقط در لحظهٔ «سایت را روی محیط بنشانیم» لازم است. برای شروع **پیاده‌سازی قابل‌انتشار**: R1–R3 باید بسته شوند. **در این PR هیچ‌کدام Passed نشده است.** (Failure classification در صورت بلوکیدن: این موارد class **C** — محیط/بلاک کسب‌وکاری — یا روال بازبینی مستندات است، نه regression کاری جدید.)
+برای شروع **Design System / Foundation slice (spec-level)**: این سند + چک‌لیست §8 + §18.۱ کافی است و **منتظر امضای مالک محصول روی تک‌تک بندها نمی‌ماند** — تصمیم روتین IA/UX/SEO/design/technical با Website Director است (`AGENTS §8`). آنچه واقعاً باز است: **R2 (خروجی Phase 0 audit: وضعیت محیط + تصمیم معماری Theme)** که پیش از «تصمیم معماری WordPress/Elementor» و هر کار محیطی لازم است. **R1 یک gate حاکمیتی/مدیریت پروژه است**، نه درخواست بازبینی جزئیات سند توسط مالک؛ و در قالب **همان بازبینی بصری Milestone A** (design system + جهت Homepage، §16) جمع می‌شود. این **کاهش ارزش تأیید بصری مالک نیست**: تا تأیید Milestone A، جهت بصری «پذیرفته‌شده» علامت نمی‌خورد. **R3** فقط در لحظۀ «سایت را روی محیط بنشانیم» لازم است. **R7/§19 الزامات انتشارند و شروع کار طراحی را متوقف نمی‌کنند**، ولی اصول §19.5 باید از همان Slice طراحی لحاظ شوند. **در این PR هیچ‌یک از R1–R7 Passed نشده است** و هیچ گیتی باز نشده است. (Failure classification در صورت بلوکیدن: class **C** برای موارد محیطی یا روال بازبینی مستندات — نه regression کار جدید.)
 
 ---
 
-## 19. شواهد این Slice (Evidence)
+## 19. قرارداد کیفیت جست‌وجو، ایندکس‌پذیری و عملکرد (Search Health / Indexability / Performance)
+
+**الزام جدید مالک محصول (ثبت در این بازنگری):** وب‌سایت عمومی CPMS باید با **سلامت فنی جست‌وجو، عملکرد، کاربردپذیری موبایل و آمادگی Google Search Console در سطح release-quality** مهندسی و منتشر شود.
+
+**قرارداد قابل‌اجرا (همین عبارت، مرجع است):**
+
+- در **لحظۀ انتشار عمومی**، هیچ نقص فنیِ قابل‌اقدامِ **ناشی از خودِ وب‌سایت** در حوزه SEO/سلامت جست‌وجو نباید بدون **استثنای صریح، پذیرفته‌شده و مستند** باقی بماند؛
+- سایت باید از نظر فنی **آمادۀ خزش و ایندکس** باشد؛
+- عملکرد و Core Web Vitals **الزام release-quality** هستند، نه بهینۀ پس‌از‌انتشار؛
+- پس از انتشار، **شواهد واقعی Search Console / field data** پایش می‌شود و یافته‌های معتبرِ قابل‌اقدام triage و رفع می‌شوند.
+
+**مرز صریح — آنچه وعده داده نمی‌شود:** این قرارداد هیچ تضمینی برای **رتبه**، حجم ترافیک یا ایندکس‌شدن همۀ صفحات نمی‌دهد و **وعده «صفر خطا/هشدار Google برای همیشه» نمی‌دهد**. Google ممکن است warning / informational / behavioural status گزارش کند که نقص سایت نیست. تعهدِ قابل‌اجرا، **فرآیند + شواهد + triage** است، نه نتیجهٔ تضمینی در پنل Google.
+
+**واژگان وضعیت ویژهٔ این قرارداد:**
+
+| برچسب | معنا |
+|---|---|
+| `ACTIONABLE SITE DEFECT` | نقص قابل‌اقدام ناشی از سایت → باید رفع شود (launch blocker تا رفع یا استثناء) |
+| `EXCEPTION — ACCEPTED & DOCUMENTED` | استثنای صریح با دلیل + پذیرنده + تاریخ + زمان بازبینی؛ بدون record، استثناء وجود ندارد |
+| `GOOGLE BEHAVIOR — NOT A SITE DEFECT` | رفتاری که توسط Google تعیین می‌شود و نقص فنی سایت نیست؛ تفسیر می‌شود، رفع اجباری ندارد |
+| `NOT YET AVAILABLE` | شواهد هنوز تولید نشده‌اند (مثلاً data قبل از crawl/processing) — **هرگز برابر PASS نیست** |
+| `NOT RUN` | بررسی انجام نشده — **هرگز برابر PASS نیست** |
+
+طبقات شکست A/B/C/D و قواعد شواهد بدون تغییر حاکم‌اند (`AGENTS.md §12/§13`).
+
+---
+
+**۱۹.۱ تفکیک Development/Staging از Public Launch (حفظ کامل سیاست موجود)**
+
+| محیط | قرارداد |
+|---|---|
+| **DEVELOPMENT / STAGING** | عمداً غیرعمومی و عمداً **non-indexed** باقی می‌ماند (ROADMAP §3 و `PRODUCT-TRUTH §1` — بدون تغییر). **از پنهان‌بودن staging هیچ نتیجه‌ای دربارهٔ آمادگی SEO تولید استخراج نمی‌شود** (نه «چون staging دیده نمی‌شود پس مشکلی نیست»، نه «چون staging non-index است پس SEO خراب است»). هیچ checklist آمادگی SEO تولید روی staging به‌عنوان **شواهد launch** پذیرفته نیست؛ در staging فقط **ساختار آماده** می‌شود. |
+| **PUBLIC LAUNCH** | indexability عمدیِ production **فقط پس از عبور Publication Gate** فعال می‌شود؛ همۀ checklist های SEO/عملکرد **روی دامنه و محیط واقعی production** اجرا و مستند می‌شوند. |
+
+**روش فنی محافظت staging (noindex / احراز هویت / robots / هوست) در این سند تجویز نمی‌شود** — `DEFERRED UNTIL IMPLEMENTATION/ENVIRONMENT`، دقیقاً مطابق ROADMAP §3 و `PRODUCT-TRUTH §1` که جزئیات را به فاز Environment/Deployment واگذار کرده‌اند. **این الزام جدید هرگز مجوز public یا indexable شدن staging را نمی‌دهد.**
+
+---
+
+**۱۹.۲ checklist الزامات فنی جست‌وجو در Public Launch** (الزام‌های آینده؛ در این Slice هیچ‌یک اجرا/پیکربندی نمی‌شود)
+
+| خوشه | الزامات پوشش‌داده‌شده | قرارداد |
+|---|---|---|
+| **۱. Indexability / Robots / Sitemap** | indexability عمدی production؛ robots policy؛ XML sitemap؛ نبود noindex تصادفی باقی‌مانده از staging؛ Search Console ownership/verification؛ sitemap submission | تصمیم **«ایندکس شو» در launch باید عمدی و مستند** باشد، نه پیش‌فرض فراموش‌شده. robots.txt تولید درست و متناظر با sitemap؛ sitemap فقط شامل URLهای **canonical، 200 و indexable** (بدون noindex/redirect/404/ staging host). هر noindex باقی‌مانده = `ACTIONABLE SITE DEFECT` مگر مستند به‌عنوان تصمیم عمدی. **مالکیت property و ارسال sitemap عملیاتِ launch هستند** (§19.7) — در زمان staging انجام نمی‌شوند. |
+| **۲. Canonical / Duplicate / URL integrity** | canonical URLs؛ clean & stable URLs؛ duplicate & thin archive control؛ pagination/indexing rules؛ launch-domain consistency؛ نشتی host | یک canonical self-consistent در هر صفحه، هم‌جهت با دامنهٔ launch. الگوی URL طبق §5.1 و **پایدار**. کنترل archiveهای کم‌محتوا/duplicate (taxonomy/tag/`?orderby`/pagination) — تصمیم index/noindex + canonical هر نوع archive **در فاز محیط و بر پایهٔ مستندات جاری Google** گرفته می‌شود، نه از حافظه. یک host نهایی (protocol / www-non-www / trailing slash) تصمیم‌گرفته و یکسان در canonical، sitemap، internal link و OG. **Audit نشتی محیط:** هیچ URL مربوط به staging/dev نباید در canonical، sitemap، لینک داخلی یا متادیتای social ظاهر شود. |
+| **۳. Metadata / Semantic content / Structured data** | title & meta handling؛ semantic headings & content؛ Open Graph/social metadata؛ truthful structured data؛ structured-data validation؛ alt-text process | عنوان/توضیح اختصاصی بدون duplicate (copy نهایی ← فاز SEO Foundation، `REQUIRES KEYWORD RESEARCH`). یک H1 + سلسله‌مراتب H2/H3 مطابق §5.3/§8. OG/social برای صفحات اصلی با تصویرِ واقعیِ مجاز (**placeholder در متادیتا ممنوع**). Structured data **فقط مطابق محتوای قابل‌مشاهده**؛ بدون Review/AggregateRating/Price/JobPosting یا هر نوع ساختگی. اعتبارسنجی structured data در فاز انتشار انجام و نتیجه **ثبت** می‌شود (`NOT RUN ≠ PASS`). فرآیند alt-text فارسی طبق §11.6 (توصیفی، بدون alt تهی انبوه). |
+| **۴. Links / Redirects / Error states** | internal linking؛ redirects؛ 404 behavior؛ no accidental soft-404؛ crawlable navigation & content | بدون orphan page؛ هدف لینک‌ها canonical و 200 (ROADMAP §4.3). هر تغییر عمدی URL → **301** بدون chain بیش از یک hop و بدون loop؛ 302 به‌عنوان حالت دائمی ممنوع. صفحۀ ناموجود → **status 404 واقعی** + مسیر بازیابی (§4.2). **Soft-404 تصادفی ممنوع:** صفحه/فیلتر/تگِ بی‌محتوا نباید 200 ایندکس‌پذیر بدهد (ترکیب noindex عمدی + consolidate، تصمیم فاز محیط). ناوبری و محتوا باید **با لینک‌های واقعی و قابل‌خزش** باشند؛ محتوای حیاتی نه با click-to-reveal تنها، نه با JS-only render که بدون خزش JS ناپدید شود (Elementor-native-friendly). |
+| **۵. Mobile usability / Transport** | mobile usability؛ HTTPS | viewport صحیح، tap targets، اندازهٔ خوانا، **هیچ سرریز افقی** (§10.2)، RTL در موبایل مستقل (§9.11). HTTPS معتبر، بدون mixed content، بدون redirect loop بین http/https. |
+
+---
+
+**۱۹.۳ قاعدۀ پذیرش Search Console (عملیاتی)**
+
+**در لحظۀ انتشار:**
+
+1. هیچ `ACTIONABLE SITE DEFECT` سطح **ERROR** ناشی از سایت نباید unresolved بماند، مگر با `EXCEPTION — ACCEPTED & DOCUMENTED` (دلیل + پذیرنده + تاریخ + زمان بازبینی)؛
+2. warning / informational **تفسیر** می‌شوند، نه اینکه کورکورانه نقص تلقی یا کورکورانه نادیده گرفته شوند؛ نتیجهٔ تفسیر ثبت می‌شود؛
+3. URLهای excluded/not-indexed باید **عمدی یا فهمیده** باشند؛ «نامشخص» = یک finding باز، نه وضعیت نرمال؛
+4. باید **سه‌سو هم‌خوان** باشند: sitemap ↔ canonical ↔ indexability status؛
+5. **دسترسی‌پذیری شواهد:** شواهد واقعی Search Console تنها پس از مالکیت + انتشار عمومی + crawl + processing وجود پیدا می‌کند؛ در فاصلهٔ «منتشر شد ولی data نیامده»، وضعیت صحیح **`NOT YET AVAILABLE`** است و تبدیل آن به PASS ممنوع است.
+
+**پس از انتشار (چرخۀ پایش — سازوکار و دوره در فاز محیط تعیین می‌شود):**
+
+coverage/indexing · پردازش sitemap · enhancement/structured-data findings در صورت کاربرد · گزارش‌های HTTPS/security-related search در دسترس · **Core Web Vitals field data وقتی داده آمد** · هر anomaly معنادار در crawl/index.
+
+در هر یافته: تشخیص اینکه **نقص سایت** است یا **رفتار مورد انتظار Google** (`GOOGLE BEHAVIOR — NOT A SITE DEFECT`)؛ فقط اولی triage و رفع می‌شود.
+
+---
+
+**۱۹.۴ قرارداد عملکرد / Core Web Vitals (release requirement)**
+
+- **هدف:** دستیابی به طبقه‌بندی **«Good» Core Web Vitals طبق تعریف جاری Google** روی صفحات critical نماینده، **هرگاه قابل‌اندازه‌گیری باشد**.
+- **ممنوعیت hard-code:** آستانه‌ها و تعریف metricها **از حافظهٔ مدل در این سند ثبت نمی‌شوند**. پیش از شروع پیاده‌سازی/پذیرش عملکرد، **مستندات جاری authoritative گوگل/web.dev** باید consulted شوند؛ **Context7 فقط برای retrieval کمک می‌کند و مرجع نهایی خودِ مستندات رسمی Google/web.dev است** (`AGENT-TOOLING §4.1`). اگر مستندات قابل‌دستیابی نبود: `NOT RETRIEVED` ثبت شود، نه پرکردن با عدد.
+- **مجموعۀ اندازه‌گیری (نماینده، الزامی):** ۱) Home ۲) Product Overview ۳) یک صفحۀ Feature نماینده ۴) Demo/Consultation ۵) یک صفحۀ media-heavy محصول/دمو.
+- **سنجه‌ها:** LCP · INP · CLS · TTFB (به‌عنوان زمینه/context) · transfer size · request count · حجم CSS/JS · font loading · responsive image loading · هزینهٔ third-party script · DOM complexity.
+- **روش:** **lab measurement روی محیط production-like نماینده پیش از launch** + **field / Search Console / CrUX evidence پس از launch، هنگامی که داده موجود شد**.
+- **قواعد:** localhost/Lighthouse عدد را به‌عنوان **شاهد production** جا نزنید (`AGENTS §12`)؛ **دنبال‌کردن synthetic score به بهای usability ممنوع**؛ بودجۀ عددی Performance همچنان تا وجود محیط نماینده + baseline **Unknown** و موکول (ROADMAP §14/§21 بدون تغییر).
+
+---
+
+**۱۹.۵ اصول مهندسی عملکرد (بارِ این اصول: Design System، Foundation، Elementor، صفحات)**
+
+بار اولیۀ کم · محدود بودن خانوادۀ فونت و تعداد وزن‌ها · **فونت فارسی بهینه** (subset، self-host، وزن‌های لازم، `font-display` هوشمند — §8) · تصاویر responsive · WebP/AVIF در جای مناسب · **lazy loading زیر fold** · بدون hero video با autoplay سنگین · ویدیو با poster/thumbnail-first (§11) · حداقل third-party script · **بدون icon-font پرهزینه** (SVG/inline بر اساس icon policy §8) · CSS/JS/asset مشروط · **DOM محدود و منظم در Elementor** · **پرهیز از add-on pack های غیرضروری Elementor** · پرهیز از کتابخانۀ انیمیشن بدون ارزش روشن (§7/§8) · **سازگاری با cache/CDN** (انتخاب provider **نمی‌شود** — `DEFERRED UNTIL IMPLEMENTATION/ENVIRONMENT`) · **ممنوعیت «سوپ اسکریپت بازاریابی»**: هر اسکریپت شخص ثالث باید دلیل، مالک و سنجهٔ هزینه داشته باشد.
+
+**هم‌راستایی:** این اصول با الزامات کیفی ROADMAP §14 یکسان‌اند و در §8 (design system) / §10 (responsive) / §11 (media) همین سند به‌عنوان قید طراحی اعمال می‌شوند؛ یعنی **عملکرد از تصمیم‌های طراحی شروع می‌شود، نه از clean-up آخر**.
+
+---
+
+**۱۹.۶ شواهد لازم برای پذیرش SEO/عملکرد (آینده — الگوی ثبت)**
+
+**پیش از انتشار:** محیط production-like نماینده · audit crawl/indexability · اعتبارسنجی sitemap/robots/canonical · اعتبارسنجی structured data در صورت استفاده · real-browser responsive checks (الزام viewport §10.1؛ ابزار: `AGENT-TOOLING §4.5`) · اندازه‌گیری عملکرد روی صفحات §19.4 · نبود خطای critical console/network · بررسی broken link/redirect · **placeholder audit** (مارک‌های `TARGET — NOT PUBLICATION-APPROVED` طبق §11.9 باید صفر یا مستند باشند).
+
+**پس از انتشار:** تأیید دامنهٔ production · **تأیید مالکیت property در Search Console** · شواهد ارسال sitemap · پایش indexing/crawl · پایش **Core Web Vitals field data** هنگامی که داده در دسترس شد.
+
+**قاعدۀ ثبت:** هر مورد یا شواهد (با SHA/تاریخ/ابزار) دارد یا **`NOT RUN` / `NOT AVAILABLE`**؛ هیچ‌کدام PASS نمی‌شود. گزارش‌ها در قالب پیوست B ROADMAP ارائه می‌شوند.
+
+---
+
+**۱۹.۷ مرز ابزار و حریم خصوصی دربارهٔ Search Console**
+
+- **در این PR هیچ ابزار Google نصب/پیکربندی نمی‌شود**؛ هیچ حساب، property، verification token یا tag ساخته و افزوده نمی‌شود.
+- استفادۀ نهایی از Search Console مستلزم: **دامنۀ production تأییدشده توسط مالک محصول** · مالکیت/دسترسی مناسب و مشخص‌صاحب · **مدیریت امن credential/secret (privacy/security-safe، خارج از Repository)** · **هیچ credential یا verification secret در Git commit نمی‌شود** (قاعده `AGENT-TOOLING §9`).
+- **Search Console مجوز analytics یا advertising نیست.** این الزام هیچ‌یک از Google Analytics، Tag Manager، ads، pixel یا cookie را authorize نمی‌کند و هیچ مجوز ضمنی برای آن‌ها ایجاد نمی‌کند؛ انتخاب/فعال‌سازی آن‌ها تصمیم جداگانه و همچنان `DEFERRED UNTIL IMPLEMENTATION/ENVIRONMENT` (ROADMAP §15 — DECIDED: در این مرحله هیچ ابزاری انتخاب نمی‌شود) و در صورت پذیرش، مستلزم consent/privacy review مستقل + `LEGAL REVIEW REQUIRED` است.
+
+---
+
+**۱۹.۸ آنچه این بخش مجاز نمی‌کند**
+
+هیچ پیاده‌سازی، پیکربندی، نصب ابزار، ساخت property، یا تنظیم indexability در این Slice انجام نمی‌شود؛ **نه Implementation Gate و نه Publication Gate Passed نشده‌اند**؛ هیچ عدد CWV/عملکرد/حجم جست‌وجو در این سند ابداع نشده است؛ staging همچنان عمداً non-index است و این بخش آن را public نمی‌کند.
+
+---
+
+## 20. شواهد این Slice (Evidence)
 
 | فیلد | مقدار |
 |---|---|
@@ -566,12 +685,15 @@ validation (server-side + پیام‌های دسترس‌پذیر)، spam protec
 | Open PRs پیش از شروع | هیچ (#1, #2 MERGED) — بدون کار موازی تکراری |
 | Working tree پیش از شروع | clean، بدون untracked |
 | اسناد خوانده‌شده در revision زنده | `AGENTS.md`, `docs/ROADMAP.md`, `docs/PRODUCT-TRUTH.md`, `docs/AGENT-TOOLING.md` |
-| تغییرات | فقط `docs/SITE-ARCHITECTURE.md` (جدید) + یک ارجاع حداقلی (حداکثر چند خط، بدون تغییر فازها/تصمیم‌ها) در `docs/ROADMAP.md` |
-| NOT RUN | هر browser/Playwright/security/runtime بررسی — به‌دلیل نوع Slice مستنداتی و نبود محیط؛ تبدیل به PASS نشده |
+| تغییرات (بازنگری ۲) | `docs/SITE-ARCHITECTURE.md`: افزودن §19 و شفاف‌سازی §3.1/§10.1/§16/§17/§18 + شماره‌گذاری مجدد Evidence به §20 · `docs/ROADMAP.md`: علامت‌گذاری مشروط Pricing Preview در §7.10 (P-02) + یک ارجاع حداقلی پس از جدول فازها — **هیچ فاز/Gate/تصمیمی بازنویسی نشد** |
+| ابزار Google | هیچ نصب/پیکربندی/حساب/property/verification token/analytics انجام **نشده**؛ فقط الزامات آینده در §19 ثبت شد |
+| پیش از این بازنگری | PR #3 باز و MERGEABLE؛ head مرورشده `a0c4c1a4d0ea9277372959d60d4cab6ab24e01cc` — SHA gate PASS (تطابق با مقدار مورد انتظار)؛ amendment روی همان branch، بدون rebase/force/duplicate PR |
+| NOT RUN | هر browser/Playwright/security/runtime بررسی، و هر اندازه‌گیری CWV/Lighthouse/SEO audit — به‌دلیل نوع Slice مستنداتی و نبود محیط؛ **هیچ عدد یا نتیجه‌ای ابداع نشد**؛ هیچ‌کدام به PASS تبدیل نشده |
 | Product claims | هیچ ادعای قابلیت جدید در این سند بیان **نشده**؛ همهٔ ارجاعات capability به snapshot ثبت‌شدهٔ `PRODUCT-TRUTH §2/#3` با همان سقف `REVERIFY BEFORE PUBLIC LAUNCH` |
 
 **Change log**
 
 | تاریخ (UTC) | محرک | خلاصه |
 |---|---|---|
+| 2026-09-27 | الزام جدید مالک دربارهٔ کیفیت جست‌وجو/عملکرد + رفع findings مرور PR (P-01، P-02) | افزودن §19 (search health / indexability / CWV / Search Console acceptance + staging/launch تفکیک)، افزودن R7 به §18.۲، شفاف‌سازی حاکمیت R1/Milestone A (P-01)، هم‌راستاسازی تعلیق Pricing با ROADMAP §7.10 (P-02)؛ بدون پیاده‌سازی، بدون ابزار، بدون عدد ابداعی |
 | 2026-09-27 | دستور «یک PR مستندات محدود: قرارداد IA + Messaging + Design Direction» | اولین نسخه: §0 واژگان، §1 مدل تجاری، §2 Positioning، §3 Home A–I، §4 Sitemap سه‌وضعیتی، §5 URL/SEO-intent، §6 Navigation، §7–8 Design، §9 RTL، §10 Responsive، §11 Media، §12 Trust، §13 Journey، §14–16 Priority/Status/Milestones، §17 Tooling routing، §18 Readiness (NOT PASSED)، §19 شواهد |
