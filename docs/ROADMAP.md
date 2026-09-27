@@ -193,6 +193,8 @@
 
 ## 4. Scope سایت و Information Architecture
 
+> **ارجاع قرارداد اجرایی:** ترجمۀ تصمیم‌های این بخش به sitemap سه‌وضعیتی (CORE / CONDITIONAL ON PRODUCT TRUTH / DEFERRED)، قرارداد navigation، intent هر صفحه و محدودیت‌های design/RTL در [`docs/SITE-ARCHITECTURE.md`](SITE-ARCHITECTURE.md) آمده است. آن سند جایگزین این بخش نمی‌شود و فازها/تصمیم‌های اینجا را تغییر نمی‌دهد؛ در تعارض، قواعد Product Truth و گیت‌ها (بخش‌های ۳ و ۱۷ این سند و `docs/PRODUCT-TRUTH.md`) مقدم‌اند.
+
 ### 4.1 صفحات اصلی پیشنهادی
 
 صفحات زیر در معماری اولیه پیش‌بینی می‌شوند. وجود نهایی هر صفحه، نام فارسی، Slug و اولویت آن در Phase 2 تأیید می‌شود:
@@ -327,7 +329,7 @@ Homepage یکی از صفحات اصلی Conversion است و باید با هد
 7. **Solutions:** مسیرهای استفاده برای Personaها و اندازه‌های مختلف مرکز.
 8. **Product Video:** ویدیوی کوتاه Product-focused، بدون Autoplay سنگین و Background Video غیرضروری.
 9. **Trust:** ابتدا پاسخ به «آیا این با نحوه کار یک کلینیک واقعی تناسب دارد؟»، سپس امنیت/دسترسی به داده و در ادامه Onboarding/آموزش/پشتیبانی (سلسله‌مراتب بخش ۱۶).
-10. **Pricing Preview:** خلاصه مسیر فروش و دعوت به دریافت پیشنهاد، بدون ساختن Plan، Price، Limit یا Discount.
+10. **Pricing Preview (مشروط/معلق — P-02):** این بلوک **دیگر لازمۀ معماری اولیه Homepage محسوب نمی‌شود** و تا **تصمیم تجاری Pricing و نحۀ نمایش عمومی آن** در حالت **CONDITIONAL — SUSPENDED** است؛ فعلاً همان «درخواست پیشنهاد از طریق گفت‌وگوی فروش» در بلوک‌های FAQ/CTA و صفحۀ Demo جریان را انجام می‌دهد و هیچ Plan، Price، Limit یا Discount ساخته نمی‌شود. این تعلیق **تصمیم Pricing نیست** و فقط از خوانده‌شدن این مورد به‌عنوان «ضروری/جاری» جلوگیری می‌کند (قرارداد اجرایی: `docs/SITE-ARCHITECTURE.md` بخش‌های ۳.۱ و ۴.۳).
 11. **FAQ:** سؤال‌های واقعی که مانع تصمیم هستند.
 12. **Final CTA:** CTA کوتاه و واضح با مقصد قابل‌اندازه‌گیری.
 
@@ -768,6 +770,8 @@ Screenshot باید واقعی، باکیفیت، دارای Context، بهین�
 | 12 — QA | Responsive، RTL، Browser، Forms، Links، Navigation، Search، 404، SEO، Accessibility و Performance | Defect list و Regression pass |
 | 13 — Conversion QA | CTA، Demo friction، Pricing clarity، Navigation و User journey | Conversion review بدون تغییر سلیقه‌ای |
 | 14 — Launch Readiness | Backup، Security، Performance، SEO، Analytics، Forms، Legal، Indexing، Robots، Sitemap و Final QA | Launch checklist با مالک و وضعیت هر مورد |
+
+> **ارجاع حداقلی (بدون تغییر فازها):** محتوای فنی الزامات «SEO Hardening» (فاز ۹)، «Performance» (فاز ۱۰) و «Security & Accessibility» (فاز ۱۱) و نیز **پذیرش انتشار SEO/عملکرد، indexability، Core Web Vitals و عملیات Search Console** به‌صورت قرارداد قابل‌اجرا در `docs/SITE-ARCHITECTURE.md` بخش ۱۹ تعریف شده است؛ آن سند الزام این فازها را شل نمی‌کند و چیزی در این فازها اضافه/حذف نمی‌شود. محیط Development/Staging همچنان عمداً غیرعمومی و non-index می‌ماند و indexability عمدی تنها پس از Publication Gate فعال می‌شود.
 
 ### ترتیب Sliceهای پیشنهادی برای کاهش ریسک
 
