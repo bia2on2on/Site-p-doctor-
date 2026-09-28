@@ -187,7 +187,7 @@ for font in Vazirmatn-Regular.woff2 Vazirmatn-Bold.woff2; do
     ok "Font URL served: $font ($response)"
   else ko "Font URL invalid: $font ($response)"; fi
 done
-font_registered="$(run_wp wp eval 'echo (class_exists("\\Elementor\\Fonts") && isset(\\Elementor\\Fonts::get_fonts()["Vazirmatn"]) && \\Elementor\\Fonts::get_fonts()["Vazirmatn"] === "koorosh-local") ? "yes" : "no";')" \
+font_registered="$(run_wp wp eval '$f = class_exists("Elementor\\Fonts") ? \Elementor\Fonts::get_fonts() : array(); echo (isset($f["Vazirmatn"]) && $f["Vazirmatn"] === "koorosh-local") ? "yes" : "no";')" \
   && expect_eq "Elementor font list includes local Vazirmatn" "yes" "$font_registered" \
   || ko "Elementor font list evaluation failed"
 if run_wp wp language core install fa_IR --activate; then
