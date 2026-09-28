@@ -1,0 +1,8 @@
+{
+  "publication": "TARGET — NOT PUBLICATION-APPROVED",
+  "canonical_recipe": "reconstruction/product-overview/recipe.mjs",
+  "claim_register": "reconstruction/product-overview/claims.md",
+  "browser_runner": "tests/browser/product-overview.mjs",
+  "seo": { "title": "نرم افزار مدیریت مطب و کلینیک | CPMS", "description_source": "WordPress page excerpt via existing Koorosh mechanism", "plugin": "none" },
+  "media": "Reserved Elementor-editable frame; verified real screenshots required before public launch"
+}

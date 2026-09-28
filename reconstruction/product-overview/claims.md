@@ -1,0 +1,7 @@
+# Product Overview content / claims register
+
+The page is a candidate owner of the commercial clinic/practice-management cluster (not Homepage). Persian terms occur in useful context, without quantitative search or ranking claims. Keyword ownership follows `docs/SEO-KEYWORD-MAP.md`; title is “نرم افزار مدیریت مطب و کلینیک | CPMS”, description is the editable WordPress excerpt through Koorosh's existing mechanism. No SEO plugin is added.
+
+Capability phrasing draws only from `docs/PRODUCT-TRUTH.md` §§3–4 and retains its historical snapshot boundary: **REVERIFY BEFORE PUBLIC LAUNCH; none PUBLISHABLE NOW**. Appointment/reception/visit, patient records, doctor workspace, prescriptions/documents, patient portal, reporting, bounded manual payment/financial summaries, multi-clinic model, role/access and scoped data mechanisms are evaluation topics, not launch promises. Reception scope explicitly needs verification. No claim implies accounting replacement, gateway, integration, mobile app, AI, certification, compliance, absolute security, support, performance, customers, pricing, or availability.
+
+Real CPMS screenshots are not present. The native Elementor-editable dark media frame is a reservation with visible disclosure, not product UI. Verified real-product screenshots must replace reserved media states before public launch. CTA stays on-page; no lead endpoint is fabricated.
