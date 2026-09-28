@@ -128,6 +128,45 @@ else
 fi
 rm -f "$home_body_file"
 
+# Child activation is explicit: wp-env maps themes but does not guarantee child activation.
+expected_hello="$(node -e 'const c=require(process.cwd()+"/.wp-env.json"); console.log(c.themes[0].match(/hello-elementor\.(\d+(?:\.\d+)+)\.zip$/)?.[1] || "INVALID")')"
+run_wp wp theme activate cpms-child && ok "Child theme activated" || ko "Could not activate child theme"
+parent_version="$(run_wp wp theme get hello-elementor --field=version)" \
+  && expect_eq "Hello parent version" "$expected_hello" "$parent_version" \
+  || ko "Hello parent version not retrieved"
+active_theme="$(run_wp wp theme list --status=active --field=name)" \
+  && expect_eq "Active child theme" "cpms-child" "$active_theme" \
+  || ko "Active child theme not retrieved"
+template="$(run_wp wp eval 'echo wp_get_theme()->get("Template");')" \
+  && expect_eq "Child Template" "hello-elementor" "$template" \
+  || ko "Child Template not retrieved"
+for php_file in functions.php; do
+  run_wp php -l "/var/www/html/wp-content/themes/cpms-child/$php_file" \
+    && ok "PHP lint: $php_file" || ko "PHP lint failed: $php_file"
+done
+home_body="$(curl --fail --silent --show-error "$BASE_URL/")" \
+  && ok "Activated child homepage HTTP 200" || ko "Activated child homepage HTTP request failed"
+for asset in 'cpms-child/style.css' 'cpms-child/foundation.css'; do
+  if [[ "$home_body" == *"/themes/$asset"* ]]; then ok "Homepage references $asset"; else ko "Homepage missing $asset"; fi
+done
+for font in Vazirmatn-Regular.woff2 Vazirmatn-Bold.woff2; do
+  response="$(curl --silent --show-error --output /dev/null --write-out '%{http_code} %{content_type}' "$BASE_URL/wp-content/themes/cpms-child/fonts/$font")"
+  if [[ "$response" == 200\ *font* ]]; then
+    ok "Font URL served: $font ($response)"
+  else ko "Font URL invalid: $font ($response)"; fi
+done
+font_registered="$(run_wp wp eval 'echo (class_exists("\Elementor\Fonts") && isset(\Elementor\Fonts::get_fonts()["Vazirmatn"]) && \Elementor\Fonts::get_fonts()["Vazirmatn"] === "cpms-local") ? "yes" : "no";')" \
+  && expect_eq "Elementor font list includes local Vazirmatn" "yes" "$font_registered" \
+  || ko "Elementor font list evaluation failed"
+if run_wp wp language core install fa_IR --activate; then
+  ok "fa_IR language installed and activated"
+  rtl_html="$(curl --fail --silent --show-error "$BASE_URL/")"
+  html_tag="$(printf '%s' "$rtl_html" | grep -ioE '<html[^>]*>' | head -1)"
+  if [[ "$html_tag" == *'lang="fa-IR"'* && "$html_tag" == *'dir="rtl"'* ]]; then
+    ok "fa_IR homepage HTML lang and RTL direction"
+  else ko "fa_IR homepage HTML missing lang=fa-IR or dir=rtl"; fi
+else ko "fa_IR installation/activation failed"; fi
+
 note "== Smoke result: $pass passed, $fail failed =="
 printf '::notice title=Smoke result::%s passed, %s failed\n' "$pass" "$fail"
 if [ "$fail" -gt 0 ]; then

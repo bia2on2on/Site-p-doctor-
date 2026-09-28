@@ -25,17 +25,12 @@ git blob SHAs between the `master` tree and the `v33.003` tag tree via the GitHu
 Checksums are also recorded in `reconstruction/manifest.json` (`artifacts`) and
 enforced by `tests/static/validate-tokens.mjs`.
 
-## Intended loading (documented — NOT YET APPLIED to any site)
+## Loading
 
-- Self-hosted, `font-display: swap`, **no third-party font CDN** (availability of
-  third-party font CDNs from Iran is not guaranteed; payload stays under project control).
-- Family name in CSS/Elementor: `Vazirmatn`; fallback stack `Tahoma, "Segoe UI", system-ui, sans-serif`.
-- Weights 400 and 700 only (design-token policy). The third weight (e.g. 500) is
-  intentionally **not** committed; add it only with a demonstrated component need
-  plus tokens/manifest update.
-- Application path: Elementor → Custom Fonts (preferred, native font picker) or a
-  minimal `@font-face` CSS layer (fallback) — see `docs/DESIGN-SYSTEM.md` §5.
-  Nothing has been uploaded or configured in any WordPress instance yet.
+The child theme serves these files via `foundation.css` (`@font-face`, `font-display: swap`).
+The child registers `Vazirmatn` in the Elementor font picker; Elementor Global Fonts
+can select it without uploading another copy through Pro. No real host or kit has
+been verified. The fallback stack is `Tahoma, "Segoe UI", system-ui, sans-serif`.
 
 ## License obligations (OFL 1.1)
 

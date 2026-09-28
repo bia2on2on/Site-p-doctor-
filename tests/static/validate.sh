@@ -44,7 +44,8 @@ if (!/^WordPress\/WordPress#\d+(\.\d+)+$/.test(c.core || "")) err("core pin malf
 if (!/^\d+(\.\d+)?$/.test(c.phpVersion || "")) err("phpVersion pin malformed: " + c.phpVersion);
 if (!Array.isArray(c.plugins) || c.plugins.length !== 1) err("plugins must be the single Elementor ZIP pin");
 else if (!/^https:\/\/downloads\.wordpress\.org\/plugin\/elementor\.\d+(\.\d+)+\.zip$/.test(c.plugins[0])) err("plugins[0] must be a pinned elementor ZIP URL: " + c.plugins[0]);
-if (JSON.stringify(Object.keys(c).sort()) !== JSON.stringify(["$schema", "core", "phpVersion", "plugins"].sort())) err("unexpected/missing top-level keys: " + Object.keys(c).join(","));
+if (!Array.isArray(c.themes) || c.themes.length !== 2 || !/^https:\/\/downloads\.wordpress\.org\/theme\/hello-elementor\.\d+(\.\d+)+\.zip$/.test(c.themes[0]) || c.themes[1] !== "./themes/cpms-child") err("themes must pin Hello and map the local child");
+if (JSON.stringify(Object.keys(c).sort()) !== JSON.stringify(["$schema", "core", "phpVersion", "plugins", "themes"].sort())) err("unexpected/missing top-level keys: " + Object.keys(c).join(","));
 process.exit(bad);
 ' "$root/.wp-env.json" \
 	&& ok ".wp-env.json pins are well-formed (core ref, phpVersion, single Elementor ZIP)" \

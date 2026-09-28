@@ -92,10 +92,10 @@ Line heights are deliberately Persian-friendly (higher than Latin defaults). `le
 |---|---|---|
 | Family count | 1 (`Vazirmatn`) + system fallback | Minimal families; one family carries headings and body |
 | Weights | **2** (400, 700) | Within the 2–3 contract; emphasis via size/color, not extra weights; a third weight is committed only on demonstrated need with tokens+manifest update |
-| Files | `design-system/fonts/vazirmatn/Vazirmatn-Regular.woff2` (50,684 B), `Vazirmatn-Bold.woff2` (51,020 B) | WOFF2 only; ≈99 KB committed total (file sizes, not a load-time measurement) |
+| Files | `themes/cpms-child/fonts/Vazirmatn-Regular.woff2` (50,684 B), `Vazirmatn-Bold.woff2` (51,020 B) | WOFF2 only; ≈99 KB committed total (file sizes, not a load-time measurement) |
 | Loading | self-hosted, `font-display: swap` | No third-party runtime font request — avoids CDN availability risk from Iran, keeps payload controllable |
 | Fallback stack | `Tahoma, "Segoe UI", system-ui, sans-serif` | Persian-capable system fallback before generic sans |
-| Licensing | OFL-1.1, `OFL.txt` committed alongside files | Honest, auditable; upstream https://github.com/rastikerdar/vazirmatn tag `v33.003`; byte-identity to the tag proven by matching git blob SHAs (see `design-system/fonts/vazirmatn/README.md`) |
+| Licensing | OFL-1.1, `OFL.txt` committed alongside files | Honest, auditable; upstream https://github.com/rastikerdar/vazirmatn tag `v33.003`; byte-identity to the tag proven by matching git blob SHAs (see `themes/cpms-child/fonts/README.md`) |
 
 **Missing-artifact policy:** if a future decision requires a font that cannot be legally committed, **no unlicensed binary is added** — record the gap as a missing artifact and keep the fallback stack. (Not currently applicable: Vazirmatn is legally committed.)
 
@@ -156,7 +156,7 @@ An Elementor global font style carries a single size; the `h1`/`h2`/`h3` distinc
 
 ### 4.4 Fonts inside Elementor
 
-**Preferred:** Elementor → **Custom Fonts** — upload `Vazirmatn` 400/700 (woff2), native font picker, editable by normal Elementor editing. Official Elementor documentation describes this workflow; secondary sources attribute it to **Elementor Pro** — the free-vs-Pro boundary on the installed real-host version is **NOT VERIFIED**. If the feature is unavailable on the installed edition, the **fallback** is a minimal `@font-face` CSS layer — justified as a required capability (self-hosted Persian font; third-party font CDNs are not acceptable here), not a preference for custom code.
+**Theme-owned:** the Git-owned Hello child serves Vazirmatn 400/700 woff2 with `@font-face` (`font-display: swap`) and registers `Vazirmatn` in Elementor’s font picker using `elementor/fonts/groups` and `elementor/fonts/additional_fonts`. Select that family in Elementor Global Fonts; the global typography styles remain Elementor-owned. Do **not** upload a second copy through Elementor Pro Custom Fonts: Pro export depends on plan and cannot be the reproducible font source. Free-CI font registration is not Pro/real-host acceptance.
 
 ### 4.5 Minimal CSS/JS support — declared needs (not shipped yet)
 

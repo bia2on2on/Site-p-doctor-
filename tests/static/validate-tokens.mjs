@@ -337,6 +337,18 @@ if (Array.isArray(el.css_support_required) && el.css_support_required.length >= 
   ko("elementor.css_support_required must record each minimal-CSS need with a justification");
 }
 
+// CSS values and font paths must stay bound to the canonical token roles.
+const css = readFileSync(join(root, "themes/cpms-child/foundation.css"), "utf8");
+for (const f of files) {
+  if (f?.path && !css.includes(`fonts/${f.path.split("/").at(-1)}`)) ko(`CSS missing token font: ${f.path}`);
+}
+if (css.includes(`outline: ${focus.ring_width_px}px solid ${roles[focus.ring_color]?.value}`) &&
+    css.includes(`outline-offset: ${focus.ring_offset_px}px`) &&
+    [...new Set(files.map((f) => f.weight))].every((w) => css.includes(`font-weight: ${w};`)) &&
+    css.includes("font-display: swap") && css.includes("prefers-reduced-motion: reduce")) {
+  ok("theme foundation CSS matches focus/font tokens and motion policy");
+} else ko("theme foundation CSS drift from focus/font/motion tokens");
+
 // ---- 7. reconstruction manifest honesty + integrity -------------------------
 const manifest = readJson("reconstruction/manifest.json");
 if (manifest) {
