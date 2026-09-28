@@ -124,6 +124,7 @@ export function productOverview(t) {
         _element_id: 'workflow-stages', flex_direction_tablet: 'row', flex_direction_mobile: 'column', flex_gap: gap(0), flex_gap_mobile: gap(0),
         background_background: 'classic', background_color: color('surface/card'),
       }),
+      text('<a href="/appointment-reception-queue/">جزئیات جریان نوبت، پذیرش و صف</a> را از نگاه تیم کلینیک دنبال کنید.'),
     ]),
     band('Product evaluation with bounded capability grouping', 'product-review', [row('Product context and compact evaluation topics', [
       column('Product evidence context', [

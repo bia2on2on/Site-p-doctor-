@@ -1,0 +1,20 @@
+{
+  "publication": "TARGET — NOT PUBLICATION-APPROVED",
+  "scope": "First representative workflow page: clinic-side appointment → reception → queue path",
+  "canonical_recipe": "reconstruction/appointment-reception-queue/recipe.mjs",
+  "claim_register": "reconstruction/appointment-reception-queue/claims.md",
+  "browser_runner": "tests/browser/appointment-reception-queue.mjs",
+  "seo": {
+    "title": "نرم افزار نوبت دهی مطب و کلینیک؛ پذیرش و صف انتظار | برای مدیران کلینیک | CPMS",
+    "description_source": "WordPress page excerpt via existing Koorosh mechanism",
+    "plugin": "none",
+    "intent": "Clinic-side appointment/reception/queue commercial intent (SEO-KEYWORD-MAP Clusters 2–3, software intent only); explicitly NOT patient/government appointment-navigation intent; does not target Product Overview's Cluster-1 heads"
+  },
+  "product_truth_boundary": "PRODUCT-TRUTH §3 #1/#9/#12 ceiling REVERIFY BEFORE PUBLIC LAUNCH: reception mechanisms described, full reception phase NOT closed at snapshot and not promised; appointment mechanism described, public online booking NOT claimed; SMS/reminder NOT claimed",
+  "media": "Two reserved Elementor-editable frames (appointment schedule; reception arrival/queue board). Launch blocker: verified real CPMS media with synthetic/demo data must replace both before public launch.",
+  "conversion": "Primary CTA links to the real Demo/Consultation page (/demo/); secondary link to Product Overview (/product-overview/). Launch blocker: live lead delivery NOT CONFIGURED / NOT AUTHORIZED; page states the demo form is technical/non-live.",
+  "launch_blockers": [
+    "Real verified CPMS media (synthetic/demo data) must replace reserved media",
+    "Live lead delivery must be configured and authorized"
+  ]
+}
