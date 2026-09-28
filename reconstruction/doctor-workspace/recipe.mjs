@@ -69,16 +69,24 @@ export function doctorWorkspace(t) {
   // Compact handoff strip: four labelled positions joined by native RTL arrows.
   // Deliberately not the numbered step rail of the earlier workflow pages — this
   // page's compositional idea is "workspace inside continuing context".
+  // Explicit percentage widths are required: Elementor containers default to
+  // `width: 100%`, so a wrapped flex row would otherwise place every child on
+  // its own line. Sized this way the strip packs one row at desktop/tablet and
+  // wraps into station+arrow lines on mobile (browser-tested at all viewports).
   const station = (id, label, note) => container(label, [
     heading(label, 'p', 'body-sm', { title_color: color('accent/primary') }),
     text(note, 'caption'),
   ], {
     html_tag: 'article', _element_id: id, flex_gap: gap(4), padding: box(12, 0),
+    width: width(20), width_tablet: width(18), width_mobile: width(44),
     border_border: 'solid', border_width: { ...box(0), bottom: '1', isLinked: false }, border_color: color('border/subtle'),
   });
   const arrow = () => container('Handoff arrow (RTL: onward)', [
     heading('←', 'p', 'h3', { title_color: color('accent/primary') }),
-  ], { padding: box(12, 0), flex_gap: gap(0) });
+  ], {
+    padding: box(12, 0), flex_gap: gap(0),
+    width: width(3), width_tablet: width(4), width_mobile: width(9),
+  });
   const panelItem = (label, note) => container(label, [
     heading(label, 'p', 'body-sm', { title_color: color('ink/primary') }),
     text(note, 'caption'),

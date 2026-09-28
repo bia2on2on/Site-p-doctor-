@@ -66,6 +66,29 @@ assert.equal(strip.settings.flex_direction, 'row', 'Handoff strip stays horizont
 const stations = nodes.filter(n => n.settings._element_id && /^station-/.test(n.settings._element_id));
 assert.deepEqual(stations.map(n => n.settings._element_id), ['station-reception', 'station-workspace', 'station-patient', 'station-records'],
   'Four handoff positions in RTL DOM order');
+// Elementor containers default to `width: 100%`, which under `flex_wrap: wrap`
+// would put each child on its own line (observed in CI at exact head). Stations
+// and arrows therefore need explicit percentage widths at every breakpoint so
+// the strip packs one row at desktop/tablet and wraps station+arrow lines on mobile.
+for (const station of stations) {
+  for (const key of ['width', 'width_tablet', 'width_mobile']) {
+    assert.equal(station.settings[key]?.unit, '%',
+      `Station ${station.settings._element_id} needs explicit ${key} in % (Elementor .e-con defaults to width: 100%)`);
+  }
+}
+assert.equal(stations[0].settings.width.size, 20, 'Desktop station width fixed');
+assert.equal(stations[0].settings.width_tablet.size, 18, 'Tablet station width fixed');
+assert.equal(stations[0].settings.width_mobile.size, 44, 'Mobile station width fixed');
+const stripArrows = strip.children.filter(child => !child.settings._element_id);
+assert.equal(stripArrows.length, 3, 'Three arrow children in the strip');
+for (const a of stripArrows) {
+  for (const key of ['width', 'width_tablet', 'width_mobile']) {
+    assert.equal(a.settings[key]?.unit, '%', `Arrow needs explicit ${key} in %`);
+  }
+}
+assert.equal(stripArrows[0].settings.width.size, 3, 'Desktop arrow width fixed');
+assert.equal(stripArrows[0].settings.width_tablet.size, 4, 'Tablet arrow width fixed');
+assert.equal(stripArrows[0].settings.width_mobile.size, 9, 'Mobile arrow width fixed');
 
 // Buttons: only real existing pages; contextual patient-record + demo coverage.
 const existingPages = ['/demo/', '/patient-record-continuity/', '/appointment-reception-queue/', '/product-overview/'];

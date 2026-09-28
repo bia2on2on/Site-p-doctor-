@@ -265,15 +265,18 @@ echo wp_json_encode(array('id' => $id, 'status' => get_post_status($id), 'editab
       }
       // The strip wraps onto multiple rows instead of overflowing.
       assert(new Set(composition.strip.map(c => c.y)).size >= 2, 'Mobile handoff strip wraps rather than compressing');
-    } else if (width >= 1366) {
-      // Desktop: one connected RTL row — positions right-to-left, arrows between.
+    } else {
+      // Tablet and desktop: one connected RTL row — positions right-to-left,
+      // arrows between. Deterministic because every child has an explicit
+      // percentage width (Elementor containers default to width: 100%, which
+      // under flex-wrap would otherwise stack one child per line).
       for (const [i, child] of composition.strip.entries()) {
-        assert(Math.abs(child.y - composition.strip[0].y) < 2, `Desktop strip shares a baseline: ${child.label}`);
+        assert(Math.abs(child.y - composition.strip[0].y) < 2, `Single-row strip shares a baseline: ${child.label}`);
         if (i > 0) {
           const prev = composition.strip[i - 1];
-          assert(child.x < prev.x, `Desktop RTL strip order: ${child.label} sits to the left of ${prev.label}`);
+          assert(child.x < prev.x, `RTL strip order: ${child.label} sits to the left of ${prev.label}`);
           const gapPx = prev.x - (child.x + child.width);
-          assert(gapPx >= 0 && gapPx <= 90, `Desktop strip children do not overlap and stay adjacent: ${child.label} (gap ${Math.round(gapPx)}px)`);
+          assert(gapPx >= 0 && gapPx <= 90, `Strip children do not overlap and stay adjacent: ${child.label} (gap ${Math.round(gapPx)}px)`);
         }
       }
     }
