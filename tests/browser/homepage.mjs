@@ -49,16 +49,22 @@ foreach ($requested as $kind => $keys) {
   $result[$kind] = array();
   foreach ($keys as $key) {
     // Query individual public controls: get_controls(null) omits lazy style controls in CLI context.
-    if ($element && $element->get_controls($key) !== null) { $result[$kind][] = $key; }
+    $control = $element ? $element->get_controls($key) : null;
+    if ($control === null && $element && preg_match('/_(mobile|tablet)$/', $key, $match)) {
+      $base = substr($key, 0, -strlen($match[0]));
+      $parent = $element->get_controls($base);
+      // Official responsive suffixes; newer Elementor generates these controls in the editor.
+      $active = $p->breakpoints->get_active_breakpoints();
+      if (isset($active[$match[1]]) && is_array($parent) && (!empty($parent['is_responsive']) || array_key_exists('responsive', $parent))) { $control = $parent; }
+    }
+    if ($control !== null) { $result[$kind][] = $key; }
   }
 }
 echo wp_json_encode($result);
 `));
 writeFileSync(resolve(out, 'native-controls.json'), JSON.stringify(schemas, null, 2));
-for (const n of all) {
-  assert(schemas[n.kind], `Native Free element missing: ${n.kind}`);
-  for (const key of Object.keys(n.settings)) assert(schemas[n.kind].includes(key), `Unsupported native control: ${n.kind}.${key}`);
-}
+const unsupported = [...new Set(all.flatMap(n => Object.keys(n.settings).filter(key => !schemas[n.kind]?.includes(key)).map(key => `${n.kind}.${key}`)))];
+assert.deepEqual(unsupported, [], 'Unsupported native controls (including active responsive variants)');
 
 
 wp('option', 'update', 'blog_public', '0');
@@ -194,7 +200,7 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
   assert.deepEqual(diagnostic.externalRequests, [], 'No remote fonts/scripts/media');
   await visitor.close();
   diagnostic.result = 'PASS';
-  console.log(`PASS: persisted Elementor homepage; ${all.length} native elements; four viewport and CTA checks`);
+  console.log(`::notice title=Homepage proof::PASS: persisted and reopened native Elementor page ${id}; ${all.length} elements; HTTP/RTL/H1/metadata/local-font/focus/CTA/overflow/network checks at all four viewports; runtime ${JSON.stringify(state)}`);
 } catch (error) {
   diagnostic.result = 'FAIL';
   diagnostic.error = error.stack;
