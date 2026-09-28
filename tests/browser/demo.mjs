@@ -331,16 +331,18 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
 
   // Standard non-AJAX POST test: proves full functionality without JavaScript
   console.log('Testing standard non-AJAX POST flow...');
-  const noJsContext = await browser.newContext({ javaScriptEnabled: false });
+  const noJsContext = await browser.newContext({ reducedMotion: 'reduce', javaScriptEnabled: false });
   const noJsPage = await noJsContext.newPage();
-  await noJsPage.goto(base);
+  await noJsPage.goto(base, { waitUntil: 'networkidle' });
   await noJsPage.locator('#cpms-contact-name').fill('دکتر آزمایشی سینا');
   await noJsPage.locator('#cpms-org-name').fill('کلینیک تخصصی نمونه');
   await noJsPage.locator('#cpms-contact-value').fill('test-clinic@example.test');
   await noJsPage.locator('#cpms-org-type').selectOption('clinic');
   await noJsPage.locator('#cpms-doctor-count').selectOption('3-5');
-  await noJsPage.locator('#cpms-submit-btn').click();
-  await noJsPage.waitForLoadState('networkidle');
+  await Promise.all([
+    noJsPage.waitForNavigation({ waitUntil: 'networkidle' }),
+    noJsPage.locator('#cpms-submit-btn').click({ force: true }),
+  ]);
   const noJsSuccess = noJsPage.locator('#cpms-form-success-notice');
   assert(await noJsSuccess.isVisible(), 'Standard POST without JS renders safe non-live success notice');
   await noJsContext.close();
