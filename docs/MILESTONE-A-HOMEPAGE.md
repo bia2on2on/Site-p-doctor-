@@ -63,3 +63,11 @@ The attempted JPEG Checks-API transport was not usable: retrieved messages were 
 - Screenshot creation: **RUN** at all four target sizes; not fabricated, not a PHP/static substitute.
 - Pro host/pilot, kit/global-settings round-trip, real product media, real lead endpoint, launch approval, production performance and full accessibility audit: unchanged separate gates.
 - Leave PR #13 **OPEN**. No merge or deployment authorized by these results.
+
+## Product Owner visual revision — continuing PR #13
+
+**Previous head:** `7c71f6c8a8be6e9b9201a2ada0a93f7a6027eeff`. Live GitHub confirmed PR OPEN on the same branch, main unchanged at `99e743596481c34447af3d8a136239dd521f9652`, no competing PR. The restored local checkout was at main with the previous PR files uncommitted; all 39 files matched the authoritative PR head byte-for-byte, with no extra untracked files. Preserved that restored snapshot in a named stash and fast-forwarded the same branch, without resetting/discarding work or creating another branch.
+
+**Owner evidence:** actual mobile/tablet/desktop screenshots reviewed; basic hero message, natural RTL, calm palette, sequence and consultation direction accepted. **Milestone A is NOT VISUALLY ACCEPTED.** This supersedes earlier “owner review not run” context; agent image inspection remains a separate fact. The reference was described as inspiration in the task; no reference image file was present in this turn, and no factual/visual product evidence was inferred from it.
+
+Revision: stronger native reserved-media frame (no fake UI); wider, 18px/1.9 mobile reading copy and shorter paragraphs; connected numbered workflow rail (horizontal RTL at tablet/desktop → vertical at mobile); 48px desktop section rhythm; split editorial layouts and compact bounded product/objection grouping; an emphasized but honest consultation panel. No changes to theme PHP/CSS, plugins, runtime pins, production assets or the authoring mechanism. Added browser assertions for the requested changes without dropping any existing assertions. New screenshots use the existing artifact mechanism and filenames. Exact new head/checks/artifact and any failure diagnosis are recorded in the PR report after execution. No merge.

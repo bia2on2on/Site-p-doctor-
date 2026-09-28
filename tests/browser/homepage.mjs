@@ -80,6 +80,7 @@ wp('post', 'meta', 'update', id, '_wp_page_template', 'page-elementor.php');
 
 const browser = await chromium.launch({ headless: true });
 let editor;
+let frontend;
 const diagnostic = { editorErrors: [], frontendErrors: [], failedRequests: [], badResponses: [], externalRequests: [], views: [], pageId: id, elementCount: all.length };
 try {
   const admin = await browser.newContext({ viewport: { width: 1440, height: 1000 }, locale: 'en-US' });
@@ -145,6 +146,7 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
 
   const visitor = await browser.newContext({ reducedMotion: 'reduce' });
   const page = await visitor.newPage();
+  frontend = page;
   page.on('pageerror', e => diagnostic.frontendErrors.push(e.message));
   page.on('console', m => { if (m.type() === 'error') diagnostic.frontendErrors.push(m.text()); });
   page.on('requestfailed', r => diagnostic.failedRequests.push({ url: r.url(), failure: r.failure() }));
@@ -181,6 +183,56 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
     assert(measures.font.includes('Vazirmatn') && measures.fontLoaded, 'Local Persian font loaded');
     assert.deepEqual(measures.brokenAnchors, []);
     assert.deepEqual(measures.offsiteLinks, []);
+    const composition = await page.evaluate(() => {
+      const rect = selector => {
+        const r = document.querySelector(selector).getBoundingClientRect();
+        return { x: r.x, y: r.y, width: r.width, height: r.height };
+      };
+      return {
+        hero: rect('#hero-copy'), media: rect('#product-media'), surface: rect('#media-reserved-surface'),
+        stages: ['appointment', 'reception', 'visit'].map(id => {
+          const selector = `#stage-${id}`;
+          const style = getComputedStyle(document.querySelector(selector));
+          return { ...rect(selector), topBorder: parseFloat(style.borderTopWidth), startBorder: parseFloat(style.borderRightWidth) };
+        }),
+        reading: [...document.querySelectorAll('.cpms-reading p')].map(p => {
+          const style = getComputedStyle(p);
+          return { font: parseFloat(style.fontSize), line: parseFloat(style.lineHeight), width: p.getBoundingClientRect().width };
+        }),
+      };
+    });
+    assert(composition.reading.length > 0, 'Reading-copy measurements must not be vacuous');
+    const levels = measures.headings.map(h => Number(h.tag.slice(1)));
+    assert.equal(levels[0], 1, 'H1 precedes subsection headings');
+    assert(levels.every((level, i) => i === 0 || level <= levels[i - 1] + 1), 'No skipped heading levels');
+    assert(await page.locator('#media-reserved-disclosure').isVisible(), 'Reserved-media disclosure remains visible');
+    assert(composition.surface.height >= (width < 768 ? 256 : 320), 'Intentional media reservation, not a collapsed empty state');
+    if (width < 768) {
+      assert(composition.hero.width >= width - 40, 'Comfortable mobile hero content width');
+      for (const p of composition.reading) {
+        assert(p.font >= 18 && p.line / p.font >= 1.85, 'Mobile reading text >=18px with Persian-friendly leading');
+        assert(p.width >= 300, 'Mobile reading copy must not sit in narrow nested columns');
+      }
+      composition.stages.forEach((step, i, steps) => {
+        assert.equal(step.topBorder, 0, 'Horizontal rail removed on mobile');
+        assert.equal(step.startBorder, 2, 'Vertical RTL inline-start progression rail');
+        if (i) {
+          assert(Math.abs(step.x - steps[i - 1].x) < 2, 'Mobile stages align');
+          assert(Math.abs(step.y - (steps[i - 1].y + steps[i - 1].height)) < 2, 'Mobile stages join vertically in DOM order');
+        }
+      });
+    } else {
+      composition.stages.forEach((step, i, steps) => {
+        assert.equal(step.topBorder, 2, 'Horizontal progression rail on tablet/desktop');
+        if (i) {
+          assert(Math.abs(step.y - steps[i - 1].y) < 2, 'Horizontal stages share a baseline');
+          assert(step.x < steps[i - 1].x, 'Native RTL progression: 01 at right, 03 at left');
+          assert(Math.abs(step.x + step.width - steps[i - 1].x) < 2, 'Horizontal rail is connected');
+        }
+      });
+      if (width > 1024) assert(composition.media.width >= composition.hero.width, 'Product media has deliberate desktop prominence');
+    }
+    console.log(`::notice title=Homepage composition ${name}::PASS: workflow ${width < 768 ? 'vertical' : 'RTL horizontal'}; minimum reading width ${Math.round(Math.min(...composition.reading.map(p => p.width)))}px; media ${Math.round(composition.media.width)}x${Math.round(composition.media.height)}px`);
     await page.screenshot({ path: resolve(out, `${name}.png`), fullPage: true });
     await page.screenshot({ path: resolve(out, `${name}-viewport.png`) });
     // Keyboard reachability and focus style; no programmatic focus shortcut.
@@ -192,7 +244,7 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
     await page.keyboard.press('Enter');
     await page.waitForURL(/#demo-consultation$/);
     assert(await page.locator('#demo-consultation').isVisible());
-    diagnostic.views.push({ name, width, height, ...measures, ctaBox });
+    diagnostic.views.push({ name, width, height, ...measures, ctaBox, composition });
   }
   assert.deepEqual(diagnostic.frontendErrors, [], 'Frontend console/page errors');
   assert.deepEqual(diagnostic.failedRequests, [], 'Failed frontend requests');
@@ -204,6 +256,7 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
 } catch (error) {
   diagnostic.result = 'FAIL';
   diagnostic.error = error.stack;
+  if (frontend && !frontend.isClosed()) await frontend.screenshot({ path: resolve(out, 'failure-frontend.png'), fullPage: true }).catch(() => {});
   if (editor && !editor.isClosed()) await editor.screenshot({ path: resolve(out, 'failure-editor.png') }).catch(() => {});
   throw error;
 } finally {

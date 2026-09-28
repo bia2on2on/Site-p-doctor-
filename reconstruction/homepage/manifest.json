@@ -8,6 +8,7 @@
   "publication": "TARGET — NOT PUBLICATION-APPROVED",
   "media": "MEDIA REQUIRED — no verified product screenshot available",
   "conversion": "In-page anchor only; no authorized form/contact endpoint",
-  "owner_visual_acceptance": "NOT RUN",
-  "site_settings_round_trip": "NOT RUN — native control values resolved from canonical tokens; no global kit claimed"
+  "owner_visual_acceptance": "NOT ACCEPTED — owner revision requested",
+  "site_settings_round_trip": "NOT RUN — native control values resolved from canonical tokens; no global kit claimed",
+  "owner_review": "Owner reviewed initial mobile/tablet/desktop screenshots; message, RTL, palette, sequence and CTA direction accepted; visual revision still requires review"
 }

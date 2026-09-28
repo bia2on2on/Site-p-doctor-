@@ -19,3 +19,7 @@ Patient portal, multi-clinic, reporting detail and integrations are omitted rath
 ## Release gates (unchanged)
 
 No current Product Truth item is `PUBLISHABLE NOW`. The visible staging design notice and `blog_public=0` keep this review fixture distinct from a publicly marketed ready product. Before public launch: complete the eight-step Launch Truth Gate, review all Persian copy against launch evidence, supply verified media, authorize a real conversion route, and perform production/accessibility/SEO checks. Static forbidden-phrase tests are guardrails, **not** proof that all claims are truthful.
+
+## Owner visual revision (PR #13)
+
+The revision does not import factual content from a visual reference. The media frame remains explicitly **MEDIA REQUIRED / NOT product UI**, with a visible Persian disclosure. The product-review block now groups the already bounded patient-record/document (#8/#10/#11) and manual payment/financial-summary (#2) topics; finance was relocated from the workflow footnote, not upgraded into accounting or payment integration. Workflow wording is shorter but the reception scope caveat remains. Objection and consultation copy retains evaluation language and the no-submission notice. No new product capability or commercial/support promise is introduced.

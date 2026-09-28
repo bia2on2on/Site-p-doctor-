@@ -65,3 +65,11 @@ Artifacts are ignored locally, not binary additions to Git. No traces/storage st
 ### Visual review limitation in this sandbox
 
 Two clean CI runs produced the requested screenshots and passed browser assertions. The reviewer sandbox cannot download the artifact blobs. A bounded alternate notice transport was tried, but the retrieved messages were truncated (4096 bytes and only ten notices), so no image could be reconstructed or honestly inspected. That unsuccessful workaround was removed; standard PNG artifacts remain the maintainable evidence path. **Visual inspection / Milestone A acceptance remain NOT VERIFIED**, distinct from passing automated browser checks. Review the artifact through GitHub or an environment with artifact-download access before merge.
+
+## Owner visual revision — same native authoring path
+
+The hero now gives the reserved product-media frame a larger share of desktop width (54% vs 46% copy), an ink-colored media surface and an explicit visible disclosure below it. This is an editorial reservation, not simulated software chrome or product imagery. Replace the `media-reserved-surface` contents with a verified optimized image later; keep the enclosing media/caption structure.
+
+Mobile reading paragraphs use the existing 18px lede-mobile size and 1.9 body leading, instead of compressing supporting feature descriptions to 15px. Section side padding is 16px; eyebrows/buttons retain their distinct 15px role and supporting captions rise to 15px on mobile. Native body/spacing controls remain editable. Long paragraphs are shortened; desktop band padding reduces from 64px to 48px, with split editorial headings/content and compact grouped product/objection topics.
+
+The workflow is a single connected three-stage rail: numbered 48px markers, a continuous teal top rule at tablet/desktop, and an inline-start vertical rule on mobile. It is built entirely with native containers, text and responsive border controls (vendor `Group_Control_Border` exposes responsive width). There are no extra CSS/JS files, icons or images. Browser checks now measure actual mobile font/leading/column width, connected horizontal RTL → vertical workflow geometry, media reservation size/disclosure and heading hierarchy, in addition to all original checks. Passing geometry is not subjective visual acceptance.

@@ -25,7 +25,16 @@ console.log(`PASS: homepage guardrails (${nodes.length} native elements; claims 
 
 const manifest = JSON.parse(readFileSync(new URL('../../reconstruction/homepage/manifest.json', import.meta.url)));
 assert.equal(manifest.publication, 'TARGET — NOT PUBLICATION-APPROVED');
-assert.equal(manifest.owner_visual_acceptance, 'NOT RUN');
+assert.equal(manifest.owner_visual_acceptance, 'NOT ACCEPTED — owner revision requested');
 for (const field of ['canonical_recipe', 'reconstruction', 'claim_register', 'browser_runner']) {
   assert(readFileSync(new URL('../../' + manifest[field], import.meta.url)).length > 0);
 }
+
+// The reserved frame introduces white text on ink/primary; validate that exact token pair.
+const luminance = hex => {
+  const rgb = hex.slice(1).match(/../g).map(x => parseInt(x, 16) / 255).map(x => x <= .04045 ? x / 12.92 : ((x + .055) / 1.055) ** 2.4);
+  return rgb[0] * .2126 + rgb[1] * .7152 + rgb[2] * .0722;
+};
+const frameContrast = (luminance(tokens.color.roles['accent/contrast-on-accent'].value) + .05) / (luminance(tokens.color.roles['ink/primary'].value) + .05);
+assert(frameContrast >= 4.5, 'Reserved-media text contrast must meet AA');
+console.log(`PASS: reserved-frame contrast ${frameContrast.toFixed(2)}:1; acceptance remains pending`);
