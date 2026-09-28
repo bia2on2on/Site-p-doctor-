@@ -169,6 +169,9 @@ template="$(run_wp wp eval 'echo wp_get_theme()->get("Template");')" \
 parent="$(run_wp wp eval 'echo wp_get_theme()->parent() ? wp_get_theme()->parent()->get_stylesheet() : "";')" \
   && expect_eq "No parent theme" "" "$parent" \
   || ko "Parent theme check failed"
+menu_locations="$(run_wp wp eval '$m = get_registered_nav_menus(); echo (isset($m["primary"]) && isset($m["footer"])) ? "yes" : "no";')" \
+  && expect_eq "Fallback primary/footer menu locations registered" "yes" "$menu_locations" \
+  || ko "Fallback menu locations could not be verified"
 run_wp wp plugin is-active elementor >/dev/null 2>&1 \
   && ok "Free Elementor still active with Koorosh active" \
   || ko "Free Elementor no longer active after Koorosh activation"
@@ -180,6 +183,9 @@ home_body="$(curl --fail --silent --show-error "$BASE_URL/")" \
   && ok "Activated Koorosh homepage HTTP 200" || ko "Activated Koorosh homepage HTTP request failed"
 for asset in 'koorosh/style.css' 'koorosh/foundation.css'; do
   if [[ "$home_body" == *"/themes/$asset"* ]]; then ok "Homepage references $asset"; else ko "Homepage missing $asset"; fi
+done
+for marker in 'skip-link' '<main id="content"' 'site-header' 'site-footer'; do
+  if [[ "$home_body" == *"$marker"* ]]; then ok "Homepage contains shell marker: $marker"; else ko "Homepage missing shell marker: $marker"; fi
 done
 for font in Vazirmatn-Regular.woff2 Vazirmatn-Bold.woff2; do
   response="$(curl --silent --show-error --output /dev/null --write-out '%{http_code} %{content_type}' "$BASE_URL/wp-content/themes/koorosh/fonts/$font")"
