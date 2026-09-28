@@ -1,0 +1,18 @@
+# Local WordPress configuration, databases and backups (never canonical)
+wp-config.php
+.env
+.env.*
+*.sql
+*.sql.gz
+*.sqlite
+*.sqlite3
+*.wpress
+
+# Raw, unreviewed kit exports and any locally supplied proprietary plugin packages
+reconstruction/incoming/
+elementor-pro*.zip
+
+# Local overrides and browser authentication state
+.wp-env.override.json
+playwright/.auth/
+test-results/

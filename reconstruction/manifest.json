@@ -1,0 +1,38 @@
+{
+  "schema_revision": 1,
+  "status": "TEMPLATE — NO EXPORT OR REBUILD VALIDATED",
+  "verified_at_utc": "NOT YET VERIFIED",
+  "version_source": "NOT YET VERIFIED",
+  "versions": {
+    "wordpress": "NOT YET VERIFIED",
+    "elementor": "NOT YET VERIFIED",
+    "elementor_pro": "NOT YET VERIFIED",
+    "php": "NOT YET VERIFIED",
+    "database_engine": "NOT YET VERIFIED",
+    "database_version": "NOT YET VERIFIED",
+    "hello_elementor": "NOT YET VERIFIED",
+    "child_theme": "NOT YET VERIFIED",
+    "required_additional_plugins": "NOT YET VERIFIED"
+  },
+  "kit_export": {
+    "source_origin": "NOT YET VERIFIED",
+    "exported_at_utc": "NOT YET VERIFIED",
+    "selected_content": "NOT YET VERIFIED",
+    "selected_templates": "NOT YET VERIFIED",
+    "selected_settings": "NOT YET VERIFIED",
+    "selected_plugins": "NOT YET VERIFIED",
+    "media_mode": "NOT YET VERIFIED"
+  },
+  "artifacts": [],
+  "expected_inventory": {
+    "pages_and_slugs": "NOT YET VERIFIED",
+    "menus_and_locations": "NOT YET VERIFIED",
+    "theme_builder_parts_and_conditions": "NOT YET VERIFIED",
+    "global_settings": "NOT YET VERIFIED",
+    "pro_widgets": "NOT YET VERIFIED",
+    "media_and_relink_sources": "NOT YET VERIFIED",
+    "optional_wxr_disjoint_content": "NOT YET VERIFIED"
+  },
+  "clean_import_pilot": "NOT RUN",
+  "authorized_pro_host_acceptance": "NOT RUN"
+}
