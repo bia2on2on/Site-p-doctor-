@@ -1,0 +1,20 @@
+{
+  "publication": "TARGET — NOT PUBLICATION-APPROVED",
+  "scope": "Third representative workflow page: the bounded doctor-side workspace inside the connected clinic flow (reception context → doctor workspace → patient context → record/document continuation)",
+  "canonical_recipe": "reconstruction/doctor-workspace/recipe.mjs",
+  "claim_register": "reconstruction/doctor-workspace/claims.md",
+  "browser_runner": "tests/browser/doctor-workspace.mjs",
+  "seo": {
+    "title": "فضای کاری پزشک و جریان کار کلینیک | برای مدیران کلینیک | CPMS",
+    "description_source": "WordPress page excerpt via existing Koorosh mechanism",
+    "plugin": "none",
+    "intent": "Supporting workflow page — it does not own the primary clinic-software commercial cluster (SEO-KEYWORD-MAP Cluster 1 stays with Product Overview per §D ownership) and does not target the patient-record Cluster-4 head. Natural supporting intent around فضای کاری پزشک and مدیریت جریان کار پزشک در کلینیک, buyer marker retained in title/description; no broad physician/patient informational targeting, no patient-navigation intent, no keyword stuffing"
+  },
+  "product_truth_boundary": "PRODUCT-TRUTH §3 #8 (doctor workspace — strong bounded evidence) as the primary ceiling, with #1/#9/#12 (appointment/reception/queue) as the reception-side continuation, #10 (patient records) as linked patient context, #11 (prescriptions/documents) bounded to recording/management inside CPMS with an explicit distinction from national e-prescription connection, and #4/#5/#6 (roles, access, clinic data separation) at mechanism level only — all REVERIFY BEFORE PUBLIC LAUNCH. Clinical decision support, AI assistant, diagnosis recommendations, automated diagnosis, national e-prescription integration, insurance integration, telemedicine/video consultation, mobile app, guaranteed medical-history completeness, certification/compliance and medical-grade security wording are NOT claimed.",
+  "media": "Two reserved Elementor-editable frames (doctor workspace view; doctor + patient-context/detail view). Launch blocker: verified real CPMS media with synthetic/demo records must replace both before public launch.",
+  "conversion": "Primary CTA links to the real Demo/Consultation page (/demo/); contextual links to /patient-record-continuity/, /appointment-reception-queue/ and /product-overview/. Launch blocker: live lead delivery NOT CONFIGURED / NOT AUTHORIZED; page states the demo form is technical/non-live.",
+  "launch_blockers": [
+    "Real verified CPMS media (synthetic/demo records) must replace reserved media",
+    "Live lead delivery must be configured and authorized"
+  ]
+}
