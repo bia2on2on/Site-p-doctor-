@@ -49,3 +49,17 @@ Run `36407232451`, head `0367545f042a05a96ea049350d921e3fa6c1cf57`: static and f
 Run `36407580896`, exact head `b3868092b10d040f2fb1b284e4c9febe24e667c6`: **both checks SUCCESS**. Foundation smoke **33/33**, plus real Chromium authoring/persistence and anonymous frontend checks at **390×844, 768×1024, 1366×768, 1920×1080**. Front page ID 7, `show_on_front=page`, Elementor editable true, theme `koorosh`, Free Elementor 4.3.2, `fa_IR`, `blog_public=0`; 78 native elements survived editor reload. HTTP/H1/metadata/local font/keyboard focus/CTA/overflow/network assertions passed. Artifact **10963151652**, `homepage-evidence-b3868092b10d040f2fb1b284e4c9febe24e667c6`, 1,552,225 bytes.
 
 Visual inspection was initially **NOT RUN** despite screenshot capture: the sandbox cannot reach GitHub's Azure artifact download host (**C**), including a direct Actions API download attempt. A capped, opt-in anonymous JPEG Checks-API evidence transport was added to allow actual inspection without adding services, permissions or committing screenshot binaries. Visual findings must be recorded only after opening those images.
+
+## Second clean pass and remaining visual-review blocker
+
+Run `36408122593`, exact head `20e298b059df41c6495266680e0a48cd4a8f6cce`: **both checks SUCCESS**, including the same persisted native-page, four-viewport and frontend assertions. Artifact **10963885205**, `homepage-evidence-20e298b059df41c6495266680e0a48cd4a8f6cce`, 1,888,722 bytes. This proves a second fresh Free reconstruction, **not** the unrelated Pro/kit clean-import pilot.
+
+The attempted JPEG Checks-API transport was not usable: retrieved messages were truncated to 4096 bytes and ten image notices; concatenation validation correctly refused to produce incomplete images (**C**, evidence-retrieval environment). It was removed rather than growing a custom transport subsystem. **No screenshot has been visually inspected by this agent.** Do not equate automated no-overflow/focus/RTL checks with visual design approval. The first major visual review must inspect `mobile.png`, `tablet.png`, `desktop.png` and corresponding viewport captures in the standard artifact before merge. Final-head checks/artifact ID are recorded in PR #13 after the final push.
+
+### Milestone A handoff
+
+- Functional implementation and native Free editability: exercised in real Chromium/WordPress, two clean successful runs above.
+- Visual inspection and owner acceptance: **NOT VERIFIED / NOT RUN**; blocked only on this sandbox's artifact retrieval, not claimed complete.
+- Screenshot creation: **RUN** at all four target sizes; not fabricated, not a PHP/static substitute.
+- Pro host/pilot, kit/global-settings round-trip, real product media, real lead endpoint, launch approval, production performance and full accessibility audit: unchanged separate gates.
+- Leave PR #13 **OPEN**. No merge or deployment authorized by these results.

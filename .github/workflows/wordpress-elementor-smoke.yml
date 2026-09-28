@@ -67,9 +67,6 @@ jobs:
           npx playwright install --with-deps chromium
 
       - name: Reconstruct native Free homepage and capture browser evidence
-        env:
-          # Milestone A: optional JPEG review via the Checks API when blob egress is blocked.
-          CPMS_INLINE_REVIEW: '1'
         run: node tests/browser/homepage.mjs
 
       - name: Upload homepage evidence (also on failure)

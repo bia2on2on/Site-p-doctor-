@@ -8,3 +8,10 @@
 - **PUBLIC CI:** Koorosh + Elementor Free compatibility/reconstruction smoke.
 - **PRIVATE ACCEPTANCE:** Elementor Pro + kit export/import + authorized test host.
 - **REFERENCE HOST:** recorded versions are test/evidence facts, not architecture locks.
+
+
+## Homepage — Milestone A
+
+The first Persian/RTL homepage is reconstructed as native **Elementor Free** content, not hardcoded theme markup. See [reconstruction instructions](reconstruction/homepage/README.md), [claim boundaries](reconstruction/homepage/claims.md), and the [Milestone A evidence/limitations](docs/MILESTONE-A-HOMEPAGE.md).
+
+Development/CI only. Verified product media, a real demo/contact route, launch-truth approval, and visual acceptance are still required. The authorized Pro host pilot remains **NOT RUN**.
