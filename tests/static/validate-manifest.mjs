@@ -134,18 +134,27 @@ const hostPhpFamily = String(hv.php ?? "").split(".").slice(0, 2).join(".");
 
 const coreRef = String(wpEnv.core ?? "");
 const pluginUrl = String((wpEnv.plugins ?? [])[0] ?? "");
-const themeUrl = String((wpEnv.themes ?? [])[0] ?? "");
+const themeMap = String((wpEnv.themes ?? [])[0] ?? "");
 const phpPin = String(wpEnv.phpVersion ?? "");
 
 const parity = {
   wordpress: coreRef === `WordPress/WordPress#${hostWp}`,
   elementor_free: pluginUrl === `https://downloads.wordpress.org/plugin/elementor.${hostEl}.zip`,
-  hello_elementor: themeUrl === `https://downloads.wordpress.org/theme/hello-elementor.${hostHello}.zip`,
   php: /^\d+\.\d+$/.test(phpPin) && phpPin === hostPhpFamily,
 };
+if (Array.isArray(wpEnv.themes) && wpEnv.themes.length === 1 && themeMap === "./themes/koorosh") {
+  ok("CI maps only the standalone Koorosh theme (Hello is not a CI dependency)");
+} else {
+  ko(`CI themes must be [\"./themes/koorosh\"], got ${JSON.stringify(wpEnv.themes)}`);
+}
+if (hostHello === "3.5.1") {
+  ok("host Hello Elementor 3.5.1 remains recorded as host evidence (not a Koorosh parent)");
+} else {
+  ko(`host hello_elementor evidence expected 3.5.1, got ${hostHello}`);
+}
 for (const [k, holds] of Object.entries(parity)) {
   if (holds) ok(`CI parity (computed): ${k} pin matches owner-reported host (family-only for php)`);
-  else ko(`CI parity broken: ${k} pin (${k === "wordpress" ? coreRef : k === "elementor_free" ? pluginUrl : k === "hello_elementor" ? themeUrl : phpPin}) does not match owner-reported host value`);
+  else ko(`CI parity broken: ${k} pin (${k === "wordpress" ? coreRef : k === "elementor_free" ? pluginUrl : phpPin}) does not match owner-reported host value`);
 }
 if (phpPin.split(".").length === 2) {
   ok(`PHP pin is major.minor only (${phpPin}) — patch-level parity is not even representable`);
@@ -171,8 +180,7 @@ if (parity.wordpress) expectPrefix("wordpress", "EXACT");
 else ko("ci_alignment.wordpress claims cannot be validated because the wordpress pin does not match");
 if (parity.elementor_free) expectPrefix("elementor_free", "EXACT");
 else ko("ci_alignment.elementor_free claims cannot be validated because the elementor pin does not match");
-if (parity.hello_elementor) expectPrefix("hello_elementor", "EXACT");
-else ko("ci_alignment.hello_elementor claims cannot be validated because the hello pin does not match");
+expectPrefix("hello_elementor", "HOST EVIDENCE ONLY");
 expectPrefix("php", "FAMILY ONLY");
 if (parity.php && String(ca.php).includes(hostPhpFamily)) ok("ci_alignment.php names the pinned family");
 else ko("ci_alignment.php must name the pinned family");

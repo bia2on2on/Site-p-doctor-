@@ -70,7 +70,7 @@
     "basis": "owner-reported host evidence (host_environment)",
     "wordpress": "EXACT — owner-reported 7.1.2 equals CI core pin",
     "elementor_free": "EXACT — owner-reported 4.3.2 equals CI plugin pin",
-    "hello_elementor": "EXACT — owner-reported 3.5.1 equals CI theme pin",
+    "hello_elementor": "HOST EVIDENCE ONLY — owner-reported 3.5.1 describes the host at evidence collection time; Koorosh is the intended project theme and has no Hello parent; Hello is not installed in public CI",
     "php": "FAMILY ONLY — host exact 8.1.34 (owner-reported); CI pin 8.1 (wp-env phpVersion format is major.minor only); NO patch-level parity claim",
     "elementor_pro": "EXCLUDED FROM PUBLIC CI — no Pro package, URL, credential, or activator in this repository; Pro acceptance tracked only by authorized_pro_host_acceptance (NOT RUN)",
     "database": "NO PARITY CLAIM — host MariaDB 11.4.13-MariaDB-cll-lve-log (owner-reported); CI uses wp-env default floating mariadb:lts image, unpinned",
@@ -105,7 +105,7 @@
   },
   "artifacts": [
     {
-      "path": "themes/cpms-child/fonts/Vazirmatn-Regular.woff2",
+      "path": "themes/koorosh/fonts/Vazirmatn-Regular.woff2",
       "kind": "font",
       "license": "OFL-1.1",
       "source": "https://github.com/rastikerdar/vazirmatn tag v33.003 (git blob c9824c872b3b4f2eb13a102748f8ef1a6ef97da0)",
@@ -114,7 +114,7 @@
       "added_at_utc": "2026-09-28"
     },
     {
-      "path": "themes/cpms-child/fonts/Vazirmatn-Bold.woff2",
+      "path": "themes/koorosh/fonts/Vazirmatn-Bold.woff2",
       "kind": "font",
       "license": "OFL-1.1",
       "source": "https://github.com/rastikerdar/vazirmatn tag v33.003 (git blob 65b427f86eba2cfa45900de247bc7cf3294cd1e5)",
@@ -123,7 +123,7 @@
       "added_at_utc": "2026-09-28"
     },
     {
-      "path": "themes/cpms-child/fonts/OFL.txt",
+      "path": "themes/koorosh/fonts/OFL.txt",
       "kind": "license",
       "license": "OFL-1.1",
       "source": "https://github.com/rastikerdar/vazirmatn tag v33.003 (git blob be66b3824e9772e75141e631695c5256f105fb57)",
@@ -144,9 +144,14 @@
   "clean_import_pilot": "NOT RUN",
   "authorized_pro_host_acceptance": "NOT RUN",
   "theme_layer": {
-    "ci_parent_pin": "hello-elementor 3.5.1 (WordPress.org themes API, 2026-09-28; equals owner-reported host version)",
-    "child": "themes/cpms-child",
+    "architecture": "standalone",
+    "name": "کوروش",
+    "slug": "koorosh",
+    "directory": "themes/koorosh",
+    "parent": "NONE",
+    "ci_theme": "./themes/koorosh",
+    "hello_elementor_host_evidence": "3.5.1 OWNER_REPORTED 2026-09-28 — historical/current-host theme at evidence collection; not Koorosh parent architecture",
     "ci_runtime": "NOT RUN",
-    "real_host": "OWNER_REPORTED 2026-09-28: Hello Elementor 3.5.1 active, no child theme active (expected pre-deployment state); AGENT_VERIFIED = NOT RUN"
+    "real_host": "OWNER_REPORTED 2026-09-28: Hello Elementor 3.5.1 active, no child theme active (pre-Koorosh deployment); AGENT_VERIFIED = NOT RUN"
   }
 }
