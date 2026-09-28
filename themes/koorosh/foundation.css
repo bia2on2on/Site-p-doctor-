@@ -24,4 +24,46 @@
     scroll-behavior: auto !important;
   }
 }
-/* Direction comes from WordPress html[dir]; future offsets must use logical properties. */
+/* Direction comes from WordPress html[dir]; shell layout uses logical properties. */
+.koorosh-skip-link {
+  position: absolute;
+  inset-block-start: 1rem;
+  inset-inline-start: 1rem;
+  z-index: 100000;
+  padding: 0.75rem 1rem;
+  color: #fff;
+  background: #0F6F66;
+  transform: translateY(calc(-100% - 1rem));
+}
+.koorosh-skip-link:focus {
+  transform: translateY(0);
+}
+.koorosh-fallback-header,
+.koorosh-fallback-footer {
+  max-inline-size: 100%;
+  padding: 1rem;
+}
+.koorosh-fallback-header__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+.koorosh-fallback-header nav,
+.koorosh-fallback-footer nav {
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+.koorosh-fallback-header nav ul,
+.koorosh-fallback-footer nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.koorosh-fallback-header a,
+.koorosh-fallback-footer a {
+  overflow-wrap: anywhere;
+}

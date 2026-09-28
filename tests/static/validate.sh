@@ -10,14 +10,16 @@
 #      phpVersion must be major.minor (wp-env documents the "0.0" format;
 #      host patch levels such as 8.1.34 are not configurable, so only family
 #      parity is representable and patch-level parity is never claimed).
-#   3. reconstruction/manifest.json parses as strict JSON and passes
+#   3. Koorosh shell structure, menu registration and safe Elementor locations
+#      (tests/static/validate-theme-shell.mjs).
+#   4. reconstruction/manifest.json parses as strict JSON and passes
 #      reconstruction/evidence validation (tests/static/validate-manifest.mjs):
 #      owner-reported host evidence with OWNER_REPORTED status, honesty
 #      sentinels, computed CI/host version parity, historical ZIP risk item,
 #      no emails/paths/credential-style keys in evidence blocks.
-#   4. Every GitHub Actions workflow file parses as YAML (PyYAML; installed
+#   5. Every GitHub Actions workflow file parses as YAML (PyYAML; installed
 #      on demand if missing).
-#   5. design-system tokens + manifest integrity (tests/static/validate-tokens.mjs:
+#   6. design-system tokens + manifest integrity (tests/static/validate-tokens.mjs:
 #      schema shape, WCAG contrast math, font budget/files, breakpoint contract,
 #      Elementor mapping coverage, manifest honesty sentinels and checksums).
 
@@ -82,7 +84,14 @@ process.exit(bad);
 	&& ok "Koorosh standalone theme identity (Theme Name کوروش, no parent, no cpms-child)" \
 	|| ko "Koorosh standalone theme identity failed"
 
-# ---- 3. reconstruction manifest ----------------------------------------------
+# ---- 3. Koorosh shell / Elementor integration contract -----------------------
+if node "$root/tests/static/validate-theme-shell.mjs"; then
+	ok "Koorosh semantic shell and safe Elementor location contract validated"
+else
+	ko "Koorosh shell contract validation failed"
+fi
+
+# ---- 4. reconstruction manifest ----------------------------------------------
 if node -e 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"))' \
 	"$root/reconstruction/manifest.json" 2>/dev/null; then
 	ok "reconstruction/manifest.json is valid JSON"
@@ -90,7 +99,7 @@ else
 	ko "reconstruction/manifest.json is not valid JSON"
 fi
 
-# ---- 4. Workflow YAML parses ---------------------------------------------------
+# ---- 5. Workflow YAML parses ---------------------------------------------------
 if ! python3 -c 'import yaml' 2>/dev/null; then
 	echo "PyYAML not present; installing pyyaml (host-local, not committed)"
 	python3 -m pip install --quiet --user pyyaml >/dev/null 2>&1 || {
@@ -118,14 +127,14 @@ else
 	ko "workflow YAML check NOT RUN (no YAML parser available)"
 fi
 
-# ---- 5. Design tokens + artifact integrity ------------------------------------
+# ---- 6. Design tokens + artifact integrity ------------------------------------
 if node "$root/tests/static/validate-tokens.mjs"; then
 	ok "design tokens and manifest integrity validated (tests/static/validate-tokens.mjs)"
 else
 	ko "design token validation failed (tests/static/validate-tokens.mjs)"
 fi
 
-# ---- 6. Host evidence, honesty sentinels, CI/host version parity --------------
+# ---- 7. Host evidence, honesty sentinels, CI/host version parity --------------
 if node "$root/tests/static/validate-manifest.mjs"; then
 	ok "host evidence, sentinels and CI/host version parity validated (tests/static/validate-manifest.mjs)"
 else

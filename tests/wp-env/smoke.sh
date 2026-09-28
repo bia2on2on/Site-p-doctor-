@@ -172,12 +172,33 @@ parent="$(run_wp wp eval 'echo wp_get_theme()->parent() ? wp_get_theme()->parent
 run_wp wp plugin is-active elementor >/dev/null 2>&1 \
   && ok "Free Elementor still active with Koorosh active" \
   || ko "Free Elementor no longer active after Koorosh activation"
+installed_plugins="$(run_wp wp plugin list --field=name)" || ko "Could not list installed plugins"
+if printf '%s\n' "${installed_plugins:-}" | grep -qx 'elementor-pro'; then
+  ko "Elementor Pro must remain absent from the free-Elementor smoke environment"
+else
+  ok "Elementor Pro is absent (free-Elementor smoke only)"
+fi
+nav_locations="$(run_wp wp eval '$locations = get_registered_nav_menus(); echo (isset($locations["primary"]) ? "primary" : "") . "," . (isset($locations["footer"]) ? "footer" : "");')" \
+  && expect_eq "Registered fallback menu locations" "primary,footer" "$nav_locations" \
+  || ko "Could not verify Koorosh menu locations"
 for php_file in functions.php index.php header.php footer.php; do
   run_wp php -l "/var/www/html/wp-content/themes/koorosh/$php_file" \
     && ok "PHP lint: $php_file" || ko "PHP lint failed: $php_file"
 done
 home_body="$(curl --fail --silent --show-error "$BASE_URL/")" \
   && ok "Activated Koorosh homepage HTTP 200" || ko "Activated Koorosh homepage HTTP request failed"
+if [[ "$home_body" == *'<main id="main-content"'* ]]; then
+  ok "No-Pro public smoke homepage contains the fallback main landmark"
+else ko "Homepage missing fallback main landmark"; fi
+if [[ "$home_body" == *'class="koorosh-fallback-header"'* ]]; then
+  ok "No-Pro public smoke homepage contains the fallback header"
+else ko "Homepage missing fallback header"; fi
+if [[ "$home_body" == *'class="koorosh-fallback-footer"'* ]]; then
+  ok "No-Pro public smoke homepage contains the fallback footer"
+else ko "Homepage missing fallback footer"; fi
+if [[ "$home_body" == *'class="koorosh-skip-link"'* ]]; then
+  ok "Homepage contains the accessible skip link"
+else ko "Homepage missing accessible skip link"; fi
 for asset in 'koorosh/style.css' 'koorosh/foundation.css'; do
   if [[ "$home_body" == *"/themes/$asset"* ]]; then ok "Homepage references $asset"; else ko "Homepage missing $asset"; fi
 done
