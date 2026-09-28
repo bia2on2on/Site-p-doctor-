@@ -22,10 +22,10 @@ Only Free **container, heading, text-editor and button** elements are used. Ther
 Requirements: Node **22+**, Docker, `@wordpress/env@11.16.0`, internet for pinned public packages. Run from repository root on a **fresh disposable environment**:
 
 ```sh
-npm install --global @wordpress/env@11.16.0
+npm ci --prefix tests/browser
+export PATH="$PWD/tests/browser/node_modules/.bin:$PATH"
 wp-env start
 bash tests/wp-env/smoke.sh
-npm ci --prefix tests/browser
 (cd tests/browser && npx playwright install --with-deps chromium)
 node tests/browser/homepage.mjs
 ```
@@ -56,3 +56,7 @@ CI extends, rather than replaces, the existing smoke job. Artifact name: `homepa
 Artifacts are ignored locally, not binary additions to Git. No traces/storage state/credentials/DB dumps are uploaded. A generated screenshot is **not** automatically a visual review: the PR report must say which images were actually opened and inspected. See `docs/MILESTONE-A-HOMEPAGE.md` and PR evidence for actual run outcomes.
 
 **Not implied:** host/Pro acceptance; authorized clean-import pilot; kit export/import; final global-settings round-trip; launch truth; final media/contact availability; production SEO/performance; full WCAG conformance or assistive-technology audit. The host pilot remains **NOT RUN**, and this runner never retries it.
+
+### CI dependency-resolution boundary
+
+`tests/browser/package-lock.json` locks the existing `@wordpress/env@11.16.0` plus Playwright tooling. The `@wp-playground/cli` transitive range is constrained to **3.1.54**: CI at `bc3d227153728812f8eb51d459d84f4410f2f8af` failed with npm ETARGET for the just-resolved `@php-wasm/node@3.1.56`; 3.1.55 also raises its Node engine above this tooling environment. Registry inspection confirmed 3.1.54 supports Node ≥20.10 and npm ≥10.2.3. This fixture requires Node 22+. Docker remains the only WordPress runtime; no Playground substitution, WordPress/Elementor pin change, Pro package or application dependency is introduced. Use `npm ci`, not a floating global install, for this slice.

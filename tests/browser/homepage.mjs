@@ -20,7 +20,7 @@ process.on('uncaughtException', error => {
 const base = 'http://localhost:8888'; // Browser runs on the CI runner, not in a user's browser.
 function wp(...args) {
   try {
-    return execFileSync('wp-env', ['run', 'cli', 'wp', ...args], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 120_000 }).trim();
+    return execFileSync(resolve(import.meta.dirname, 'node_modules/.bin/wp-env'), ['run', 'cli', 'wp', ...args], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 120_000 }).trim();
   } catch (error) {
     // Do not print command arguments (an ephemeral password can be among them).
     throw new Error(`wp-env CLI failed: ${error.stderr?.toString().replace(/user_pass=\S+/g, 'user_pass=[redacted]')}`);

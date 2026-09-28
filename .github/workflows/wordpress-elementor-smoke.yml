@@ -43,16 +43,17 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Install pinned @wordpress/env
+      - name: Install locked WordPress and browser tooling
         run: |
           # Public-package bootstrap: expose bounded diagnostics through annotations
           # as well as log blobs (the latter can be unreachable from review sandboxes).
-          if ! npm install --global --no-fund --no-audit @wordpress/env@11.16.0 > /tmp/wp-env-install.log 2>&1; then
+          if ! npm ci --prefix tests/browser --no-fund --no-audit > /tmp/wp-env-install.log 2>&1; then
             tail -20 /tmp/wp-env-install.log
             detail=$(tail -12 /tmp/wp-env-install.log | tr '\n' ' ')
             echo "::error title=wp-env package bootstrap::$detail"
             exit 1
           fi
+          echo "$GITHUB_WORKSPACE/tests/browser/node_modules/.bin" >> "$GITHUB_PATH"
 
       - name: Start clean WordPress environment with pinned free Elementor
         run: wp-env start
@@ -62,7 +63,6 @@ jobs:
 
       - name: Install bounded browser tooling
         run: |
-          npm ci --prefix tests/browser --no-audit --no-fund
           cd tests/browser
           npx playwright install --with-deps chromium
 
