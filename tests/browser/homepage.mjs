@@ -38,16 +38,23 @@ assert.equal(wp('post', 'list', '--post_type=page', `--name=${pageIdentity.slug}
 
 // Validate settings against the installed native controls before any page is created.
 // get_controls() is the public Controls_Stack API, not private storage inspection.
+const requestedControls = Object.fromEntries(['container', 'heading', 'text-editor', 'button'].map(kind => [kind, [...new Set(all.filter(n => n.kind === kind).flatMap(n => Object.keys(n.settings)))]]));
+const requestedBase64 = Buffer.from(JSON.stringify(requestedControls)).toString('base64');
 const schemas = JSON.parse(wp('eval', `
 $p = \\Elementor\\Plugin::$instance;
 $result = array();
-$result['container'] = array_keys($p->elements_manager->get_element_types('container')->get_controls());
-foreach (array('heading', 'text-editor', 'button') as $kind) {
-  $widget = $p->widgets_manager->get_widget_types($kind);
-  $result[$kind] = array_keys($widget->get_controls());
+$requested = json_decode(base64_decode('${requestedBase64}'), true);
+foreach ($requested as $kind => $keys) {
+  $element = $kind === 'container' ? $p->elements_manager->get_element_types($kind) : $p->widgets_manager->get_widget_types($kind);
+  $result[$kind] = array();
+  foreach ($keys as $key) {
+    // Query individual public controls: get_controls(null) omits lazy style controls in CLI context.
+    if ($element && $element->get_controls($key) !== null) { $result[$kind][] = $key; }
+  }
 }
 echo wp_json_encode($result);
 `));
+writeFileSync(resolve(out, 'native-controls.json'), JSON.stringify(schemas, null, 2));
 for (const n of all) {
   assert(schemas[n.kind], `Native Free element missing: ${n.kind}`);
   for (const key of Object.keys(n.settings)) assert(schemas[n.kind].includes(key), `Unsupported native control: ${n.kind}.${key}`);
@@ -57,7 +64,8 @@ writeFileSync(resolve(out, 'native-controls.json'), JSON.stringify(schemas, null
 wp('option', 'update', 'blog_public', '0');
 wp('option', 'update', 'blogname', 'CPMS');
 wp('option', 'update', 'blogdescription', '');
-wp('user', 'meta', 'update', 'admin', 'locale', 'en_US');
+const adminId = wp('user', 'get', 'admin', '--field=ID');
+wp('user', 'meta', 'update', adminId, 'locale', 'en_US');
 const password = randomBytes(24).toString('hex');
 wp('user', 'update', 'admin', `--user_pass=${password}`);
 const id = wp('post', 'create', '--post_type=page', '--post_status=draft', `--post_title=${pageIdentity.title}`, `--post_name=${pageIdentity.slug}`, `--post_excerpt=${pageIdentity.description}`, '--porcelain');
