@@ -25,7 +25,14 @@ fail=0
 
 note() { printf '%s\n' "$*"; }
 ok()   { printf 'PASS: %s\n' "$*"; pass=$((pass + 1)); }
-ko()   { printf 'FAIL: %s\n' "$*"; fail=$((fail + 1)); }
+# Every FAIL is also emitted as a GitHub annotation (::error) so failure
+# evidence stays retrievable via the check-runs API even where step-log
+# download is not possible (e.g. restricted egress to log blob storage).
+ko() {
+	printf 'FAIL: %s\n' "$*"
+	printf '::error title=Smoke FAIL::%s\n' "$*"
+	fail=$((fail + 1))
+}
 
 # expect_eq <label> <expected> <actual>
 expect_eq() {
@@ -43,6 +50,7 @@ run_wp() {
 }
 
 if [ ! -f "$WP_ENV_CONFIG" ]; then
+	printf '::error title=Smoke FAIL::config not found: %s\n' "$WP_ENV_CONFIG"
 	note "FAIL: config not found: $WP_ENV_CONFIG"
 	exit 2
 fi
@@ -104,6 +112,7 @@ else
 fi
 
 note "== Smoke result: $pass passed, $fail failed =="
+printf '::notice title=Smoke result::%s passed, %s failed\n' "$pass" "$fail"
 if [ "$fail" -gt 0 ]; then
 	note "This smoke test covers free Elementor CI only; NOT Elementor Pro acceptance."
 	exit 1
