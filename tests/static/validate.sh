@@ -10,6 +10,9 @@
 #   3. reconstruction/manifest.json parses as strict JSON.
 #   4. Every GitHub Actions workflow file parses as YAML (PyYAML; installed
 #      on demand if missing).
+#   5. design-system tokens + manifest integrity (tests/static/validate-tokens.mjs:
+#      schema shape, WCAG contrast math, font budget/files, breakpoint contract,
+#      Elementor mapping coverage, manifest honesty sentinels and checksums).
 
 set -u -o pipefail
 
@@ -81,6 +84,13 @@ if python3 -c 'import yaml' 2>/dev/null; then
 	fi
 else
 	ko "workflow YAML check NOT RUN (no YAML parser available)"
+fi
+
+# ---- 5. Design tokens + artifact integrity ------------------------------------
+if node "$root/tests/static/validate-tokens.mjs"; then
+	ok "design tokens and manifest integrity validated (tests/static/validate-tokens.mjs)"
+else
+	ko "design token validation failed (tests/static/validate-tokens.mjs)"
 fi
 
 printf '== Static validation result: %s passed, %s failed ==\n' "$pass" "$fail"
