@@ -11,8 +11,12 @@
 #
 # Scope: proves WordPress boots, the pinned WordPress version is retrievable,
 # Elementor is installed AND active AND runtime-loaded at the pinned version,
-# and the site responds over HTTP. This is a FREE-Elementor CI smoke test only;
-# it is NOT Elementor Pro acceptance and NOT a real-host compatibility proof.
+# the PHP runtime family matches the .wp-env.json pin (family/minor only —
+# patch-level parity with the host is neither configured nor claimed), the
+# database version is retrievable (recorded informationally, NOT
+# parity-asserted), and the site responds over HTTP. This is a FREE-Elementor
+# CI smoke test only; it is NOT Elementor Pro acceptance and NOT a real-host
+# compatibility proof.
 
 set -u -o pipefail
 
@@ -71,7 +75,17 @@ if (!m) { process.exit(1); }
 console.log(m[1]);
 ' "$WP_ENV_CONFIG")" || { note "FAIL: .wp-env.json elementor pin missing/malformed"; exit 2; }
 
-note "== Smoke: WordPress $expected_wp + free Elementor $expected_elementor ($BASE_URL) =="
+# phpVersion must be major.minor (wp-env documents the "0.0" format; exact
+# host patches like 8.1.34 are not configurable, so only family parity is
+# representable here).
+expected_php_family="$(node -e '
+const c = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
+const m = String(c.phpVersion || "").match(/^(\d+\.\d+)$/);
+if (!m) { process.exit(1); }
+console.log(m[1]);
+' "$WP_ENV_CONFIG")" || { note "FAIL: .wp-env.json phpVersion pin missing/malformed (expected major.minor)"; exit 2; }
+
+note "== Smoke: WordPress $expected_wp + free Elementor $expected_elementor (PHP family $expected_php_family) ($BASE_URL) =="
 
 # ---- 1. WordPress boots and reports its version via WP-CLI -----------------
 wp_cli_version="$(run_wp wp core version)" || ko "WP-CLI reachable in wp-env container"
@@ -102,6 +116,19 @@ rm -f "$active_plugins_file"
 elementor_version="$(run_wp wp eval 'echo defined("ELEMENTOR_VERSION") ? ELEMENTOR_VERSION : "";')" \
 	&& expect_eq "Elementor runtime-loaded version (ELEMENTOR_VERSION)" "$expected_elementor" "$elementor_version" \
 	|| ko "ELEMENTOR_VERSION not defined at runtime (plugin not loaded)"
+
+# ---- 4b. PHP runtime family matches the pin (NO patch-level parity claim) ---
+php_runtime_version="$(run_wp wp eval 'echo PHP_VERSION;')" || ko "Could not retrieve PHP_VERSION at runtime"
+php_family="$(printf '%s' "${php_runtime_version:-}" | cut -d. -f1,2)"
+expect_eq "PHP runtime family matches .wp-env.json pin (family only; patch parity NOT claimed)" "$expected_php_family" "$php_family"
+[ -n "${php_runtime_version:-}" ] && note "CI runtime PHP_VERSION=$php_runtime_version (informational evidence; owner-reported host exact = 8.1.34)"
+
+# ---- 4c. Database version retrievable (informational, NOT parity-asserted) --
+# NOTE: WP-CLI has no `wp db version` subcommand; query through WordPress
+# instead (SELECT VERSION() via wpdb), recorded as evidence only.
+db_version="$(run_wp wp eval 'global $wpdb; echo $wpdb->get_var("SELECT VERSION()");')" \
+	&& ok "Database version retrievable (recorded, NOT parity-asserted): $db_version" \
+	|| ko "Could not retrieve database version (wpdb SELECT VERSION())"
 
 # ---- 5. Site responds over HTTP ---------------------------------------------
 http_code="$(curl --fail --silent --show-error --output /dev/null --write-out '%{http_code}' "$BASE_URL/")" \
@@ -140,6 +167,9 @@ active_theme="$(run_wp wp theme list --status=active --field=name)" \
 template="$(run_wp wp eval 'echo wp_get_theme()->get("Template");')" \
   && expect_eq "Child Template" "hello-elementor" "$template" \
   || ko "Child Template not retrieved"
+run_wp wp plugin is-active elementor >/dev/null 2>&1 \
+  && ok "Free Elementor still active with cpms-child active" \
+  || ko "Free Elementor no longer active after child theme activation"
 for php_file in functions.php; do
   run_wp php -l "/var/www/html/wp-content/themes/cpms-child/$php_file" \
     && ok "PHP lint: $php_file" || ko "PHP lint failed: $php_file"

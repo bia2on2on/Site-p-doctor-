@@ -7,7 +7,14 @@
 #   1. .wp-env.json parses as strict JSON.
 #   2. .wp-env.json pins are well-formed (core ref, Elementor plugin ZIP URL,
 #      phpVersion) so the smoke test can always derive expected versions.
-#   3. reconstruction/manifest.json parses as strict JSON.
+#      phpVersion must be major.minor (wp-env documents the "0.0" format;
+#      host patch levels such as 8.1.34 are not configurable, so only family
+#      parity is representable and patch-level parity is never claimed).
+#   3. reconstruction/manifest.json parses as strict JSON and passes
+#      reconstruction/evidence validation (tests/static/validate-manifest.mjs):
+#      owner-reported host evidence with OWNER_REPORTED status, honesty
+#      sentinels, computed CI/host version parity, historical ZIP risk item,
+#      no emails/paths/credential-style keys in evidence blocks.
 #   4. Every GitHub Actions workflow file parses as YAML (PyYAML; installed
 #      on demand if missing).
 #   5. design-system tokens + manifest integrity (tests/static/validate-tokens.mjs:
@@ -41,7 +48,7 @@ const c = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
 let bad = 0;
 const err = (m) => { console.error(m); bad = 1; };
 if (!/^WordPress\/WordPress#\d+(\.\d+)+$/.test(c.core || "")) err("core pin malformed: " + c.core);
-if (!/^\d+(\.\d+)?$/.test(c.phpVersion || "")) err("phpVersion pin malformed: " + c.phpVersion);
+if (!/^\d+\.\d+$/.test(c.phpVersion || "")) err("phpVersion pin must be major.minor (wp-env format 0.0): " + c.phpVersion);
 if (!Array.isArray(c.plugins) || c.plugins.length !== 1) err("plugins must be the single Elementor ZIP pin");
 else if (!/^https:\/\/downloads\.wordpress\.org\/plugin\/elementor\.\d+(\.\d+)+\.zip$/.test(c.plugins[0])) err("plugins[0] must be a pinned elementor ZIP URL: " + c.plugins[0]);
 if (!Array.isArray(c.themes) || c.themes.length !== 2 || !/^https:\/\/downloads\.wordpress\.org\/theme\/hello-elementor\.\d+(\.\d+)+\.zip$/.test(c.themes[0]) || c.themes[1] !== "./themes/cpms-child") err("themes must pin Hello and map the local child");
@@ -92,6 +99,13 @@ if node "$root/tests/static/validate-tokens.mjs"; then
 	ok "design tokens and manifest integrity validated (tests/static/validate-tokens.mjs)"
 else
 	ko "design token validation failed (tests/static/validate-tokens.mjs)"
+fi
+
+# ---- 6. Host evidence, honesty sentinels, CI/host version parity --------------
+if node "$root/tests/static/validate-manifest.mjs"; then
+	ok "host evidence, sentinels and CI/host version parity validated (tests/static/validate-manifest.mjs)"
+else
+	ko "manifest evidence/parity validation failed (tests/static/validate-manifest.mjs)"
 fi
 
 printf '== Static validation result: %s passed, %s failed ==\n' "$pass" "$fail"

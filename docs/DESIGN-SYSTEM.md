@@ -246,7 +246,7 @@ Policy-level binding so the next slice designs components on the same substrate 
 ## 9. Version control & reconstruction
 
 - **Canonical:** `design-system/tokens.json` (schema_revision 1) + this spec + font assets with license/checksums. This is sufficient to diff against a future Elementor settings/kit export (global colors/fonts/layout/breakpoints are all named in the `elementor` block).
-- **`reconstruction/manifest.json` updated honestly** (schema_revision 2): `design_system` block points at the tokens/spec, records owner acceptance **NOT RUN** and Elementor representation **NOT AVAILABLE**; `artifacts` records the two font files + `OFL.txt` with SHA-256; `expected_inventory.global_settings` now states the canonical expectation. **`clean_import_pilot` and `authorized_pro_host_acceptance` remain `NOT RUN`** (enforced by test — any flip to PASS fails validation).
+- **`reconstruction/manifest.json` updated honestly** (schema_revision 3): `design_system` block points at the tokens/spec, records owner acceptance **NOT RUN** and Elementor representation **NOT AVAILABLE**; `artifacts` records the two font files + `OFL.txt` with SHA-256; `expected_inventory.global_settings` now states the canonical expectation; `host_environment` / `ci_alignment` / `historical_log_evidence` / `elementor_feature_state` record owner-reported test-host evidence (2026-09-28, `OWNER_REPORTED`, not agent-verified). **`clean_import_pilot` and `authorized_pro_host_acceptance` remain `NOT RUN`** (enforced by test — any flip to PASS fails validation).
 - **Comparison procedure (future):** export Site Settings via the documented Website Templates settings path (`docs/TECHNICAL-FOUNDATION.md` §1), then diff exported global colors (hex), global fonts (family/weight/size/line-height), content width and breakpoints against `tokens.json` role-by-role. Divergence = drift.
 - No Elementor export ZIP is fabricated; raw imports belong in ignored `reconstruction/incoming/` per the reconstruction contract.
 
@@ -263,7 +263,7 @@ Policy-level binding so the next slice designs components on the same substrate 
 | https://github.com/rastikerdar/vazirmatn tag `v33.003` (git tree API) | Font files + OFL 1.1; byte-identity via matching blob SHAs |
 | `docs/SITE-ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/TECHNICAL-FOUNDATION.md` | All contract-level constraints |
 
-**NOT VERIFIED / NOT RETRIEVED:** real-host WordPress/Elementor/Pro/PHP/DB versions; Elementor Pro capabilities on the installed edition (Custom Fonts, Custom Code); applied Elementor configuration of any kind; rendered-page accessibility, RTL, responsive and performance behavior (Playwright **NOT RUN** — no visible change exists yet); upstream release ZIP vs repo-tree byte-identity (tag tree equality used instead); anything requiring the authorized host.
+**NOT VERIFIED / NOT RETRIEVED:** agent-verified real-host versions (owner-reported values are recorded in `reconstruction/manifest.json` → `host_environment` as `OWNER_REPORTED`, 2026-09-28, and are not agent verification); Elementor Pro capabilities on the installed edition (Custom Fonts, Custom Code); applied Elementor configuration of any kind; rendered-page accessibility, RTL, responsive and performance behavior (Playwright **NOT RUN** — no visible change exists yet); upstream release ZIP vs repo-tree byte-identity (tag tree equality used instead); anything requiring the authorized host.
 
 ---
 
@@ -272,3 +272,4 @@ Policy-level binding so the next slice designs components on the same substrate 
 | Date (UTC) | Change |
 |---|---|
 | 2026-09-28 | First version: canonical tokens (18 color roles, 7 type roles, spacing/containers/border/shadow/focus/motion/breakpoints), Vazirmatn 400/700 committed (OFL-1.1), Elementor mapping spec, WCAG 2.2 AA accessibility foundation, responsive targets, performance foundation, reconstruction metadata (manifest schema_revision 2), static validation with WCAG contrast math + integrity checks |
+| 2026-09-28 | Host-evidence slice: manifest schema_revision 3 (`host_environment` owner-reported versions with `OWNER_REPORTED` status, `ci_alignment` parity records, `historical_log_evidence` ZIP-import retest item, `elementor_feature_state`), CI aligned to owner-reported versions (PHP family-only 8.1), manifest/parity validator added |
