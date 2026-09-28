@@ -128,6 +128,11 @@ try {
   // Stable post-name URLs (documented structural pattern, SITE-ARCHITECTURE §5.1)
   // so cross-page links to /demo/ and /product-overview/ are real destinations here.
   wp('rewrite', 'structure', '/%postname%/');
+  // Older standalone runners temporarily use Product Overview as the front page.
+  // Restore the actual Homepage for this integrated four-page reconstruction.
+  const homeId = wp('post', 'list', '--post_type=page', '--name=cpms-home', '--field=ID');
+  assert.match(homeId, /^\d+$/);
+  wp('option', 'update', 'page_on_front', homeId);
   wp('elementor', 'flush-css');
 
   // Reopen to prove persisted native editable elements, not only transient editor state.
@@ -266,9 +271,9 @@ echo wp_json_encode(array('id' => $id, 'status' => get_post_status($id), 'editab
   // Keyboard reachability and visible focus; no programmatic focus shortcut.
   await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto(pageUrl, { waitUntil: 'networkidle' });
-  await page.keyboard.press('tab'); // skip link
-  await page.keyboard.press('tab'); // neutral shell home link
-  await page.keyboard.press('tab'); // first content link = demo CTA
+  await page.keyboard.press('Tab'); // skip link
+  await page.keyboard.press('Tab'); // neutral shell home link
+  await page.keyboard.press('Tab'); // first content link = demo CTA
   const cta = page.getByRole('link', { name: 'درخواست دمو / مشاوره', exact: true });
   assert(await cta.evaluate(a => a === document.activeElement), 'CTA reachable in reading order');
   assert(await cta.evaluate(a => getComputedStyle(a).outlineStyle !== 'none'), 'Visible keyboard focus');
@@ -281,9 +286,13 @@ echo wp_json_encode(array('id' => $id, 'status' => get_post_status($id), 'editab
   const overview = await page.goto(`${base}/product-overview/`, { waitUntil: 'networkidle' });
   assert.equal(overview.status(), 200);
   assert.match(await page.locator('h1').innerText(), /نرم‌افزار مدیریت مطب و کلینیک/, 'Product Overview identity intact');
+  await page.getByRole('link', { name: 'جزئیات جریان نوبت، پذیرش و صف', exact: true }).click();
+  await page.waitForURL(pageUrl);
+  assert.match(await page.locator('h1').innerText(), /نوبت، پذیرش و صف/, 'Inbound native link reaches workflow page');
   const home = await page.goto(`${base}/`, { waitUntil: 'networkidle' });
   assert.equal(home.status(), 200);
   assert.equal(await page.locator('h1').count(), 1, 'Homepage still serves one H1');
+  assert.match(await page.locator('h1').innerText(), /مدیریت کلینیک،\s*با نگاهی یکپارچه/, 'Actual Homepage identity at root, not Product Overview');
   await page.goto(pageUrl, { waitUntil: 'networkidle' });
 
   assert.deepEqual(diagnostic.frontendErrors, [], 'Frontend console/page errors');

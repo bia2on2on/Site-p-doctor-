@@ -186,7 +186,7 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
     assert(measures.scrollWidth <= measures.width, `${name}: horizontal overflow`);
     assert(measures.font.includes('Vazirmatn') && measures.fontLoaded, 'Local Persian font loaded');
     assert.deepEqual(measures.brokenAnchors, []);
-    assert.deepEqual(measures.offsiteLinks, []);
+    assert.deepEqual(measures.offsiteLinks, [`${base}/appointment-reception-queue/`], 'Only the workflow detail page is linked; destination verified after full reconstruction');
     const composition = await page.evaluate(() => {
       const rect = selector => {
         const r = document.querySelector(selector).getBoundingClientRect();
