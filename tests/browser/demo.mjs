@@ -313,27 +313,21 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
 
   // Security Negative Test: direct POST without valid CSRF nonce must be rejected
   console.log('Testing security negative: POST without CSRF nonce...');
-  const tamperedSubmit = JSON.parse(wp('eval', `
-$url = get_permalink(${id});
-$response = wp_remote_post($url, array(
-  'body' => array(
-    'cpms_demo_submit' => '1',
-    'cpms_ajax' => '1',
-    'cpms_demo_nonce' => 'invalid_tampered_nonce',
-    'cpms_contact_name' => 'Attacker',
-    'cpms_org_name' => 'Bad Org',
-    'cpms_contact_value' => 'bad@example.test',
-    'cpms_org_type' => 'clinic',
-    'cpms_doctor_count' => '1-2'
-  )
-));
-echo wp_json_encode(array(
-  'code' => wp_remote_retrieve_response_code($response),
-  'body' => json_decode(wp_remote_retrieve_body($response), true)
-));
-`));
-  assert.equal(tamperedSubmit.code, 403, 'Tampered/missing nonce must be rejected with HTTP 403');
-  assert.equal(tamperedSubmit.body?.success, false, 'Tampered nonce returns success=false');
+  const securityResponse = await visitor.request.post(`${base}/`, {
+    form: {
+      cpms_demo_submit: '1',
+      cpms_ajax: '1',
+      cpms_demo_nonce: 'invalid_tampered_nonce',
+      cpms_contact_name: 'Attacker',
+      cpms_org_name: 'Bad Org',
+      cpms_contact_value: 'bad@example.test',
+      cpms_org_type: 'clinic',
+      cpms_doctor_count: '1-2',
+    },
+  });
+  assert.equal(securityResponse.status(), 403, 'Tampered/missing nonce must be rejected with HTTP 403');
+  const securityBody = await securityResponse.json();
+  assert.equal(securityBody?.success, false, 'Tampered nonce returns success=false');
 
   // Standard non-AJAX POST test: proves full functionality without JavaScript
   console.log('Testing standard non-AJAX POST flow...');
