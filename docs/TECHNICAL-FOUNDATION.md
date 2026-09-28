@@ -23,11 +23,21 @@ A vendor kit is **not a complete DB backup**, license transfer, or guarantee of 
 
 **Media:** small licensed, original, synthetic/demo assets may be Git-owned with attribution/manifest/checksum and importer mapping when needed. Real/large production media belongs in a separately controlled WordPress Media Library/asset store with a documented source, license and restoration path; a WXR attachment record alone is insufficient. No PHI or customer media. For a kit, select ZIP-compatible media mode, inspect its contents and verify every asset survives re-import. If media must stay outside Git, list it as an explicit environment prerequisite, not “reconstructable from Git” until access/relink is documented. Inspect SVGs before allowing unfiltered upload. **No actual kit/WXR/media exists in this repository yet.**
 
-### Theme architecture — selected base; child conditional
+### Theme architecture — standalone Koorosh; Elementor authoring
 
-Use **maintained Hello Elementor** from WordPress.org as the minimal base, **not** a multipurpose theme. Elementor describes it as a small blank canvas for Elementor/Theme Builder; its WordPress.org directory lists RTL support, accessibility-ready features and maintenance. [Hello overview](https://elementor.com/help/what-is-elementor-hello-theme/), [Hello directory](https://wordpress.org/themes/hello-elementor/), [Elementor theme compatibility](https://elementor.com/help/is-elementor-compatible-with-all-wordpress-themes/). Keep parent unmodified and record its **installed/tested** version, not an upstream listing as the project's version.
+**THEME:** **کوروش** (`themes/koorosh`) is a **standalone lightweight custom WordPress theme**. It does **not** require Hello Elementor as a parent; `Template:` is not declared. Hello Elementor 3.5.1 remains **owner-reported host evidence** (the theme active at evidence collection) and is **not** Koorosh’s parent architecture.
 
-**Theme layer (2026-09-28):** `themes/cpms-child` is the minimal Git-owned child (`Template: hello-elementor`) over the unmodified Hello Elementor parent. CI pins the WordPress.org themes API version **3.5.1** in `.wp-env.json`, which now equals the owner-reported host version (Hello Elementor 3.5.1, 2026-09-28). The host reported **no child theme active** at report time — expected pre-deployment state (the Git-owned child is not deployed yet), not a defect. The child owns only font files/OFL and `@font-face`, Elementor font-picker registration, a token-backed focus ring, reduced-motion handling and RTL/logical-properties policy. Hello owns its own parent styles; the child style and foundation CSS enqueue after them. Elementor still owns global typography, colors and layouts. Runtime CI assertions cover installed/active versions, stylesheet delivery, font HTTP and registration, PHP lint and fa_IR RTL when the smoke actually runs. **NOT VERIFIED:** agent verification of host versions, Pro behavior, kit export/import, clean import pilot, browser-level accessibility/RTL and host deployment. [Hello child enqueue reference](https://github.com/elementor/hello-theme-child/blob/master/functions.php); [Elementor font hooks](https://developers.elementor.com/docs/hooks/php); [wp-env](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/).
+**AUTHORING:** normal marketing pages, layout, Site Settings, and (later) Theme Builder header/footer/site parts belong to **Elementor + Elementor Pro**. Koorosh owns only bootstrap, theme supports, minimal semantic fallback templates, self-hosted Vazirmatn, RTL-safe foundation CSS (focus ring, reduced-motion, logical-properties policy), public Elementor font-picker hooks, and optional Theme Builder core-location registration when that public API is present. Exact Elementor patch versions are **not** hard theme dependencies.
+
+**GIT:** canonical theme, design tokens, and reconstruction metadata.
+
+**PUBLIC CI:** Koorosh + Elementor Free smoke. Hello is no longer installed in public CI.
+
+**PRIVATE ACCEPTANCE:** Elementor Pro + kit export/import + authorized test host remain **NOT RUN**.
+
+**REFERENCE HOST:** recorded versions in `reconstruction/manifest.json` → `host_environment` are test/evidence facts, not permanent architecture locks.
+
+[WordPress theme `style.css` headers](https://developer.wordpress.org/themes/classic-themes/basics/main-stylesheet-style-css/); [template files (`index.php` required)](https://developer.wordpress.org/themes/classic-themes/basics/template-files/); [Elementor PHP hooks (`elementor/fonts/*`)](https://developers.elementor.com/docs/hooks/php); [Elementor displaying locations](https://developers.elementor.com/docs/themes/displaying-locations); [wp-env](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/).
 
 ## 3. Inventory and version record
 
@@ -65,7 +75,7 @@ Future Git inventory, each with manifest path + SHA-256 + export source version/
 **What CI now actually does** (`.github/workflows/wordpress-elementor-smoke.yml`, `permissions: contents: read`, actions pinned to immutable commit SHAs, no secrets, no `pull_request_target`):
 
 - **Static validation job:** `.wp-env.json` strict-JSON + pin-shape checks (single Elementor ZIP pin, core ref, phpVersion as major.minor), `reconstruction/manifest.json` JSON syntax, workflow YAML parse (`tests/static/validate.sh`), plus `tests/static/validate-manifest.mjs`: owner-reported host evidence (exact values, `OWNER_REPORTED` status), honesty sentinels, computed CI↔host version parity, the historical ZIP-import retest item, and a no-emails/no-paths/no-credential-keys scan of the evidence blocks.
-- **Smoke job on a clean ephemeral Ubuntu runner (Docker):** installs pinned `@wordpress/env@11.16.0` (official WordPress package; current wp-env docs retrieved 2026-09-28), starts a clean WordPress from `.wp-env.json` with free **Elementor installed+activated from WordPress.org**, then runs `tests/wp-env/smoke.sh` asserting at runtime: WordPress boots; `wp core version` and runtime `get_bloginfo('version')` match the pinned core; `elementor` is active and `ELEMENTOR_VERSION` matches the pin; the **PHP runtime family matches the configured pin (family/minor only — no patch-parity claim)**; the database version is retrievable and recorded informationally (**not** parity-asserted); site home responds **HTTP 200 with HTML**; the Git-owned `cpms-child` activates with the expected `hello-elementor` parent relationship at the pinned parent version, WordPress loads with it active, and **free Elementor remains active** with the child active. This is **free-Elementor CI only — NOT Elementor Pro acceptance**.
+- **Smoke job on a clean ephemeral Ubuntu runner (Docker):** installs pinned `@wordpress/env@11.16.0` (official WordPress package; current wp-env docs retrieved 2026-09-28), starts a clean WordPress from `.wp-env.json` with free **Elementor installed+activated from WordPress.org**, then runs `tests/wp-env/smoke.sh` asserting at runtime: WordPress boots; `wp core version` and runtime `get_bloginfo('version')` match the pinned core; `elementor` is active and `ELEMENTOR_VERSION` matches the pin; the **PHP runtime family matches the configured pin (family/minor only — no patch-parity claim)**; the database version is retrievable and recorded informationally (**not** parity-asserted); site home responds **HTTP 200 with HTML**; the Git-owned standalone **کوروش** (`koorosh`) activates with **no parent**, Theme Name `کوروش`, WordPress loads with it active, and **free Elementor remains active**. This is **free-Elementor CI only — NOT Elementor Pro acceptance**.
 
 **Host-aligned CI pins in `.wp-env.json`** (aligned 2026-09-28 to the owner-reported host evidence in `reconstruction/manifest.json` → `host_environment`; wp-env capability evidence: official wp-env reference docs and pinned `@wordpress/env@11.16.0` source retrieved 2026-09-28 — `phpVersion` is documented in the `0.0` (major.minor) format and maps to `wordpress:php<family>` images; there is no `mysqlVersion` field in the wp-env schema):
 
@@ -73,7 +83,7 @@ Future Git inventory, each with manifest path + SHA-256 + export source version/
 |---|---|---|---|
 | WordPress | `7.1.2` (mirror tag `WordPress/WordPress#7.1.2`) | 7.1.2 | **EXACT** |
 | Elementor (free) | `4.3.2` (wp.org versioned ZIP) | 4.3.2 | **EXACT** |
-| Hello Elementor | `3.5.1` (wp.org versioned ZIP) | 3.5.1 | **EXACT** |
+| Hello Elementor | not in CI (Koorosh is standalone) | 3.5.1 | **HOST EVIDENCE ONLY — not a CI pin, not Koorosh parent** |
 | PHP | `8.1` (family/minor only) | 8.1.34 (exact) | **FAMILY ONLY — patch level not configurable in wp-env, not claimed** |
 | Database | wp-env default floating `mariadb:lts` image (no `mysqlVersion` field — unpinned) | MariaDB 11.4.13-MariaDB-cll-lve-log | **NO PARITY CLAIM** |
 | Web server | Apache (from the WordPress Docker image) | LiteSpeed | **NO PARITY CLAIM** |
@@ -100,7 +110,7 @@ The next clean Elementor reconstruction pilot must prove **all** of the followin
 
 1. Start from a **clean WordPress environment** (fresh, disposable; no pre-existing colliding content).
 2. Record exact/compatible **WordPress + PHP + Hello Elementor + Elementor** versions actually running there and compare against `reconstruction/manifest.json` → `host_environment` (owner-reported) and `ci_alignment`.
-3. Install and activate the **Git-owned `themes/cpms-child`**; verify the `hello-elementor` parent relationship and that WordPress loads with it active.
+3. Install and activate the **Git-owned standalone `themes/koorosh` (کوروش)**; verify it has **no parent** and that WordPress loads with it active. Hello Elementor may still be present on the historical host as evidence, but must not be required as parent.
 4. Install **Elementor Pro only on the authorized private test host**, through the legitimate environment-owned mechanism — never from this repository, CI, or any helper/activator.
 5. Export a **minimal Elementor Website Template/Kit** using the current official Elementor workflow (Website Templates → Export).
 6. **Inspect the export before any Git commit** for secrets, personal data, form submissions, absolute staging URLs, unexpected plugin dependencies, and proprietary material; regenerate/sanitize via supported export options if anything prohibited is found.

@@ -51,12 +51,36 @@ if (!/^WordPress\/WordPress#\d+(\.\d+)+$/.test(c.core || "")) err("core pin malf
 if (!/^\d+\.\d+$/.test(c.phpVersion || "")) err("phpVersion pin must be major.minor (wp-env format 0.0): " + c.phpVersion);
 if (!Array.isArray(c.plugins) || c.plugins.length !== 1) err("plugins must be the single Elementor ZIP pin");
 else if (!/^https:\/\/downloads\.wordpress\.org\/plugin\/elementor\.\d+(\.\d+)+\.zip$/.test(c.plugins[0])) err("plugins[0] must be a pinned elementor ZIP URL: " + c.plugins[0]);
-if (!Array.isArray(c.themes) || c.themes.length !== 2 || !/^https:\/\/downloads\.wordpress\.org\/theme\/hello-elementor\.\d+(\.\d+)+\.zip$/.test(c.themes[0]) || c.themes[1] !== "./themes/cpms-child") err("themes must pin Hello and map the local child");
+if (!Array.isArray(c.themes) || c.themes.length !== 1 || c.themes[0] !== "./themes/koorosh") err("themes must map only the standalone Koorosh theme");
 if (JSON.stringify(Object.keys(c).sort()) !== JSON.stringify(["$schema", "core", "phpVersion", "plugins", "themes"].sort())) err("unexpected/missing top-level keys: " + Object.keys(c).join(","));
 process.exit(bad);
 ' "$root/.wp-env.json" \
-	&& ok ".wp-env.json pins are well-formed (core ref, phpVersion, single Elementor ZIP)" \
+	&& ok ".wp-env.json pins are well-formed (core ref, phpVersion, single Elementor ZIP, Koorosh theme)" \
 	|| ko ".wp-env.json pins are malformed"
+
+node -e '
+const fs = require("fs");
+const path = require("path");
+const root = process.argv[1];
+let bad = 0;
+const err = (m) => { console.error(m); bad = 1; };
+if (fs.existsSync(path.join(root, "themes/cpms-child"))) err("legacy themes/cpms-child must be gone");
+const dir = path.join(root, "themes/koorosh");
+if (!fs.existsSync(dir)) err("themes/koorosh missing");
+const style = fs.readFileSync(path.join(dir, "style.css"), "utf8");
+if (!/^Theme Name:\s*کوروش\s*$/m.test(style)) err("style.css Theme Name must be کوروش");
+if (/^Template:/m.test(style)) err("style.css must not declare Template: parent");
+for (const f of ["functions.php", "index.php", "header.php", "footer.php", "foundation.css"]) {
+  if (!fs.existsSync(path.join(dir, f))) err("missing theme file: " + f);
+}
+const fontDir = path.join(dir, "fonts");
+for (const f of ["Vazirmatn-Regular.woff2", "Vazirmatn-Bold.woff2", "OFL.txt"]) {
+  if (!fs.existsSync(path.join(fontDir, f))) err("missing font artifact: " + f);
+}
+process.exit(bad);
+' "$root" \
+	&& ok "Koorosh standalone theme identity (Theme Name کوروش, no parent, no cpms-child)" \
+	|| ko "Koorosh standalone theme identity failed"
 
 # ---- 3. reconstruction manifest ----------------------------------------------
 if node -e 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"))' \

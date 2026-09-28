@@ -27,8 +27,8 @@ enforced by `tests/static/validate-tokens.mjs`.
 
 ## Loading
 
-The child theme serves these files via `foundation.css` (`@font-face`, `font-display: swap`).
-The child registers `Vazirmatn` in the Elementor font picker; Elementor Global Fonts
+The Koorosh theme serves these files via `foundation.css` (`@font-face`, `font-display: swap`).
+The theme registers `Vazirmatn` in the Elementor font picker; Elementor Global Fonts
 can select it without uploading another copy through Pro. No real host or kit has
 been verified. The fallback stack is `Tahoma, "Segoe UI", system-ui, sans-serif`.
 

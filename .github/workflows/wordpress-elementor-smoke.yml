@@ -6,7 +6,7 @@ name: WordPress + Elementor smoke
 # (source: owner-reported Elementor/host system information, evidence date
 # 2026-09-28, verification status OWNER_REPORTED — see
 # reconstruction/manifest.json host_environment / ci_alignment): exact for
-# WordPress, free Elementor and Hello Elementor; PHP is family-only (CI 8.1
+# WordPress and free Elementor; Hello Elementor is host evidence only, not a CI theme pin; PHP is family-only (CI 8.1)
 # vs host 8.1.34 — no patch-level parity claim); database and web server are
 # unpinned (no parity claim). Green CI is CI evidence bound to an exact SHA;
 # it is NOT host acceptance. authorized_pro_host_acceptance remains NOT RUN.

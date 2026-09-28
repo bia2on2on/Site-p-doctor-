@@ -155,37 +155,39 @@ else
 fi
 rm -f "$home_body_file"
 
-# Child activation is explicit: wp-env maps themes but does not guarantee child activation.
-expected_hello="$(node -e 'const c=require(process.cwd()+"/.wp-env.json"); console.log(c.themes[0].match(/hello-elementor\.(\d+(?:\.\d+)+)\.zip$/)?.[1] || "INVALID")')"
-run_wp wp theme activate cpms-child && ok "Child theme activated" || ko "Could not activate child theme"
-parent_version="$(run_wp wp theme get hello-elementor --field=version)" \
-  && expect_eq "Hello parent version" "$expected_hello" "$parent_version" \
-  || ko "Hello parent version not retrieved"
+# Standalone Koorosh activation is explicit: wp-env maps themes but does not guarantee activation.
+run_wp wp theme activate koorosh && ok "Koorosh theme activated" || ko "Could not activate Koorosh theme"
 active_theme="$(run_wp wp theme list --status=active --field=name)" \
-  && expect_eq "Active child theme" "cpms-child" "$active_theme" \
-  || ko "Active child theme not retrieved"
+  && expect_eq "Active theme" "koorosh" "$active_theme" \
+  || ko "Active theme not retrieved"
+theme_name="$(run_wp wp eval 'echo wp_get_theme()->get("Name");')" \
+  && expect_eq "Theme Name" "کوروش" "$theme_name" \
+  || ko "Theme Name not retrieved"
 template="$(run_wp wp eval 'echo wp_get_theme()->get("Template");')" \
-  && expect_eq "Child Template" "hello-elementor" "$template" \
-  || ko "Child Template not retrieved"
+  && expect_eq "Standalone Template (empty parent)" "" "$template" \
+  || ko "Theme Template not retrieved"
+parent="$(run_wp wp eval 'echo wp_get_theme()->parent() ? wp_get_theme()->parent()->get_stylesheet() : "";')" \
+  && expect_eq "No parent theme" "" "$parent" \
+  || ko "Parent theme check failed"
 run_wp wp plugin is-active elementor >/dev/null 2>&1 \
-  && ok "Free Elementor still active with cpms-child active" \
-  || ko "Free Elementor no longer active after child theme activation"
-for php_file in functions.php; do
-  run_wp php -l "/var/www/html/wp-content/themes/cpms-child/$php_file" \
+  && ok "Free Elementor still active with Koorosh active" \
+  || ko "Free Elementor no longer active after Koorosh activation"
+for php_file in functions.php index.php header.php footer.php; do
+  run_wp php -l "/var/www/html/wp-content/themes/koorosh/$php_file" \
     && ok "PHP lint: $php_file" || ko "PHP lint failed: $php_file"
 done
 home_body="$(curl --fail --silent --show-error "$BASE_URL/")" \
-  && ok "Activated child homepage HTTP 200" || ko "Activated child homepage HTTP request failed"
-for asset in 'cpms-child/style.css' 'cpms-child/foundation.css'; do
+  && ok "Activated Koorosh homepage HTTP 200" || ko "Activated Koorosh homepage HTTP request failed"
+for asset in 'koorosh/style.css' 'koorosh/foundation.css'; do
   if [[ "$home_body" == *"/themes/$asset"* ]]; then ok "Homepage references $asset"; else ko "Homepage missing $asset"; fi
 done
 for font in Vazirmatn-Regular.woff2 Vazirmatn-Bold.woff2; do
-  response="$(curl --silent --show-error --output /dev/null --write-out '%{http_code} %{content_type}' "$BASE_URL/wp-content/themes/cpms-child/fonts/$font")"
+  response="$(curl --silent --show-error --output /dev/null --write-out '%{http_code} %{content_type}' "$BASE_URL/wp-content/themes/koorosh/fonts/$font")"
   if [[ "$response" == 200\ *font* ]]; then
     ok "Font URL served: $font ($response)"
   else ko "Font URL invalid: $font ($response)"; fi
 done
-font_registered="$(run_wp wp eval 'echo (class_exists("\Elementor\Fonts") && isset(\Elementor\Fonts::get_fonts()["Vazirmatn"]) && \Elementor\Fonts::get_fonts()["Vazirmatn"] === "cpms-local") ? "yes" : "no";')" \
+font_registered="$(run_wp wp eval 'echo (class_exists("\\Elementor\\Fonts") && isset(\\Elementor\\Fonts::get_fonts()["Vazirmatn"]) && \\Elementor\\Fonts::get_fonts()["Vazirmatn"] === "koorosh-local") ? "yes" : "no";')" \
   && expect_eq "Elementor font list includes local Vazirmatn" "yes" "$font_registered" \
   || ko "Elementor font list evaluation failed"
 if run_wp wp language core install fa_IR --activate; then

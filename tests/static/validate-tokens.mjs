@@ -338,7 +338,7 @@ if (Array.isArray(el.css_support_required) && el.css_support_required.length >= 
 }
 
 // CSS values and font paths must stay bound to the canonical token roles.
-const css = readFileSync(join(root, "themes/cpms-child/foundation.css"), "utf8");
+const css = readFileSync(join(root, "themes/koorosh/foundation.css"), "utf8");
 for (const f of files) {
   if (f?.path && !css.includes(`fonts/${f.path.split("/").at(-1)}`)) ko(`CSS missing token font: ${f.path}`);
 }
