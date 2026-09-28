@@ -21,6 +21,7 @@ Koorosh remains a semantic/performance/accessibility shell. The WordPress title/
 - `node tests/static/validate-homepage.mjs`: PASS when authored (78 native elements; one H1; anchored links; forbidden-copy guardrails). This is not a semantic claim audit substitute.
 - JS syntax and shell syntax: run before push; exact PR checks supersede this local note.
 - Local full WordPress/PHP/browser runtime: **NOT RUN**. No PHP/Docker initially; a single bounded package-install attempt failed because OS package mirrors were unreachable. No private host attempt made.
+- Independent YAML parsing with `yaml@2.8.1`: PASS; tokens 70/70 and host manifest 38/38 checks: PASS.
 - Local static suite initially reached a missing PyYAML parser (class C environment), not a homepage regression. Configuration/token/manifest/homepage checks ran; workflow parsing must be checked separately or in CI.
 - CI uses existing pinned WordPress/Free Elementor, validates native controls before authoring, persists/reopens the document, checks configured front page and theme/plugin state, HTTP, H1/metadata/RTL, local font loading, no endpoint/media fabrication, keyboard/focus/anchor behavior, overflow, external/failed requests and JS errors at 390×844, 768×1024, 1366×768 and 1920×1080.
 - Actual CI conclusions and inspected screenshot evidence must be bound to the final PR head/run in the PR report. A pending test or screenshot file is never a PASS.
@@ -28,3 +29,7 @@ Koorosh remains a semantic/performance/accessibility shell. The WordPress title/
 ## Still NOT RUN / NOT VERIFIED
 
 Authorized host/Pro acceptance and clean-import pilot, vendor kit export/import, Site Settings globals/breakpoint round-trip, launch truth, real product media, authorized lead delivery, production CWV/SEO, manual screen-reader audit, Safari/Firefox. Design tokens and direction remain provisional until Milestone A visual acceptance. This PR must remain **OPEN**, not auto-merged.
+
+## First CI diagnosis
+
+Run `36405743853`, head `743f0435ff1ac313e98743163987f67dc2743a53`: existing runtime smoke **33 passed / 0 failed**, including PHP lint. Static failure **D**: the homepage record extended a closed host-manifest schema. Fixed by keeping a separate `reconstruction/homepage/manifest.json`; the existing host schema and honesty checks remain untouched. Browser reconstruction failed before screenshot generation; no visual PASS claimed. Log-blob retrieval is unavailable from the sandbox (**C**); early-error artifact/annotation reporting added for bounded diagnosis, not to suppress failures.

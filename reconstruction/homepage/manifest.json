@@ -1,0 +1,13 @@
+{
+  "scope": "Milestone A — Free native editor authoring recipe; not a website kit",
+  "canonical_recipe": "reconstruction/homepage/recipe.mjs",
+  "reconstruction": "reconstruction/homepage/README.md",
+  "claim_register": "reconstruction/homepage/claims.md",
+  "browser_runner": "tests/browser/homepage.mjs",
+  "evidence": "Exact-head GitHub Actions artifact homepage-evidence-<head SHA>; conclusions in PR report",
+  "publication": "TARGET — NOT PUBLICATION-APPROVED",
+  "media": "MEDIA REQUIRED — no verified product screenshot available",
+  "conversion": "In-page anchor only; no authorized form/contact endpoint",
+  "owner_visual_acceptance": "NOT RUN",
+  "site_settings_round_trip": "NOT RUN — native control values resolved from canonical tokens; no global kit claimed"
+}

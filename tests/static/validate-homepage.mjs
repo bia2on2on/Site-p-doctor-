@@ -22,3 +22,10 @@ assert(copy.includes('اطلاعاتی دریافت یا ارسال نمی‌ش�
 assert(copy.includes('درخواست دمو / مشاوره'));
 assert(!readFileSync(new URL('../../tests/browser/homepage.mjs', import.meta.url), 'utf8').includes('_elementor_data'), 'No private database payload authoring');
 console.log(`PASS: homepage guardrails (${nodes.length} native elements; claims still require human/launch review)`);
+
+const manifest = JSON.parse(readFileSync(new URL('../../reconstruction/homepage/manifest.json', import.meta.url)));
+assert.equal(manifest.publication, 'TARGET — NOT PUBLICATION-APPROVED');
+assert.equal(manifest.owner_visual_acceptance, 'NOT RUN');
+for (const field of ['canonical_recipe', 'reconstruction', 'claim_register', 'browser_runner']) {
+  assert(readFileSync(new URL('../../' + manifest[field], import.meta.url)).length > 0);
+}

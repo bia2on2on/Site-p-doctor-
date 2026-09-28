@@ -10,6 +10,13 @@ import { homepage, pageIdentity } from '../../reconstruction/homepage/recipe.mjs
 const root = resolve(import.meta.dirname, '../..');
 const out = resolve(import.meta.dirname, 'artifacts');
 mkdirSync(out, { recursive: true });
+// Make pre-browser fixture failures retrievable even when CI log-blob egress is unavailable.
+process.on('uncaughtException', error => {
+  const message = String(error.stack || error).replace(/user_pass=\S+/g, 'user_pass=[redacted]');
+  writeFileSync(resolve(out, 'bootstrap-error.txt'), message);
+  console.error(`::error title=Homepage reconstruction::${message.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A')}`);
+  process.exitCode = 1;
+});
 const base = 'http://localhost:8888'; // Browser runs on the CI runner, not in a user's browser.
 function wp(...args) {
   try {
