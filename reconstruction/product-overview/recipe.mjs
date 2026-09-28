@@ -136,6 +136,9 @@ export function productOverview(t) {
         item('پرونده و مستندات ویزیت', 'اطلاعات بیمار و مستندات ویزیت را در فضای کاری پزشک بررسی کنید.'),
         item('پرتال بیمار، گزارش‌گیری و مدل چندکلینیکی', 'دامنه و دسترس‌پذیری هر بخش را با نسخهٔ ارائه و نیاز مجموعه در جلسه بررسی کنید.'),
         item('ثبت دستی پرداخت', 'دامنهٔ ثبت پرداخت و خلاصه‌های مالی را با نیاز مرکز بسنجید؛ نه به‌عنوان جایگزین حسابداری.'),
+        // Contextual inbound link to the clinic-scoped patient-record / continuity page
+        // (one link, inside the bounded topic it belongs to — no hub or nav duplication).
+        text('محدودهٔ پرونده در کلینیک و تداوم اطلاعات آن را در <a href="/patient-record-continuity/">پرونده بیمار و تداوم اطلاعات</a> دنبال کنید.', 'caption'),
       ], 55, { flex_gap: gap(0) }),
     ])], { background_background: 'classic', background_color: color('background/subtle') }),
     band('Audience and operational fit', 'fit', [

@@ -1,0 +1,20 @@
+{
+  "publication": "TARGET — NOT PUBLICATION-APPROVED",
+  "scope": "Second representative workflow page: clinic-scoped patient record and information continuity (patient context → doctor workspace → record/documents → onward clinic follow-up)",
+  "canonical_recipe": "reconstruction/patient-record-continuity/recipe.mjs",
+  "claim_register": "reconstruction/patient-record-continuity/claims.md",
+  "browser_runner": "tests/browser/patient-record-continuity.mjs",
+  "seo": {
+    "title": "پرونده الکترونیک بیمار در محدودهٔ کلینیک | برای مدیران کلینیک | CPMS",
+    "description_source": "WordPress page excerpt via existing Koorosh mechanism",
+    "plugin": "none",
+    "intent": "Bounded commercial/informational intent around پرونده الکترونیک بیمار (SEO-KEYWORD-MAP Cluster 4), clinic scope explicit in title/H1/section heading; bare «پرونده بیمار» is NOT the commercial head; institutional/national EHR terminology appears only inside explicit negations; does not target Product Overview's Cluster-1 heads"
+  },
+  "product_truth_boundary": "PRODUCT-TRUTH §3 #10 (patient records) and #8 (doctor workspace) as the primary ceiling, #11 (prescriptions/documents) bounded to recording/management inside CPMS, #7 (patient portal) bounded, #4/#5/#6 (roles, access, clinic data separation) at mechanism level only — all REVERIFY BEFORE PUBLIC LAUNCH. National EHR/national e-prescription connection, insurance, AI, decision support, automated diagnosis, mobile app, interoperability, certification/compliance and absolute security wording are NOT claimed.",
+  "media": "Two reserved Elementor-editable frames (patient record / doctor context; document and workflow context). Launch blocker: verified real CPMS media with synthetic/demo records must replace both before public launch.",
+  "conversion": "Primary CTA links to the real Demo/Consultation page (/demo/); secondary links to Product Overview (/product-overview/) and the appointment/reception/queue page (/appointment-reception-queue/). Launch blocker: live lead delivery NOT CONFIGURED / NOT AUTHORIZED; page states the demo form is technical/non-live.",
+  "launch_blockers": [
+    "Real verified CPMS media (synthetic/demo records) must replace reserved media",
+    "Live lead delivery must be configured and authorized"
+  ]
+}

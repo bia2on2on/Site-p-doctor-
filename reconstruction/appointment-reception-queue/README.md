@@ -18,7 +18,7 @@ node tests/browser/demo.mjs
 node tests/browser/appointment-reception-queue.mjs
 ```
 
-The final runner requires all three preceding pages. It refuses an existing workflow slug, validates every native control, creates an empty WP draft, authors via public Elementor Create/Settings/Publish commands, reopens the persisted editor, and verifies native editability. It establishes `/%postname%/` URLs and restores the **actual Homepage** at `/` after the older per-page runners. Product Overview supplies the inbound native text link. The integrated fixture verifies that link, `/demo/`, `/product-overview/` and `/` by browser navigation and page identity. `blog_public=0` remains set; WordPress `publish` in this localhost fixture is not public launch. Do not run against shared or production data.
+This runner requires the three preceding pages; the later patient-record/continuity slice (`../patient-record-continuity/README.md`) now runs after it in CI. It refuses an existing workflow slug, validates every native control, creates an empty WP draft, authors via public Elementor Create/Settings/Publish commands, reopens the persisted editor, and verifies native editability. It establishes `/%postname%/` URLs and restores the **actual Homepage** at `/` after the older per-page runners. Product Overview supplies the inbound native text link. The integrated fixture verifies that link, `/demo/`, `/product-overview/` and `/` by browser navigation and page identity. `blog_public=0` remains set; WordPress `publish` in this localhost fixture is not public launch. Do not run against shared or production data.
 
 ## Editing and ownership
 
