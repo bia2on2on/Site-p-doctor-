@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/wp-env.json",
-	"phpVersion": "8.3",
+	"phpVersion": "8.1",
 	"core": "WordPress/WordPress#7.1.2",
 	"plugins": [
 		"https://downloads.wordpress.org/plugin/elementor.4.3.2.zip"

@@ -2,9 +2,14 @@ name: WordPress + Elementor smoke
 
 # Free-Elementor CI foundation only. This workflow is NOT Elementor Pro
 # acceptance: no Pro package, license, or secrets are used or fetched here.
-# Temporary CI pins (upstream current stable at implementation time) live in
-# .wp-env.json and are NOT the real-host compatibility target, which remains
-# unverified until versions are captured from the authorized test host.
+# CI pins in .wp-env.json are aligned to owner-reported test-host versions
+# (source: owner-reported Elementor/host system information, evidence date
+# 2026-09-28, verification status OWNER_REPORTED — see
+# reconstruction/manifest.json host_environment / ci_alignment): exact for
+# WordPress, free Elementor and Hello Elementor; PHP is family-only (CI 8.1
+# vs host 8.1.34 — no patch-level parity claim); database and web server are
+# unpinned (no parity claim). Green CI is CI evidence bound to an exact SHA;
+# it is NOT host acceptance. authorized_pro_host_acceptance remains NOT RUN.
 
 on:
   pull_request:
