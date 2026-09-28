@@ -124,9 +124,11 @@ expect_eq "PHP runtime family matches .wp-env.json pin (family only; patch parit
 [ -n "${php_runtime_version:-}" ] && note "CI runtime PHP_VERSION=$php_runtime_version (informational evidence; owner-reported host exact = 8.1.34)"
 
 # ---- 4c. Database version retrievable (informational, NOT parity-asserted) --
-db_version="$(run_wp wp db version)" \
+# NOTE: WP-CLI has no `wp db version` subcommand; query through WordPress
+# instead (SELECT VERSION() via wpdb), recorded as evidence only.
+db_version="$(run_wp wp eval 'global $wpdb; echo $wpdb->get_var("SELECT VERSION()");')" \
 	&& ok "Database version retrievable (recorded, NOT parity-asserted): $db_version" \
-	|| ko "Could not retrieve database version (wp db version)"
+	|| ko "Could not retrieve database version (wpdb SELECT VERSION())"
 
 # ---- 5. Site responds over HTTP ---------------------------------------------
 http_code="$(curl --fail --silent --show-error --output /dev/null --write-out '%{http_code}' "$BASE_URL/")" \
