@@ -16,11 +16,12 @@ for (const n of nodes.filter(n => n.kind === 'button')) {
 const text = nodes.map(n => n.settings.title || n.settings.editor || n.settings.text || '').join('\n');
 for (const pattern of [/درگاه پرداخت آنلاین/, /اتصال به بیمه/, /نسخه الکترونیک ملی/, /هوش مصنوعی/, /اپلیکیشن موبایل/, /گواهی امنیت/, /۱۰۰٪|۱۰۰ درصد|100%/, /۲۴\s*[\/×]\s*۷|24\s*[\/×]\s*7/, /تومان|ریال/, /mailto:|tel:/]) assert(!pattern.test(text), `Forbidden claim/contact: ${pattern}`);
 for (const phrase of ['نرم‌افزار مدیریت مطب', 'نرم‌افزار مدیریت کلینیک', 'فقط نرم‌افزار نوبت‌دهی است؟', 'جایگزین حسابداری کامل است؟', 'نمای واقعی نرم‌افزار CPMS', 'تصویر محیط نرم‌افزار نیست']) assert(text.includes(phrase), `Missing bounded page identity: ${phrase}`);
-// Architecture: Product Overview links onward to the two real workflow pages and never
+// Architecture: Product Overview links onward to the real workflow pages and never
 // absorbs their narrative (SEO-KEYWORD-MAP §D ownership rule).
 assert(text.includes('جزئیات جریان نوبت، پذیرش و صف'), 'Contextual link to the appointment/reception/queue page');
 assert(text.includes('پرونده بیمار و تداوم اطلاعات'), 'Contextual link to the patient-record/continuity page');
-for (const href of ['/appointment-reception-queue/', '/patient-record-continuity/']) {
+assert(text.includes('ادامهٔ جریان کار پزشک در کلینیک'), 'Contextual link to the doctor-workspace page');
+for (const href of ['/appointment-reception-queue/', '/patient-record-continuity/', '/doctor-workspace/']) {
   assert(text.includes(`href="${href}"`), `Missing inbound internal link: ${href}`);
   assert(!nodes.some(n => n.settings.title && n.settings.title.includes(href)), 'Links must stay inside copy, not become section titles');
 }

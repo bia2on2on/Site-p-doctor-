@@ -162,6 +162,12 @@ else
 	ko "Patient-record / information-continuity page guardrails failed"
 fi
 
+if node "$root/tests/static/validate-doctor-workspace.mjs"; then
+	ok "Doctor-workspace page native authoring and bounded message guardrails"
+else
+	ko "Doctor-workspace page guardrails failed"
+fi
+
 printf '== Static validation result: %s passed, %s failed ==\n' "$pass" "$fail"
 [ "$fail" -eq 0 ] || exit 1
 exit 0

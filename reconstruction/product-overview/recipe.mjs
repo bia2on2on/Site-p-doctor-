@@ -139,6 +139,9 @@ export function productOverview(t) {
         // Contextual inbound link to the clinic-scoped patient-record / continuity page
         // (one link, inside the bounded topic it belongs to — no hub or nav duplication).
         text('محدودهٔ پرونده در کلینیک و تداوم اطلاعات آن را در <a href="/patient-record-continuity/">پرونده بیمار و تداوم اطلاعات</a> دنبال کنید.', 'caption'),
+        // Contextual inbound link to the bounded doctor-workspace page: completes the
+        // product map (reception → workspace → record) with one link, no narrative takeover.
+        text('ادامهٔ جریان کار پزشک در کلینیک را در <a href="/doctor-workspace/">فضای کاری پزشک</a> دنبال کنید.', 'caption'),
       ], 55, { flex_gap: gap(0) }),
     ])], { background_background: 'classic', background_color: color('background/subtle') }),
     band('Audience and operational fit', 'fit', [
