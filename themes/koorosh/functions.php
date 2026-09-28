@@ -74,3 +74,22 @@ add_action(
 		$elementor_theme_manager->register_location( 'footer' );
 	}
 );
+
+// Self-hosted type is a site-wide performance/privacy requirement, not page styling.
+add_filter( 'elementor/frontend/print_google_fonts', '__return_false' );
+
+// Page excerpts are the editable description source until an SEO layer is authorized.
+add_action(
+	'init',
+	function () {
+		add_post_type_support( 'page', 'excerpt' );
+	}
+);
+add_action(
+	'wp_head',
+	function () {
+		if ( is_page_template( 'page-elementor.php' ) && has_excerpt() ) {
+			printf( '<meta name="description" content="%s">' . "\n", esc_attr( wp_strip_all_tags( get_the_excerpt() ) ) );
+		}
+	}
+);

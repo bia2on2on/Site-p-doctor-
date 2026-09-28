@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
-<a class="skip-link screen-reader-text" href="#content"><?php esc_html_e( 'Skip to content', 'koorosh' ); ?></a>
+<a class="skip-link screen-reader-text" href="#content"><?php echo is_rtl() ? esc_html( 'رفتن به محتوا' ) : esc_html__( 'Skip to content', 'koorosh' ); ?></a>
 <?php
 if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_location( 'header' ) ) :
 	?>

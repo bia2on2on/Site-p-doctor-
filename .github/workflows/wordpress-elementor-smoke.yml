@@ -43,14 +43,40 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Install pinned @wordpress/env
-        run: npm install --global --no-fund --no-audit @wordpress/env@11.16.0
+      - name: Install locked WordPress and browser tooling
+        run: |
+          # Public-package bootstrap: expose bounded diagnostics through annotations
+          # as well as log blobs (the latter can be unreachable from review sandboxes).
+          if ! npm ci --prefix tests/browser --no-fund --no-audit > /tmp/wp-env-install.log 2>&1; then
+            tail -20 /tmp/wp-env-install.log
+            detail=$(tail -12 /tmp/wp-env-install.log | tr '\n' ' ')
+            echo "::error title=wp-env package bootstrap::$detail"
+            exit 1
+          fi
+          echo "$GITHUB_WORKSPACE/tests/browser/node_modules/.bin" >> "$GITHUB_PATH"
 
       - name: Start clean WordPress environment with pinned free Elementor
         run: wp-env start
 
       - name: Run runtime smoke test
         run: bash tests/wp-env/smoke.sh
+
+      - name: Install bounded browser tooling
+        run: |
+          cd tests/browser
+          npx playwright install --with-deps chromium
+
+      - name: Reconstruct native Free homepage and capture browser evidence
+        run: node tests/browser/homepage.mjs
+
+      - name: Upload homepage evidence (also on failure)
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: homepage-evidence-${{ github.event.pull_request.head.sha || github.sha }}
+          path: tests/browser/artifacts/
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Collect container logs on failure
         if: failure()

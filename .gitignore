@@ -16,3 +16,7 @@ elementor-pro*.zip
 .wp-env.override.json
 playwright/.auth/
 test-results/
+
+# Reproducible browser tooling and ephemeral evidence
+node_modules/
+tests/browser/artifacts/

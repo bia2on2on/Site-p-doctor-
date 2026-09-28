@@ -85,3 +85,24 @@
     width: min(100% - 1rem, 72rem);
   }
 }
+
+/* Theme defaults for non-Elementor shell content; composition stays in the editor. */
+body {
+  margin: 0;
+  background: #F6F8F9;
+  color: #14212B;
+  font-family: 'Vazirmatn', Tahoma, 'Segoe UI', system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.9;
+}
+a { color: #0F6F66; }
+a:hover { color: #0B5B54; }
+.site-title { font-weight: 700; text-decoration: none; }
+.site-header { border-block-end: 1px solid #DDE5E9; }
+.site-footer { border-block-start: 1px solid #DDE5E9; }
+/* Logical focus treatment also survives Elementor's button reset styles. */
+.elementor a:focus-visible {
+  outline: 2px solid #0F6F66;
+  outline-offset: 2px;
+}
+bdi { unicode-bidi: isolate; }
