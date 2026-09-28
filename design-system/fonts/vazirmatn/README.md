@@ -40,6 +40,9 @@ enforced by `tests/static/validate-tokens.mjs`.
 ## License obligations (OFL 1.1)
 
 - The license text (`OFL.txt`) must accompany any redistribution — it is committed here.
+- `OFL.txt` is kept **byte-identical to upstream** (its SHA-256 is enforced by test);
+  `.gitattributes` disables whitespace checks for this path so the vendored text is
+  never "fixed".
 - The fonts may not be sold by themselves; bundling with the website is permitted.
 - Reserved Font Name: none declared for these files beyond the upstream OFL notice;
   do not rename the family when redistributing the unmodified files.
