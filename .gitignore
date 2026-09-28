@@ -1,5 +1,7 @@
 # Local WordPress configuration, databases and backups (never canonical)
 wp-config.php
+.env
+.env.*
 *.sql
 *.sql.gz
 *.sqlite
