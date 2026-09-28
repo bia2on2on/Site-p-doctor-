@@ -183,6 +183,17 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
     assert.deepEqual(measures.offsiteLinks, []);
     await page.screenshot({ path: resolve(out, `${name}.png`), fullPage: true });
     await page.screenshot({ path: resolve(out, `${name}-viewport.png`) });
+    // Optional, bounded review transport when a reviewer cannot reach artifact blob storage.
+    // Anonymous fixture imagery ONLY; never the editor/login page or authentication state.
+    // Normal PNG artifacts remain authoritative. No additional library/service/permission.
+    if (process.env.CPMS_INLINE_REVIEW === '1' && name !== 'large-desktop') {
+      const jpeg = await page.screenshot({ type: 'jpeg', quality: 45, fullPage: true });
+      assert(jpeg.length <= 256_000, 'Inline review image budget exceeded; use normal artifact download');
+      writeFileSync(resolve(out, `${name}-review.jpg`), jpeg);
+      const encoded = jpeg.toString('base64');
+      const chunks = encoded.match(/.{1,48000}/g);
+      chunks.forEach((chunk, i) => console.log(`::notice title=Review image ${name} ${i + 1}/${chunks.length}::${chunk}`));
+    }
     // Keyboard reachability and focus style; no programmatic focus shortcut.
     await page.keyboard.press('Tab'); // skip link
     await page.keyboard.press('Tab'); // neutral shell home link
