@@ -1,5 +1,5 @@
 {
-  "schema_revision": 1,
+  "schema_revision": 2,
   "status": "TEMPLATE — NO EXPORT OR REBUILD VALIDATED",
   "verified_at_utc": "NOT YET VERIFIED",
   "version_source": "NOT YET VERIFIED",
@@ -23,12 +23,47 @@
     "selected_plugins": "NOT YET VERIFIED",
     "media_mode": "NOT YET VERIFIED"
   },
-  "artifacts": [],
+  "design_system": {
+    "canonical_tokens": "design-system/tokens.json",
+    "spec": "docs/DESIGN-SYSTEM.md",
+    "decided_at_utc": "2026-09-28",
+    "owner_visual_acceptance": "NOT RUN — Milestone A (docs/SITE-ARCHITECTURE.md §16) still pending",
+    "elementor_representation": "NOT AVAILABLE — no Elementor kit or settings export exists; tokens map to Elementor globals via the elementor block in tokens.json (spec only)"
+  },
+  "artifacts": [
+    {
+      "path": "design-system/fonts/vazirmatn/Vazirmatn-Regular.woff2",
+      "kind": "font",
+      "license": "OFL-1.1",
+      "source": "https://github.com/rastikerdar/vazirmatn tag v33.003 (git blob c9824c872b3b4f2eb13a102748f8ef1a6ef97da0)",
+      "bytes": 50684,
+      "sha256": "e382101336c6eb32cfb31381c027d02d2e0354bad08f6a395d4088beb3db3d91",
+      "added_at_utc": "2026-09-28"
+    },
+    {
+      "path": "design-system/fonts/vazirmatn/Vazirmatn-Bold.woff2",
+      "kind": "font",
+      "license": "OFL-1.1",
+      "source": "https://github.com/rastikerdar/vazirmatn tag v33.003 (git blob 65b427f86eba2cfa45900de247bc7cf3294cd1e5)",
+      "bytes": 51020,
+      "sha256": "836fae7d42d83faa249bc00e0099592be98a1fa260d22d82f269b6091e585627",
+      "added_at_utc": "2026-09-28"
+    },
+    {
+      "path": "design-system/fonts/vazirmatn/OFL.txt",
+      "kind": "license",
+      "license": "OFL-1.1",
+      "source": "https://github.com/rastikerdar/vazirmatn tag v33.003 (git blob be66b3824e9772e75141e631695c5256f105fb57)",
+      "bytes": 4391,
+      "sha256": "17e355067c8284f47743a1ee3b1ef7ff684ff0601eda357f9353b10b3016ab31",
+      "added_at_utc": "2026-09-28"
+    }
+  ],
   "expected_inventory": {
     "pages_and_slugs": "NOT YET VERIFIED",
     "menus_and_locations": "NOT YET VERIFIED",
     "theme_builder_parts_and_conditions": "NOT YET VERIFIED",
-    "global_settings": "NOT YET VERIFIED",
+    "global_settings": "Canonical expectation now defined in design-system/tokens.json (elementor mapping: 18 global colors, 7 global font styles, layout/breakpoints); applied to no WordPress instance yet and NOT VERIFIED against any kit export",
     "pro_widgets": "NOT YET VERIFIED",
     "media_and_relink_sources": "NOT YET VERIFIED",
     "optional_wxr_disjoint_content": "NOT YET VERIFIED"
