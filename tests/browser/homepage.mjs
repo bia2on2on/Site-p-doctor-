@@ -90,12 +90,12 @@ try {
   await editor.locator('#user_pass').fill(password);
   await Promise.all([editor.waitForURL(/wp-admin/), editor.locator('#wp-submit').click()]);
   await editor.goto(`${base}/wp-admin/post.php?post=${id}&action=elementor`);
-  await editor.waitForFunction(() => window.elementor?.getPreviewContainer?.() && window.$e?.commands?.getAll(), null, { timeout: 120_000 });
+  await editor.waitForFunction(() => window.elementor?.getPreviewContainer?.() && ['document/elements/create', 'document/elements/settings', 'document/save/publish'].every(name => window.$e?.commands?.getAll()?.includes(name)), null, { timeout: 120_000 });
 
   const authoring = await editor.evaluate(async nodes => {
     const required = ['document/elements/create', 'document/elements/settings', 'document/save/publish'];
     const commands = $e.commands.getAll();
-    for (const name of required) if (!commands[name]) throw new Error(`Documented user command unavailable: ${name}`);
+    for (const name of required) if (!commands.includes(name)) throw new Error(`Documented user command unavailable: ${name}`);
     const parent = elementor.getPreviewContainer();
     if (parent.children.length) throw new Error('Refusing to replace existing editor content');
     const created = [];
