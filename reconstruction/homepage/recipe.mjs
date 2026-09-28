@@ -110,7 +110,7 @@ export function homepage(t) {
       ]),
     ], { background_background: 'classic', background_color: color('surface/card') }),
     band('Demo consultation destination — no endpoint', 'demo-consultation', [
-      eyebrow('گام بعدی'), heading('گفت‌وگو دربارهٔ جریان کار کلینیک شما'),
+      eyebrow('درخواست دمو / مشاوره'), heading('گفت‌وگو دربارهٔ جریان کار کلینیک شما'),
       text('برای درخواست دمو / مشاوره، تعداد پزشکان، نقش‌های پذیرش و اولویت‌های کاری مرکز را آماده کنید. هدف، بررسی تناسب CPMS با نیاز شماست.', 'lede'),
       text('مسیر ثبت درخواست هنوز متصل نشده است. در این پیش‌نمایش اطلاعاتی دریافت یا ارسال نمی‌شود.', 'body-sm'),
       button('مرور موضوعات گفت‌وگو', '#evaluation', false),

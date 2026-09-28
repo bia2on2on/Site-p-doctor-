@@ -59,7 +59,7 @@ for (const n of all) {
   assert(schemas[n.kind], `Native Free element missing: ${n.kind}`);
   for (const key of Object.keys(n.settings)) assert(schemas[n.kind].includes(key), `Unsupported native control: ${n.kind}.${key}`);
 }
-writeFileSync(resolve(out, 'native-controls.json'), JSON.stringify(schemas, null, 2));
+
 
 wp('option', 'update', 'blog_public', '0');
 wp('option', 'update', 'blogname', 'CPMS');
