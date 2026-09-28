@@ -1,0 +1,4 @@
+# Vendored upstream license text must stay byte-identical to its source
+# (SIL OFL 1.1 from github.com/rastikerdar/vazirmatn tag v33.003); do not
+# "fix" whitespace inside it — disable whitespace checks for that path only.
+design-system/fonts/vazirmatn/OFL.txt -whitespace
