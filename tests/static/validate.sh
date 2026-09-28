@@ -144,6 +144,12 @@ else
 	ko "Product Overview guardrails failed"
 fi
 
+if node "$root/tests/static/validate-demo.mjs"; then
+	ok "Demo consultation native authoring, qualification and safe non-live guardrails"
+else
+	ko "Demo consultation guardrails failed"
+fi
+
 printf '== Static validation result: %s passed, %s failed ==\n' "$pass" "$fail"
 [ "$fail" -eq 0 ] || exit 1
 exit 0

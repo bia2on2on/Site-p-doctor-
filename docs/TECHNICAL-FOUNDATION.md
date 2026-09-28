@@ -33,6 +33,8 @@ A vendor kit is **not a complete DB backup**, license transfer, or guarantee of 
 
 **PUBLIC CI:** Koorosh + Elementor Free smoke. Hello is no longer installed in public CI.
 
+**CONVERSION & LEAD DELIVERY STATUS (2026-09-28):** **LIVE LEAD DELIVERY = NOT CONFIGURED / NOT AUTHORIZED.** The Demo / Consultation conversion page is reconstructed natively in Elementor with Koorosh-owned qualification form behavior (`[cpms_demo_form]`). Because the Product Owner has not authorized a production recipient email, CRM, webhook, third-party form SaaS, analytics, advertising pixels, WhatsApp/phone destination, or production SMTP/form-delivery architecture, the page operates strictly in an explicit **SAFE NON-LIVE MODE**. Real lead submissions are neither accepted nor discarded silently; synthetic test payloads are validated client/server-side but never persisted, logged, or transmitted. Live lead delivery configuration remains a **launch blocker** for the conversion path.
+
 **PRIVATE ACCEPTANCE:** Elementor Pro + kit export/import + authorized test host remain **NOT RUN**.
 
 **REFERENCE HOST:** recorded versions in `reconstruction/manifest.json` → `host_environment` are test/evidence facts, not permanent architecture locks.
