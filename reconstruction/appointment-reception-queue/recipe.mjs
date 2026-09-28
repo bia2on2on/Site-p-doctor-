@@ -107,13 +107,15 @@ export function appointmentReceptionQueue(t) {
         eyebrow('جریان کاری کلینیک · نوبت، پذیرش، صف'),
         heading('نوبت، پذیرش و صف؛<br>یک مسیر کاری متصل در کلینیک', 'h1'),
         text(`از برنامهٔ نوبت‌ها تا ورود مراجعان، صف انتظار و ادامهٔ مسیر در کلینیک؛ ${cpms} این مسیر کاری را برای مدیران کلینیک، پذیرش و پزشکان در کنار هم می‌بیند — نه به‌شکل ابزارهای جدا و نه به‌عنوان صفحهٔ نوبت‌گیری بیماران.`, 'lede'),
+        // Mobile-first: actions precede the progression strip so the primary CTA
+        // stays inside the first viewport in this single-column hero.
+        row('Hero actions', [button('درخواست دمو / مشاوره', '/demo/'), button('دیدن جریان کاری', '#workflow', false)], { flex_gap: gap(12), flex_gap_mobile: gap(12), flex_direction_tablet: 'row', flex_direction_mobile: 'column', flex_wrap: 'wrap' }),
         row('Clinic-side progression strip', [
           chip('flow-appointment', 'نوبت'),
           chip('flow-reception', 'پذیرش'),
           chip('flow-queue', 'صف'),
           chip('flow-continuity', 'ادامهٔ مسیر در کلینیک', true),
         ], { _element_id: 'flow-strip', flex_direction_tablet: 'row', flex_direction_mobile: 'row', flex_wrap: 'wrap', flex_gap: gap(24), flex_gap_mobile: gap(16) }),
-        row('Hero actions', [button('درخواست دمو / مشاوره', '/demo/'), button('دیدن جریان کاری', '#workflow', false)], { flex_gap: gap(12), flex_gap_mobile: gap(12), flex_direction_tablet: 'row', flex_direction_mobile: 'column', flex_wrap: 'wrap' }),
         text('مخاطب این صفحه مدیران و کارکنان کلینیک هستند؛ اگر برای گرفتن نوبت مراجعه کرده‌اید، این صفحه برای شما نیست.', 'caption'),
       ], { flex_gap: gap(16) }),
     ], { padding: box(32, 24), padding_mobile: box(24, 16) }),
