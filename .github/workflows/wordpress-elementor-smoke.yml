@@ -75,7 +75,10 @@ jobs:
       - name: Reconstruct native Free Demo conversion page and capture browser evidence
         run: node tests/browser/demo.mjs
 
-      - name: Upload homepage, Product Overview and Demo evidence (also on failure)
+      - name: Reconstruct native Free appointment/reception/queue workflow page and capture browser evidence
+        run: node tests/browser/appointment-reception-queue.mjs
+
+      - name: Upload homepage, Product Overview, Demo and workflow page evidence (also on failure)
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
