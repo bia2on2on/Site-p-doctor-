@@ -88,11 +88,15 @@ wp_runtime_version="$(run_wp wp eval 'echo get_bloginfo("version");')" \
 
 # ---- 3. Elementor installed and active --------------------------------------
 active_plugins="$(run_wp wp plugin list --status=active --field=name)" || ko "Could not list active plugins"
-if printf '%s\n' "$active_plugins" | grep -qx 'elementor'; then
+# Match from a temp file: pipefail + `grep -q` on a pipe can fail via SIGPIPE.
+active_plugins_file="$(mktemp)"
+printf '%s\n' "${active_plugins:-}" > "$active_plugins_file"
+if grep -qx 'elementor' "$active_plugins_file"; then
 	ok "Elementor is installed and active (wp plugin list --status=active)"
 else
 	ko "Elementor not found among active plugins"
 fi
+rm -f "$active_plugins_file"
 
 # ---- 4. Elementor runtime-loaded version retrievable ------------------------
 elementor_version="$(run_wp wp eval 'echo defined("ELEMENTOR_VERSION") ? ELEMENTOR_VERSION : "";')" \
@@ -107,16 +111,22 @@ http_code="$(curl --fail --silent --show-error --output /dev/null --write-out '%
 home_body=""
 curl_body_exit=0
 home_body="$(curl --fail --silent --show-error "$BASE_URL/")" || curl_body_exit=$?
-if printf '%s' "${home_body:-}" | grep -qi '<html'; then
+# Grep a temp file, not a pipe: with pipefail, `grep -q` on a pipe exits at
+# the first match while printf can still receive SIGPIPE (bodies larger than
+# the pipe buffer), making a successful match report failure (observed in CI).
+home_body_file="$(mktemp)"
+printf '%s' "${home_body:-}" > "$home_body_file"
+if grep -iaq '<html' "$home_body_file"; then
 	ok "Site home returns an HTML document"
 else
 	# Emit retrievable runtime evidence before failing: body size, curl exit
 	# code, and the first bytes of the response actually received.
 	body_len="${#home_body}"
-	body_head="$(printf '%s' "${home_body:-}" | tr '\n\r' '  ' | head -c 200)"
+	body_head="$(head -c 200 "$home_body_file" | tr '\n\r' '  ')"
 	printf '::error title=Smoke evidence::home body length=%s curl_exit=%s head200=[%s]\n' "$body_len" "$curl_body_exit" "$body_head"
 	ko "Site home did not return HTML"
 fi
+rm -f "$home_body_file"
 
 note "== Smoke result: $pass passed, $fail failed =="
 printf '::notice title=Smoke result::%s passed, %s failed\n' "$pass" "$fail"
