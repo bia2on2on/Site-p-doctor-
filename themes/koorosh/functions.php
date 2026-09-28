@@ -40,6 +40,13 @@ add_action(
 			array( 'koorosh' ),
 			$version
 		);
+		wp_enqueue_script(
+			'koorosh-demo-form',
+			get_stylesheet_directory_uri() . '/demo-form.js',
+			array(),
+			$version,
+			true
+		);
 	}
 );
 
@@ -93,3 +100,6 @@ add_action(
 		}
 	}
 );
+
+// Demo / consultation qualification form handler (safe non-live test mode).
+require_once get_template_directory() . '/demo-form.php';

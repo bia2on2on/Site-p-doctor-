@@ -1,0 +1,21 @@
+{
+  "publication": "TARGET — NOT PUBLICATION-APPROVED",
+  "canonical_recipe": "reconstruction/demo/recipe.mjs",
+  "claim_register": "reconstruction/demo/claims.md",
+  "browser_runner": "tests/browser/demo.mjs",
+  "seo": {
+    "title": "درخواست دمو و مشاوره | CPMS",
+    "description_source": "WordPress page excerpt via existing Koorosh mechanism",
+    "plugin": "none"
+  },
+  "conversion": "Assisted-sale qualification; safe non-live test mode; delivery destination NOT AUTHORIZED",
+  "delivery_destination": "NOT CONFIGURED / NOT AUTHORIZED — launch blocker",
+  "form_fields": [
+    "cpms_contact_name",
+    "cpms_org_name",
+    "cpms_contact_value",
+    "cpms_org_type",
+    "cpms_doctor_count",
+    "cpms_discussion_topic"
+  ]
+}
