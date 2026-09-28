@@ -56,7 +56,16 @@ jobs:
           echo "$GITHUB_WORKSPACE/tests/browser/node_modules/.bin" >> "$GITHUB_PATH"
 
       - name: Start clean WordPress environment with pinned free Elementor
-        run: wp-env start
+        run: |
+          # Expose the start-up failure reason through an annotation: log blobs are not
+          # always reachable from review sandboxes (same pattern as the package bootstrap).
+          if ! wp-env start > /tmp/wp-env-start.log 2>&1; then
+            tail -25 /tmp/wp-env-start.log
+            detail=$(tail -15 /tmp/wp-env-start.log | tr '\n' ' ')
+            echo "::error title=wp-env start failed::$detail"
+            exit 1
+          fi
+          tail -5 /tmp/wp-env-start.log
 
       - name: Run runtime smoke test
         run: bash tests/wp-env/smoke.sh
