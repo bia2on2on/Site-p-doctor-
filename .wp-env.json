@@ -4,5 +4,9 @@
 	"core": "WordPress/WordPress#7.1.2",
 	"plugins": [
 		"https://downloads.wordpress.org/plugin/elementor.4.3.2.zip"
+	],
+	"themes": [
+		"https://downloads.wordpress.org/theme/hello-elementor.3.5.1.zip",
+		"./themes/cpms-child"
 	]
 }

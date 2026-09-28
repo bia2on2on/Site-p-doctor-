@@ -32,7 +32,7 @@
   },
   "artifacts": [
     {
-      "path": "design-system/fonts/vazirmatn/Vazirmatn-Regular.woff2",
+      "path": "themes/cpms-child/fonts/Vazirmatn-Regular.woff2",
       "kind": "font",
       "license": "OFL-1.1",
       "source": "https://github.com/rastikerdar/vazirmatn tag v33.003 (git blob c9824c872b3b4f2eb13a102748f8ef1a6ef97da0)",
@@ -41,7 +41,7 @@
       "added_at_utc": "2026-09-28"
     },
     {
-      "path": "design-system/fonts/vazirmatn/Vazirmatn-Bold.woff2",
+      "path": "themes/cpms-child/fonts/Vazirmatn-Bold.woff2",
       "kind": "font",
       "license": "OFL-1.1",
       "source": "https://github.com/rastikerdar/vazirmatn tag v33.003 (git blob 65b427f86eba2cfa45900de247bc7cf3294cd1e5)",
@@ -50,7 +50,7 @@
       "added_at_utc": "2026-09-28"
     },
     {
-      "path": "design-system/fonts/vazirmatn/OFL.txt",
+      "path": "themes/cpms-child/fonts/OFL.txt",
       "kind": "license",
       "license": "OFL-1.1",
       "source": "https://github.com/rastikerdar/vazirmatn tag v33.003 (git blob be66b3824e9772e75141e631695c5256f105fb57)",
@@ -69,5 +69,11 @@
     "optional_wxr_disjoint_content": "NOT YET VERIFIED"
   },
   "clean_import_pilot": "NOT RUN",
-  "authorized_pro_host_acceptance": "NOT RUN"
+  "authorized_pro_host_acceptance": "NOT RUN",
+  "theme_layer": {
+    "ci_parent_pin": "hello-elementor 3.5.1 (WordPress.org themes API, 2026-09-28)",
+    "child": "themes/cpms-child",
+    "ci_runtime": "NOT RUN",
+    "real_host": "NOT VERIFIED"
+  }
 }
