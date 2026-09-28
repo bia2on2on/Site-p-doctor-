@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+#
+# Static validation of repository-controlled configuration/metadata.
+# No WordPress runtime required; safe to run anywhere with node and python3.
+#
+# Checks:
+#   1. .wp-env.json parses as strict JSON.
+#   2. .wp-env.json pins are well-formed (core ref, Elementor plugin ZIP URL,
+#      phpVersion) so the smoke test can always derive expected versions.
+#   3. reconstruction/manifest.json parses as strict JSON.
+#   4. Every GitHub Actions workflow file parses as YAML (PyYAML; installed
+#      on demand if missing).
+
+set -u -o pipefail
+
+pass=0
+fail=0
+root="$(cd "$(dirname "$0")/../.." && pwd)"
+
+if [ ! -f "$root/.wp-env.json" ]; then
+	echo "FAIL: repo root not resolved (no .wp-env.json at: $root)"
+	exit 2
+fi
+
+ok() { printf 'PASS: %s\n' "$*"; pass=$((pass + 1)); }
+ko() { printf 'FAIL: %s\n' "$*"; fail=$((fail + 1)); }
+
+# ---- 1+2. wp-env config ------------------------------------------------------
+if node -e 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"))' \
+	"$root/.wp-env.json" 2>/dev/null; then
+	ok ".wp-env.json is valid JSON"
+else
+	ko ".wp-env.json is not valid JSON"
+fi
+
+node -e '
+const c = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
+let bad = 0;
+const err = (m) => { console.error(m); bad = 1; };
+if (!/^WordPress\/WordPress#\d+(\.\d+)+$/.test(c.core || "")) err("core pin malformed: " + c.core);
+if (!/^\d+(\.\d+)?$/.test(c.phpVersion || "")) err("phpVersion pin malformed: " + c.phpVersion);
+if (!Array.isArray(c.plugins) || c.plugins.length !== 1) err("plugins must be the single Elementor ZIP pin");
+else if (!/^https:\/\/downloads\.wordpress\.org\/plugin\/elementor\.\d+(\.\d+)+\.zip$/.test(c.plugins[0])) err("plugins[0] must be a pinned elementor ZIP URL: " + c.plugins[0]);
+if (JSON.stringify(Object.keys(c).sort()) !== JSON.stringify(["$schema", "core", "phpVersion", "plugins"].sort())) err("unexpected/missing top-level keys: " + Object.keys(c).join(","));
+process.exit(bad);
+' "$root/.wp-env.json" \
+	&& ok ".wp-env.json pins are well-formed (core ref, phpVersion, single Elementor ZIP)" \
+	|| ko ".wp-env.json pins are malformed"
+
+# ---- 3. reconstruction manifest ----------------------------------------------
+if node -e 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"))' \
+	"$root/reconstruction/manifest.json" 2>/dev/null; then
+	ok "reconstruction/manifest.json is valid JSON"
+else
+	ko "reconstruction/manifest.json is not valid JSON"
+fi
+
+# ---- 4. Workflow YAML parses ---------------------------------------------------
+if ! python3 -c 'import yaml' 2>/dev/null; then
+	echo "PyYAML not present; installing pyyaml (host-local, not committed)"
+	python3 -m pip install --quiet --user pyyaml >/dev/null 2>&1 || {
+		echo "SKIP: could not make PyYAML available; workflow YAML not parsed here (GitHub still parses workflows at push time)"
+	}
+fi
+if python3 -c 'import yaml' 2>/dev/null; then
+	yaml_bad=0
+	yaml_files=0
+	while IFS= read -r -d '' f; do
+		yaml_files=$((yaml_files + 1))
+		if python3 -c 'import sys, yaml; yaml.safe_load(open(sys.argv[1], encoding="utf-8"))' "$f" 2>/dev/null; then
+			echo "PASS: YAML parses: ${f#"$root"/}"
+		else
+			echo "FAIL: YAML does not parse: ${f#"$root"/}"
+			yaml_bad=1
+		fi
+	done < <(find "$root/.github/workflows" \( -name '*.yml' -o -name '*.yaml' \) -print0 2>/dev/null)
+	if [ "$yaml_files" -eq 0 ]; then
+		ko "no workflow YAML files found under .github/workflows (nothing validated)"
+	else
+		[ "$yaml_bad" -eq 0 ] && ok "all $yaml_files workflow YAML file(s) parse" || ko "workflow YAML failed to parse"
+	fi
+else
+	ko "workflow YAML check NOT RUN (no YAML parser available)"
+fi
+
+printf '== Static validation result: %s passed, %s failed ==\n' "$pass" "$fail"
+[ "$fail" -eq 0 ] || exit 1
+exit 0

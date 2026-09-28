@@ -1,0 +1,57 @@
+name: WordPress + Elementor smoke
+
+# Free-Elementor CI foundation only. This workflow is NOT Elementor Pro
+# acceptance: no Pro package, license, or secrets are used or fetched here.
+# Temporary CI pins (upstream current stable at implementation time) live in
+# .wp-env.json and are NOT the real-host compatibility target, which remains
+# unverified until versions are captured from the authorized test host.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wp-smoke-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  static-validation:
+    name: Static validation (JSON/YAML/pins)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Run static validation
+        run: bash tests/static/validate.sh
+
+  wp-elementor-smoke:
+    name: Clean WordPress + free Elementor smoke (wp-env)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install pinned @wordpress/env
+        run: npm install --global --no-fund --no-audit @wordpress/env@11.16.0
+
+      - name: Start clean WordPress environment with pinned free Elementor
+        run: wp-env start
+
+      - name: Run runtime smoke test
+        run: bash tests/wp-env/smoke.sh
+
+      - name: Collect container logs on failure
+        if: failure()
+        run: |
+          docker ps -a
+          for c in $(docker ps -aq); do
+            echo "=== logs: $c ==="
+            docker logs --tail 60 "$c" 2>&1 || true
+          done
