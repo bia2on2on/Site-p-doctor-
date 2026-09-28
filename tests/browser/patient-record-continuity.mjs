@@ -1,20 +1,27 @@
-/** Ephemeral wp-env only. No DB JSON writes, private APIs, or host operations. */
+/**
+ * Browser verification of the CPMS patient-record / information-continuity page
+ * («پرونده بیمار و تداوم اطلاعات»). Ephemeral wp-env only. No DB JSON writes,
+ * private APIs, or host operations. Run in the CI sequence AFTER the
+ * homepage / Product Overview / Demo / appointment-reception-queue runners:
+ * it proves those pages still reconstruct and that the inbound Product Overview
+ * link and every outbound destination resolve to real pages.
+ */
 import { chromium } from 'playwright';
 import { execFileSync } from 'node:child_process';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
 import { resolve } from 'node:path';
 import assert from 'node:assert/strict';
-import { productOverview, pageIdentity } from '../../reconstruction/product-overview/recipe.mjs';
+import { patientRecordContinuity, pageIdentity } from '../../reconstruction/patient-record-continuity/recipe.mjs';
 
 const root = resolve(import.meta.dirname, '../..');
-const out = resolve(import.meta.dirname, 'artifacts/product-overview');
+const out = resolve(import.meta.dirname, 'artifacts/patient-record-continuity');
 mkdirSync(out, { recursive: true });
 // Make pre-browser fixture failures retrievable even when CI log-blob egress is unavailable.
 process.on('uncaughtException', error => {
   const message = String(error.stack || error).replace(/user_pass=\S+/g, 'user_pass=[redacted]');
   writeFileSync(resolve(out, 'bootstrap-error.txt'), message);
-  console.error(`::error title=Product Overview reconstruction::${message.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A')}`);
+  console.error(`::error title=Patient-record continuity reconstruction::${message.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A')}`);
   process.exitCode = 1;
 });
 const base = 'http://localhost:8888'; // Browser runs on the CI runner, not in a user's browser.
@@ -27,7 +34,7 @@ function wp(...args) {
   }
 }
 const tokens = JSON.parse(readFileSync(resolve(root, 'design-system/tokens.json')));
-const recipe = productOverview(tokens);
+const recipe = patientRecordContinuity(tokens);
 const flatten = nodes => nodes.flatMap(n => [n, ...flatten(n.children)]);
 const all = flatten(recipe);
 
@@ -35,6 +42,14 @@ assert.equal(wp('option', 'get', 'home'), base, 'Only the disposable default wp-
 assert.equal(wp('theme', 'list', '--status=active', '--field=name'), 'koorosh');
 wp('plugin', 'is-active', 'elementor');
 assert.equal(wp('post', 'list', '--post_type=page', `--name=${pageIdentity.slug}`, '--format=count'), '0', 'Refuse to overwrite existing page; use a clean environment');
+
+// Regression guard: the four previously reconstructed pages remain published and
+// Elementor-editable in this shared fixture and are the real link destinations.
+const precedingPages = ['cpms-home', 'product-overview', 'demo', 'appointment-reception-queue'];
+for (const slug of precedingPages) {
+  assert.equal(wp('post', 'list', '--post_type=page', `--name=${slug}`, '--field=post_status'), 'publish', `${slug} must already be reconstructed and published by its own runner`);
+  assert.equal(wp('eval', `$p = get_page_by_path('${slug}'); $d = $p ? \\Elementor\\Plugin::$instance->documents->get($p->ID) : null; echo $d && $d->is_built_with_elementor() ? '1' : '0';`), '1', `${slug} must remain Elementor-editable`);
+}
 
 // Validate settings against the installed native controls before any page is created.
 // get_controls() is the public Controls_Stack API, not private storage inspection.
@@ -65,7 +80,6 @@ echo wp_json_encode($result);
 writeFileSync(resolve(out, 'native-controls.json'), JSON.stringify(schemas, null, 2));
 const unsupported = [...new Set(all.flatMap(n => Object.keys(n.settings).filter(key => !schemas[n.kind]?.includes(key)).map(key => `${n.kind}.${key}`)))];
 assert.deepEqual(unsupported, [], 'Unsupported native controls (including active responsive variants)');
-
 
 wp('option', 'update', 'blog_public', '0');
 wp('option', 'update', 'blogname', 'CPMS');
@@ -114,8 +128,14 @@ try {
   }, recipe);
   writeFileSync(resolve(out, 'authoring.json'), JSON.stringify(authoring, null, 2));
   assert.equal(wp('post', 'get', id, '--field=post_status'), 'publish');
-  wp('option', 'update', 'show_on_front', 'page');
-  wp('option', 'update', 'page_on_front', id);
+  // Stable post-name URLs (documented structural pattern, SITE-ARCHITECTURE §5.1)
+  // so links to /demo/, /product-overview/ and /appointment-reception-queue/ are real.
+  wp('rewrite', 'structure', '/%postname%/');
+  // Earlier standalone runners temporarily use Product Overview as the front page.
+  // Keep the actual Homepage at / for this integrated five-page reconstruction.
+  const homeId = wp('post', 'list', '--post_type=page', '--name=cpms-home', '--field=ID');
+  assert.match(homeId, /^\d+$/);
+  wp('option', 'update', 'page_on_front', homeId);
   wp('elementor', 'flush-css');
 
   // Reopen to prove persisted native editable elements, not only transient editor state.
@@ -132,18 +152,19 @@ try {
   await admin.close();
 
   const state = JSON.parse(wp('eval', `
-$id = (int) get_option('page_on_front');
+$id = ${id};
 $document = \\Elementor\\Plugin::$instance->documents->get($id);
-echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'), 'editable' => $document && $document->is_built_with_elementor(), 'theme' => get_stylesheet(), 'elementor' => defined('ELEMENTOR_VERSION') ? ELEMENTOR_VERSION : '', 'locale' => get_locale(), 'indexable' => get_option('blog_public')));
+echo wp_json_encode(array('id' => $id, 'status' => get_post_status($id), 'editable' => $document && $document->is_built_with_elementor(), 'theme' => get_stylesheet(), 'elementor' => defined('ELEMENTOR_VERSION') ? ELEMENTOR_VERSION : '', 'locale' => get_locale(), 'indexable' => get_option('blog_public'), 'permalinks' => get_option('permalink_structure')));
 `));
-  assert.equal(state.front, Number(id));
-  assert.equal(state.mode, 'page');
+  assert.equal(state.status, 'publish');
   assert.equal(state.editable, true);
   assert.equal(state.theme, 'koorosh');
   assert.equal(state.locale, 'fa_IR');
   assert.equal(state.indexable, '0');
+  assert.equal(state.permalinks, '/%postname%/');
   diagnostic.runtime = state;
 
+  const pageUrl = `${base}/${pageIdentity.slug}/`;
   const visitor = await browser.newContext({ reducedMotion: 'reduce' });
   const page = await visitor.newPage();
   frontend = page;
@@ -154,49 +175,71 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
   page.on('request', r => { if (!r.url().startsWith(base) && /^https?:/.test(r.url())) diagnostic.externalRequests.push(r.url()); });
   for (const [name, width, height] of [['mobile', 390, 844], ['tablet', 768, 1024], ['desktop', 1366, 768], ['large-desktop', 1920, 1080]]) {
     await page.setViewportSize({ width, height });
-    const response = await page.goto(base, { waitUntil: 'networkidle' });
-    assert.equal(response.status(), 200);
+    const response = await page.goto(pageUrl, { waitUntil: 'networkidle' });
+    assert.equal(response.status(), 200, `${name}: patient-record page serves successfully`);
     await page.evaluate(() => document.fonts.ready);
     assert.equal(await page.locator('html').getAttribute('dir'), 'rtl');
     assert.equal(await page.locator('html').getAttribute('lang'), 'fa-IR');
     assert.equal(await page.locator('main').count(), 1);
-    assert.equal(await page.locator('h1').count(), 1);
+    assert.equal(await page.locator('h1').count(), 1, 'Exactly one H1');
     assert.match(await page.title(), /CPMS/);
-    assert.match(await page.locator('h1').innerText(), /نرم‌افزار مدیریت مطب و کلینیک/);
-    assert(await page.getByText('CPMS فقط نرم‌افزار نوبت‌دهی است؟', { exact: true }).count() === 1, 'Integrated clinic-management identity');
-    assert(await page.getByText('جایگزین حسابداری کامل است؟', { exact: true }).count() === 1, 'Bounded finance objection');
-    assert(await page.getByText('این قاب، تصویر محیط نرم‌افزار نیست', { exact: false }).count() > 0, 'Reserved media is explicitly not product UI');
+    assert.match(await page.locator('h1').innerText(), /پروندهٔ بیمار و تداوم اطلاعات/);
     assert.equal(await page.locator('meta[name="description"]').count(), 1);
     assert.match(await page.locator('meta[name="robots"]').getAttribute('content'), /noindex/);
+    assert.equal(await page.locator('form').count(), 0, 'No form without an authorized endpoint');
+    // Explicit bounded claims must stay visible at every viewport.
+    assert(await page.getByText('ادعای این صفحه نیست', { exact: false }).count() >= 1, 'Hero scope note visible');
+    assert(await page.getByText('مرز صریح', { exact: false }).count() >= 1, 'Record boundary visible');
+    assert(await page.getByText('ثبت و مدیریت در محیط CPMS', { exact: false }).count() >= 1, 'In-CPMS recording wording visible');
+    assert(await page.getByText('تمایز صریح', { exact: false }).count() >= 1, 'National-system distinction visible');
+    assert(await page.getByText('پشتیبانی تصمیم بالینی، هشدار خودکار یا پیشنهاد تشخیص', { exact: false }).count() >= 1, 'No clinical decision support invented');
+    assert(await page.getByText('دسترسی و تفکیک داده', { exact: false }).count() >= 1, 'Mechanism-level access section visible');
+    assert(await page.getByText('غیرزنده', { exact: false }).count() >= 1, 'Non-live conversion reality stated');
     const cta = page.getByRole('link', { name: 'درخواست دمو / مشاوره', exact: true });
-    assert.equal(await cta.getAttribute('href'), '#demo-consultation');
+    assert.equal(await cta.getAttribute('href'), '/demo/');
     const ctaBox = await cta.boundingBox();
     assert(ctaBox.y + ctaBox.height < height, `${name}: hero CTA must be in first viewport`);
     assert(ctaBox.height >= 44, 'CTA touch size');
-    assert.equal(await page.locator('form').count(), 0, 'No form without an authorized endpoint');
-    assert.equal(await page.locator('#product-media img, #product-media svg, #product-media canvas').count(), 0, 'No fabricated product media');
+    assert.equal(await page.locator('#product-media-record img, #product-media-record svg, #product-media-record canvas, #product-media-document img, #product-media-document svg, #product-media-document canvas').count(), 0, 'No fabricated product media');
     const measures = await page.evaluate(() => ({
       width: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth,
       font: getComputedStyle(document.querySelector('h1')).fontFamily,
       fontLoaded: document.fonts.check('700 30px Vazirmatn'),
       headings: [...document.querySelectorAll('main h1, main h2, main h3')].map(n => ({ tag: n.tagName, text: n.textContent })),
       brokenAnchors: [...document.querySelectorAll('a[href^="#"]')].filter(a => !document.getElementById(decodeURIComponent(a.hash.slice(1)))).map(a => a.hash),
-      offsiteLinks: [...document.querySelectorAll('main a')].filter(a => a.origin !== location.origin || a.pathname !== location.pathname).map(a => a.href),
+      offsiteLinks: [...document.querySelectorAll('main a')].filter(a => a.origin !== location.origin).map(a => a.href),
+      crossPageLinks: [...document.querySelectorAll('main a')].filter(a => a.origin === location.origin && a.pathname !== location.pathname && !a.hash).map(a => a.pathname),
+      reservations: [...document.querySelectorAll('[id^="product-media-"]')].length,
+      // Claim boundary checked on the rendered text, not only in the authored source.
+      renderedStrings: [...document.querySelectorAll('main h1, main h2, main h3, main p')].map(n => n.textContent.trim()).filter(Boolean),
     }));
     assert(measures.scrollWidth <= measures.width, `${name}: horizontal overflow`);
     assert(measures.font.includes('Vazirmatn') && measures.fontLoaded, 'Local Persian font loaded');
     assert.deepEqual(measures.brokenAnchors, []);
-    // Cross-page links are limited to the two real workflow pages; each destination is
-    // verified by its own runner later in this CI sequence (sort keeps this order-independent).
-    assert.deepEqual([...measures.offsiteLinks].sort(), [`${base}/appointment-reception-queue/`, `${base}/patient-record-continuity/`].sort(), 'Only the two real workflow detail pages are linked');
+    assert.deepEqual(measures.offsiteLinks, [], 'No offsite links');
+    assert.deepEqual([...new Set(measures.crossPageLinks)].sort(), ['/appointment-reception-queue/', '/demo/', '/product-overview/'], `Only existing reconstructed pages are linked: ${measures.crossPageLinks}`);
+    assert.equal(measures.reservations, 2, 'Exactly two media reservations on the page');
+    const nationalTerms = [/سامانهٔ ملی/, /نسخهٔ الکترونیک ملی/, /پروندهٔ الکترونیک سلامت/, /کشوری/];
+    for (const value of measures.renderedStrings) {
+      for (const term of nationalTerms) {
+        if (term.test(value)) assert(/نیست|نمی‌شود|نمی‌دهد|نمی‌دهند|ندارد|ندارند|خیر|بدون/.test(value) || /؟\s*$/.test(value), `Rendered national-system wording must stay negated: ${value.slice(0, 90)}`);
+      }
+    }
+    const rendered = measures.renderedStrings.join('\n');
+    for (const pattern of [/کاملاً امن/, /گواهی/, /انطباق قانونی/, /۱۰۰٪|100%/, /تضمین/, /بهترین/, /رایگان/, /درگاه پرداخت/, /اپلیکیشن موبایل/, /هوش مصنوعی/, /تشخیص خودکار/, /بیمه/]) {
+      assert(!pattern.test(rendered), `Forbidden rendered claim: ${pattern}`);
+    }
+    const levels = measures.headings.map(h => Number(h.tag.slice(1)));
+    assert.equal(levels[0], 1, 'H1 precedes subsection headings');
+    assert(levels.every((level, i) => i === 0 || level <= levels[i - 1] + 1), 'No skipped heading levels');
     const composition = await page.evaluate(() => {
       const rect = selector => {
         const r = document.querySelector(selector).getBoundingClientRect();
         return { x: r.x, y: r.y, width: r.width, height: r.height };
       };
       return {
-        hero: rect('#hero-copy'), media: rect('#product-media'), surface: rect('#media-reserved-surface'),
-        stages: ['appointment', 'reception', 'visit'].map(id => {
+        surfaces: ['record', 'document'].map(slot => ({ slot, surface: rect(`#media-${slot}-surface`), wrapper: rect(`#product-media-${slot}`) })),
+        stages: ['context', 'workspace', 'document', 'follow-up'].map(id => {
           const selector = `#stage-${id}`;
           const style = getComputedStyle(document.querySelector(selector));
           return { ...rect(selector), topBorder: parseFloat(style.borderTopWidth), startBorder: parseFloat(style.borderRightWidth) };
@@ -208,20 +251,19 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
       };
     });
     assert(composition.reading.length > 0, 'Reading-copy measurements must not be vacuous');
-    const levels = measures.headings.map(h => Number(h.tag.slice(1)));
-    assert.equal(levels[0], 1, 'H1 precedes subsection headings');
-    assert(levels.every((level, i) => i === 0 || level <= levels[i - 1] + 1), 'No skipped heading levels');
-    assert(await page.locator('#media-reserved-disclosure').isVisible(), 'Reserved-media disclosure remains visible');
-    assert(composition.surface.height >= (width < 768 ? 256 : 320), 'Intentional media reservation, not a collapsed empty state');
+    assert(await page.locator('#media-record-disclosure').isVisible() && await page.locator('#media-document-disclosure').isVisible(), 'Reserved-media disclosures remain visible');
+    assert(await page.locator('#patient-portal-boundary').isVisible(), 'Bounded patient-portal note stays visible');
+    for (const media of composition.surfaces) {
+      assert(media.surface.height >= (width < 768 ? 256 : 320), `${media.slot}: intentional media reservation, not a collapsed empty state`);
+    }
     if (width < 768) {
-      assert(composition.hero.width >= width - 40, 'Comfortable mobile hero content width');
       for (const p of composition.reading) {
         assert(p.font >= 18 && p.line / p.font >= 1.85, 'Mobile reading text >=18px with Persian-friendly leading');
         assert(p.width >= 300, 'Mobile reading copy must not sit in narrow nested columns');
       }
       composition.stages.forEach((step, i, steps) => {
-        assert.equal(step.topBorder, 0, 'Horizontal rail removed on mobile');
-        assert.equal(step.startBorder, 2, 'Vertical RTL inline-start progression rail');
+        assert.equal(step.topBorder, 0, 'Shared horizontal rail removed on mobile');
+        assert.equal(step.startBorder, 2, 'Vertical RTL inline-start continuity rail');
         if (i) {
           assert(Math.abs(step.x - steps[i - 1].x) < 2, 'Mobile stages align');
           assert(Math.abs(step.y - (steps[i - 1].y + steps[i - 1].height)) < 2, 'Mobile stages join vertically in DOM order');
@@ -229,36 +271,58 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
       });
     } else {
       composition.stages.forEach((step, i, steps) => {
-        assert.equal(step.topBorder, 2, 'Horizontal progression rail on tablet/desktop');
+        assert.equal(step.topBorder, 2, 'Continuous continuity rail on tablet/desktop');
         if (i) {
           assert(Math.abs(step.y - steps[i - 1].y) < 2, 'Horizontal stages share a baseline');
-          assert(step.x < steps[i - 1].x, 'Native RTL progression: 01 at right, 03 at left');
+          assert(step.x < steps[i - 1].x, 'Native RTL continuity: 01 at right, 04 at left');
           assert(Math.abs(step.x + step.width - steps[i - 1].x) < 2, 'Horizontal rail is connected');
         }
       });
-      if (width > 1024) assert(composition.media.width >= composition.hero.width, 'Product media has deliberate desktop prominence');
     }
-    console.log(`::notice title=Product Overview composition ${name}::PASS: workflow ${width < 768 ? 'vertical' : 'RTL horizontal'}; minimum reading width ${Math.round(Math.min(...composition.reading.map(p => p.width)))}px; media ${Math.round(composition.media.width)}x${Math.round(composition.media.height)}px`);
+    console.log(`::notice title=Patient-record composition ${name}::PASS: continuity ${width < 768 ? 'vertical' : 'RTL horizontal'}; minimum reading width ${Math.round(Math.min(...composition.reading.map(p => p.width)))}px; record media ${Math.round(composition.surfaces[0].wrapper.width)}x${Math.round(composition.surfaces[0].wrapper.height)}px; reservations ${measures.reservations}`);
     await page.screenshot({ path: resolve(out, `${name}.png`), fullPage: true });
     await page.screenshot({ path: resolve(out, `${name}-viewport.png`) });
-    // Keyboard reachability and focus style; no programmatic focus shortcut.
-    await page.keyboard.press('Tab'); // skip link
-    await page.keyboard.press('Tab'); // neutral shell home link
-    await page.keyboard.press('Tab'); // first content link = demo CTA
-    assert(await cta.evaluate(a => a === document.activeElement), 'CTA reachable in reading order');
-    assert(await cta.evaluate(a => getComputedStyle(a).outlineStyle !== 'none'), 'Visible keyboard focus');
-    await page.keyboard.press('Enter');
-    await page.waitForURL(/#demo-consultation$/);
-    assert(await page.locator('#demo-consultation').isVisible());
-    diagnostic.views.push({ name, width, height, ...measures, ctaBox, composition });
+    diagnostic.views.push({ name, width, height, ...measures, renderedStrings: undefined, ctaBox, composition });
   }
+
+  // Keyboard reachability and visible focus; no programmatic focus shortcut.
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto(pageUrl, { waitUntil: 'networkidle' });
+  await page.keyboard.press('Tab'); // skip link
+  await page.keyboard.press('Tab'); // neutral shell home link
+  await page.keyboard.press('Tab'); // first content link = demo CTA
+  const cta = page.getByRole('link', { name: 'درخواست دمو / مشاوره', exact: true });
+  assert(await cta.evaluate(a => a === document.activeElement), 'CTA reachable in reading order');
+  assert(await cta.evaluate(a => getComputedStyle(a).outlineStyle !== 'none'), 'Visible keyboard focus');
+  await page.keyboard.press('Enter');
+  await page.waitForURL(/\/demo\/?$/);
+  assert.equal(await page.locator('h1').count(), 1, 'Demo CTA destination serves one H1');
+  assert.match(await page.locator('h1').innerText(), /بررسی تناسب CPMS/, 'CTA destination is the real Demo/Consultation page');
+
+  // Inbound architecture link: Product Overview must reach this page by a native text link.
+  const overview = await page.goto(`${base}/product-overview/`, { waitUntil: 'networkidle' });
+  assert.equal(overview.status(), 200);
+  assert.match(await page.locator('h1').innerText(), /نرم‌افزار مدیریت مطب و کلینیک/, 'Product Overview identity intact');
+  await page.getByRole('link', { name: 'پرونده بیمار و تداوم اطلاعات', exact: true }).click();
+  await page.waitForURL(pageUrl);
+  assert.match(await page.locator('h1').innerText(), /پروندهٔ بیمار و تداوم اطلاعات/, 'Inbound native link reaches the patient-record page');
+
+  // The related workflow page and the actual Homepage still serve their own identities.
+  const workflow = await page.goto(`${base}/appointment-reception-queue/`, { waitUntil: 'networkidle' });
+  assert.equal(workflow.status(), 200);
+  assert.match(await page.locator('h1').innerText(), /نوبت، پذیرش و صف/, 'Existing workflow page still serves its identity');
+  const home = await page.goto(`${base}/`, { waitUntil: 'networkidle' });
+  assert.equal(home.status(), 200);
+  assert.equal(await page.locator('h1').count(), 1, 'Homepage still serves one H1');
+  assert.match(await page.locator('h1').innerText(), /مدیریت کلینیک،\s*با نگاهی یکپارچه/, 'Actual Homepage identity at root, not another page');
+
   assert.deepEqual(diagnostic.frontendErrors, [], 'Frontend console/page errors');
   assert.deepEqual(diagnostic.failedRequests, [], 'Failed frontend requests');
   assert.deepEqual(diagnostic.badResponses, [], 'Frontend HTTP errors');
   assert.deepEqual(diagnostic.externalRequests, [], 'No remote fonts/scripts/media');
   await visitor.close();
   diagnostic.result = 'PASS';
-  console.log(`::notice title=Product Overview proof::PASS: persisted and reopened native Elementor page ${id}; ${all.length} elements; HTTP/RTL/H1/metadata/local-font/focus/CTA/overflow/network checks at all four viewports; runtime ${JSON.stringify(state)}`);
+  console.log(`::notice title=Patient-record page proof::PASS: persisted and reopened native Elementor page ${id}; ${all.length} elements; HTTP/RTL/H1/metadata/local-font/focus/CTA/overflow/reservation/claim-boundary/network checks at all four viewports; inbound Product Overview link and all outbound destinations resolve; runtime ${JSON.stringify(state)}`);
 } catch (error) {
   diagnostic.result = 'FAIL';
   diagnostic.error = error.stack;
