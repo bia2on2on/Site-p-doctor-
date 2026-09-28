@@ -20,6 +20,12 @@ add_action(
 		);
 		add_theme_support( 'align-wide' );
 		add_theme_support( 'responsive-embeds' );
+		register_nav_menus(
+			array(
+				'primary' => __( 'Primary Menu', 'koorosh' ),
+				'footer'  => __( 'Footer Menu', 'koorosh' ),
+			)
+		);
 	}
 );
 
@@ -54,14 +60,17 @@ add_filter(
 );
 
 /**
- * Register Elementor Theme Builder core locations when the public Theme API exists.
- * Does nothing if Elementor Pro / Theme locations are unavailable.
+ * Register only the shell locations Koorosh renders. This is a documented
+ * Elementor public hook; the guard keeps the theme independent of Elementor.
  */
 add_action(
 	'elementor/theme/register_locations',
 	function ( $elementor_theme_manager ) {
-		if ( is_object( $elementor_theme_manager ) && method_exists( $elementor_theme_manager, 'register_all_core_location' ) ) {
-			$elementor_theme_manager->register_all_core_location();
+		if ( ! is_object( $elementor_theme_manager ) || ! method_exists( $elementor_theme_manager, 'register_location' ) ) {
+			return;
 		}
+
+		$elementor_theme_manager->register_location( 'header' );
+		$elementor_theme_manager->register_location( 'footer' );
 	}
 );
