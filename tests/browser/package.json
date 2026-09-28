@@ -1,0 +1,7 @@
+{
+  "name": "cpms-homepage-browser-evidence",
+  "private": true,
+  "type": "module",
+  "scripts": { "homepage": "node homepage.mjs" },
+  "devDependencies": { "playwright": "1.63.0" }
+}

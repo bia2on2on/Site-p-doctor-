@@ -52,6 +52,24 @@ jobs:
       - name: Run runtime smoke test
         run: bash tests/wp-env/smoke.sh
 
+      - name: Install bounded browser tooling
+        run: |
+          npm ci --prefix tests/browser --no-audit --no-fund
+          cd tests/browser
+          npx playwright install --with-deps chromium
+
+      - name: Reconstruct native Free homepage and capture browser evidence
+        run: node tests/browser/homepage.mjs
+
+      - name: Upload homepage evidence (also on failure)
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: homepage-evidence-${{ github.event.pull_request.head.sha || github.sha }}
+          path: tests/browser/artifacts/
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Collect container logs on failure
         if: failure()
         run: |

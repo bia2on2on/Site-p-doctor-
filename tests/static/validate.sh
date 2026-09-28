@@ -132,6 +132,12 @@ else
 	ko "manifest evidence/parity validation failed (tests/static/validate-manifest.mjs)"
 fi
 
+if node "$root/tests/static/validate-homepage.mjs"; then
+	ok "homepage native-element, anchor and claim guardrails"
+else
+	ko "homepage guardrails failed"
+fi
+
 printf '== Static validation result: %s passed, %s failed ==\n' "$pass" "$fail"
 [ "$fail" -eq 0 ] || exit 1
 exit 0

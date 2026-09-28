@@ -123,3 +123,7 @@ The next clean Elementor reconstruction pilot must prove **all** of the followin
 13. `authorized_pro_host_acceptance` **remains a separate gate** and must not be inferred from free CI or from any step above.
 
 Executing this pilot is explicitly **out of scope for the environment-alignment slice**; the pilot status stays **NOT RUN**.
+
+## 8. Homepage-only Free reconstruction exception (2026-09-28)
+
+The explicit Milestone A task authorizes version-insensitive homepage work without retrying the inaccessible Pro host pilot. This narrows the historical pilot gating statement for **this slice only**; `clean_import_pilot` and `authorized_pro_host_acceptance` stay **NOT RUN**. The homepage uses a Git-owned authoring recipe and the documented public Elementor editor Commands API in a clean Free wp-env runtime, not a fabricated kit or private database payload. See [`reconstruction/homepage/README.md`](../reconstruction/homepage/README.md) for vendor evidence, native-control validation, exact reconstruction and limitations. The full-site canonical Website Template/Kit contract is unchanged; this is not a successful kit pilot or host acceptance.
