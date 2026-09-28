@@ -104,10 +104,17 @@ http_code="$(curl --fail --silent --show-error --output /dev/null --write-out '%
 	&& expect_eq "HTTP status for site home" "200" "$http_code" \
 	|| ko "Site home did not respond over HTTP at $BASE_URL/"
 
-home_body="$(curl --fail --silent --show-error "$BASE_URL/")" || true
+home_body=""
+curl_body_exit=0
+home_body="$(curl --fail --silent --show-error "$BASE_URL/")" || curl_body_exit=$?
 if printf '%s' "${home_body:-}" | grep -qi '<html'; then
 	ok "Site home returns an HTML document"
 else
+	# Emit retrievable runtime evidence before failing: body size, curl exit
+	# code, and the first bytes of the response actually received.
+	body_len="${#home_body}"
+	body_head="$(printf '%s' "${home_body:-}" | tr '\n\r' '  ' | head -c 200)"
+	printf '::error title=Smoke evidence::home body length=%s curl_exit=%s head200=[%s]\n' "$body_len" "$curl_body_exit" "$body_head"
 	ko "Site home did not return HTML"
 fi
 
