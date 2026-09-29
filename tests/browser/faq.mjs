@@ -13,6 +13,14 @@ import { randomBytes } from 'node:crypto';
 import { resolve } from 'node:path';
 import assert from 'node:assert/strict';
 import { faqPage, faqGroups, faqQuestions, faqAnswers, pageIdentity } from '../../reconstruction/faq/recipe.mjs';
+import { homepage } from '../../reconstruction/homepage/recipe.mjs';
+import { productOverview } from '../../reconstruction/product-overview/recipe.mjs';
+import { demoPage } from '../../reconstruction/demo/recipe.mjs';
+import { appointmentReceptionQueue } from '../../reconstruction/appointment-reception-queue/recipe.mjs';
+import { patientRecordContinuity } from '../../reconstruction/patient-record-continuity/recipe.mjs';
+import { doctorWorkspace } from '../../reconstruction/doctor-workspace/recipe.mjs';
+import { patientPortal } from '../../reconstruction/patient-portal/recipe.mjs';
+import { prescriptionsDocuments } from '../../reconstruction/prescriptions-documents/recipe.mjs';
 import {
   assertNoHardForbidden, assertBoundaryTermsNegated, assertPersianTypography, assertObjectionPageShape, stripTags,
 } from '../static/boundary-faq.mjs';
@@ -40,7 +48,10 @@ const tokens = JSON.parse(readFileSync(resolve(root, 'design-system/tokens.json'
 const recipe = faqPage(tokens);
 const flatten = nodes => nodes.flatMap(n => [n, ...flatten(n.children)]);
 const all = flatten(recipe);
-const normalize = value => String(value).replace(/\s+/g, ' ').trim();
+const normalize = value => String(value).replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+// Expected H1s are derived from the recipes themselves, never hardcoded, so this
+// runner cannot drift from the pages it regresses.
+const authoredH1 = authored => normalize(flatten(authored(tokens)).find(n => n.kind === 'heading' && n.settings.header_size === 'h1').settings.title);
 
 assert.equal(wp('option', 'get', 'home'), base, 'Only the disposable default wp-env URL is supported');
 assert.equal(wp('theme', 'list', '--status=active', '--field=name'), 'koorosh');
@@ -50,14 +61,14 @@ assert.equal(wp('post', 'list', '--post_type=page', `--name=${pageIdentity.slug}
 // Regression guard: the eight previously reconstructed pages remain published and
 // Elementor-editable in this shared fixture, and are this page's real link targets.
 const precedingPages = [
-  ['cpms-home', '/', /نرم‌افزار مدیریت مطب و کلینیک/],
-  ['product-overview', '/product-overview/', /مدیریت مطب و کلینیک/],
-  ['demo', '/demo/', /بررسی تناسب CPMS/],
-  ['appointment-reception-queue', '/appointment-reception-queue/', /نوبت/],
-  ['patient-record-continuity', '/patient-record-continuity/', /پرونده/],
-  ['doctor-workspace', '/doctor-workspace/', /فضای کاری پزشک/],
-  ['patient-portal', '/patient-portal/', /پورتال بیمار/],
-  ['prescriptions-documents', '/prescriptions-documents/', /نسخه/],
+  ['cpms-home', '/', homepage],
+  ['product-overview', '/product-overview/', productOverview],
+  ['demo', '/demo/', demoPage],
+  ['appointment-reception-queue', '/appointment-reception-queue/', appointmentReceptionQueue],
+  ['patient-record-continuity', '/patient-record-continuity/', patientRecordContinuity],
+  ['doctor-workspace', '/doctor-workspace/', doctorWorkspace],
+  ['patient-portal', '/patient-portal/', patientPortal],
+  ['prescriptions-documents', '/prescriptions-documents/', prescriptionsDocuments],
 ];
 for (const [slug] of precedingPages) {
   assert.equal(wp('post', 'list', '--post_type=page', `--name=${slug}`, '--field=post_status'), 'publish', `${slug} must already be reconstructed and published by its own runner`);
@@ -335,27 +346,27 @@ echo wp_json_encode(array('id' => $id, 'status' => get_post_status($id), 'editab
   assert.equal(await page.locator('form').count(), 1, 'Demo page keeps its own qualification form (non-live, unchanged)');
 
   // Contextual destinations are reached by clicking this page's own links.
-  async function followFromFaq(linkName, destination, expectedTitle) {
+  async function followFromFaq(linkName, destination, authored) {
     await page.goto(pageUrl, { waitUntil: 'networkidle' });
     await page.locator('main').getByRole('link', { name: linkName, exact: true }).first().click();
     await page.waitForURL(new RegExp(`${destination}/?$`));
     assert.equal(await page.locator('h1').count(), 1, `${destination} serves one H1`);
-    assert.match(normalize(await page.locator('h1').innerText()), expectedTitle, `${linkName}: the link reaches the real ${destination} page`);
+    assert.equal(normalize(await page.locator('h1').innerText()), authoredH1(authored), `${linkName}: the link reaches the real ${destination} page`);
   }
-  await followFromFaq('معرفی محصول', '/product-overview', /مدیریت مطب و کلینیک/);
-  await followFromFaq('نوبت، پذیرش و صف', '/appointment-reception-queue', /نوبت/);
-  await followFromFaq('پروندهٔ بیمار و تداوم اطلاعات', '/patient-record-continuity', /پرونده/);
-  await followFromFaq('پورتال بیمار', '/patient-portal', /پورتال بیمار/);
-  await followFromFaq('نسخه‌ها و اسناد در CPMS', '/prescriptions-documents', /نسخه/);
-  await followFromFaq('صفحهٔ دمو و مشاوره', '/demo', /بررسی تناسب CPMS/);
+  await followFromFaq('معرفی محصول', '/product-overview', productOverview);
+  await followFromFaq('نوبت، پذیرش و صف', '/appointment-reception-queue', appointmentReceptionQueue);
+  await followFromFaq('پروندهٔ بیمار و تداوم اطلاعات', '/patient-record-continuity', patientRecordContinuity);
+  await followFromFaq('پورتال بیمار', '/patient-portal', patientPortal);
+  await followFromFaq('نسخه‌ها و اسناد در CPMS', '/prescriptions-documents', prescriptionsDocuments);
+  await followFromFaq('صفحهٔ دمو و مشاوره', '/demo', demoPage);
 
   // Every earlier page (including the actual Homepage at the root) still serves its own authored H1.
   const sweep = [];
-  for (const [slug, path, expected] of precedingPages) {
+  for (const [slug, path, authored] of precedingPages) {
     const earlier = await page.goto(`${base}${path}`, { waitUntil: 'networkidle' });
     assert.equal(earlier.status(), 200, `${slug} still serves`);
     assert.equal(await page.locator('h1').count(), 1, `${slug} still serves one H1`);
-    assert.match(normalize(await page.locator('h1').innerText()), expected, `${slug} still serves its own authored H1`);
+    assert.equal(normalize(await page.locator('h1').innerText()), authoredH1(authored), `${slug} still serves its own authored H1`);
     sweep.push({ slug, path, status: earlier.status() });
   }
   diagnostic.earlierPages = sweep;
