@@ -186,9 +186,9 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
     assert(measures.scrollWidth <= measures.width, `${name}: horizontal overflow`);
     assert(measures.font.includes('Vazirmatn') && measures.fontLoaded, 'Local Persian font loaded');
     assert.deepEqual(measures.brokenAnchors, []);
-    // Cross-page links are limited to the four real detail pages; each destination is
+    // Cross-page links are limited to the five real detail pages; each destination is
     // verified by its own runner later in this CI sequence (sort keeps this order-independent).
-    assert.deepEqual([...measures.offsiteLinks].sort(), [`${base}/appointment-reception-queue/`, `${base}/patient-record-continuity/`, `${base}/doctor-workspace/`, `${base}/patient-portal/`].sort(), 'Only the real workflow detail pages are linked');
+    assert.deepEqual([...measures.offsiteLinks].sort(), [`${base}/appointment-reception-queue/`, `${base}/patient-record-continuity/`, `${base}/doctor-workspace/`, `${base}/patient-portal/`, `${base}/prescriptions-documents/`].sort(), 'Only the real workflow detail pages are linked');
     const composition = await page.evaluate(() => {
       const rect = selector => {
         const r = document.querySelector(selector).getBoundingClientRect();

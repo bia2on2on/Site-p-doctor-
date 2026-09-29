@@ -22,7 +22,8 @@ assert(text.includes('جزئیات جریان نوبت، پذیرش و صف'), '
 assert(text.includes('پرونده بیمار و تداوم اطلاعات'), 'Contextual link to the patient-record/continuity page');
 assert(text.includes('ادامهٔ جریان کار پزشک در کلینیک'), 'Contextual link to the doctor-workspace page');
 assert(text.includes('جایگاه بخش رو به بیمار در کنار جریان کار کلینیک'), 'Contextual link to the patient-portal page');
-for (const href of ['/appointment-reception-queue/', '/patient-record-continuity/', '/doctor-workspace/', '/patient-portal/']) {
+assert(text.includes('جایگاه نسخه‌ها و اسناد در ادامهٔ پرونده و جریان کار'), 'Contextual link to the prescriptions-and-documents page');
+for (const href of ['/appointment-reception-queue/', '/patient-record-continuity/', '/doctor-workspace/', '/patient-portal/', '/prescriptions-documents/']) {
   assert(text.includes(`href="${href}"`), `Missing inbound internal link: ${href}`);
   assert(!nodes.some(n => n.settings.title && n.settings.title.includes(href)), 'Links must stay inside copy, not become section titles');
 }
