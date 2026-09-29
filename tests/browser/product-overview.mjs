@@ -189,9 +189,10 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
     assert.deepEqual(measures.brokenAnchors, []);
     assert.deepEqual(measures.externalLinks, [], 'No external links');
     // Cross-page routes are limited to the real sales journey: the Demo page and
-    // the four workflow detail pages (each verified by its own runner + site-shell).
+    // the five workflow/capability detail pages (each verified by its own runner + site-shell).
     const crossRoutes = new Set(measures.crossPageLinks);
-    const allowedRoutes = new Set(['/demo/', '/appointment-reception-queue/', '/patient-record-continuity/', '/doctor-workspace/', '/patient-portal/']);
+    const detailRoutes = [`${base}/appointment-reception-queue/`, `${base}/patient-record-continuity/`, `${base}/doctor-workspace/`, `${base}/patient-portal/`, `${base}/prescriptions-documents/`].map(u => new URL(u).pathname);
+    const allowedRoutes = new Set(['/demo/', ...detailRoutes]);
     for (const route of crossRoutes) assert(allowedRoutes.has(route), `Unexpected cross-page link: ${route}`);
     for (const route of allowedRoutes) assert(crossRoutes.has(route), `Expected cross-page route missing: ${route}`);
     const composition = await page.evaluate(() => {

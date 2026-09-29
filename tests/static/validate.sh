@@ -174,6 +174,12 @@ else
 	ko "Patient-portal page guardrails failed"
 fi
 
+if node "$root/tests/static/validate-prescriptions-documents.mjs"; then
+	ok "Prescriptions-and-documents page native authoring, composition and internal-versus-national claim guardrails"
+else
+	ko "Prescriptions-and-documents page guardrails failed"
+fi
+
 if node "$root/tests/static/validate-site-shell.mjs"; then
 	ok "Site-shell navigation, menu-structure and honesty guardrails"
 else

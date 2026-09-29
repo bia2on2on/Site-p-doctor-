@@ -1,0 +1,20 @@
+{
+  "publication": "TARGET — NOT PUBLICATION-APPROVED",
+  "scope": "Fifth representative workflow/capability page: the bounded prescription and document capability INSIDE CPMS, beside the patient record and the connected clinic workflow (doctor work → patient context → prescription/document record), with an explicit distinction from any national e-prescription, insurance, pharmacy or other external connection",
+  "canonical_recipe": "reconstruction/prescriptions-documents/recipe.mjs",
+  "claim_register": "reconstruction/prescriptions-documents/claims.md",
+  "browser_runner": "tests/browser/prescriptions-documents.mjs",
+  "seo": {
+    "title": "ثبت و مدیریت نسخه‌ها و اسناد در جریان کار کلینیک | برای مدیران کلینیک | CPMS",
+    "description_source": "WordPress page excerpt via existing Koorosh mechanism",
+    "plugin": "none",
+    "intent": "Supporting product/capability page — it does not own the primary clinic-software commercial cluster (SEO-KEYWORD-MAP Cluster 1 stays with Product Overview per §D ownership), does not target the patient-record Cluster-4 head, and does not target national e-prescription or electronic-prescription keywords (REJECTED / NOT ALLOWED in the keyword map). The bounded verb pair «ثبت و مدیریت» in the title, H1 framing and copy keeps a searcher expecting a national connection from being invited by mistake; the national term appears only inside explicit negations or a question, never in title, H1, H2s, eyebrows or description. No SEO plugin, no invented search volumes, no ranking claims"
+  },
+  "product_truth_boundary": "PRODUCT-TRUTH §3 #11 (prescriptions/documents — bounded technical evidence; national e-prescription connection forbidden) as the primary ceiling, with #8 (doctor workspace) and #10 (patient records) as the surrounding context, #7 (patient portal — bounded evidence that its scope includes prescriptions and files; exposure of every item is NOT assumed), and #4/#5/#6 (roles, access, clinic data separation) at mechanism level only — all REVERIFY BEFORE PUBLIC LAUNCH. National/Social-Security/Salamat e-prescription integration, automatic prescription transmission, pharmacy/insurance/national health-network integration, drug-interaction checking, AI prescription or diagnosis assistance, regulatory compliance/certification, legal-validity guarantees, mobile app, signing/stamping, file formats/quotas/OCR/cloud storage/external sharing, certification/compliance and absolute security wording are NOT claimed. Text tests are not product capability verification.",
+  "media": "Two reserved Elementor-editable frames (prescription/document context in the hero; document beside patient context in the documents band). Launch blocker: verified real CPMS media with synthetic/demo records must replace both before public launch.",
+  "conversion": "Primary CTA links to the real Demo/Consultation page (/demo/); contextual links to /doctor-workspace/ and /patient-record-continuity/. Launch blocker: live lead delivery NOT CONFIGURED / NOT AUTHORIZED; page states the demo form is technical/non-live.",
+  "launch_blockers": [
+    "Real verified CPMS media (synthetic/demo records) must replace reserved media",
+    "Live lead delivery must be configured and authorized"
+  ]
+}
