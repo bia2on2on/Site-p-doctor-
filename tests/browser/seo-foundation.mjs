@@ -179,11 +179,32 @@ try {
   }
   assert.equal(new Set(canonicals).size, canonicals.length, 'Every page declares its own distinct canonical');
 
-  // 8. Primary navigation discovery: every real page reachable from the shell.
-  const home = (await text(base)).body;
-  for (const page of routes.filter(p => p.route !== '/')) {
-    assert(home.includes(`href="${base}${page.route}"`) || home.includes(`href="${page.route}"`), `Homepage shell links to ${page.route} as a crawlable anchor`);
+  // 8. Discovery paths: no orphan page. Not every page sits in the site-shell
+  //    menus by design (for example the prescriptions/documents page is reached
+  //    contextually from Product Overview), so the real requirement is that
+  //    every page is reachable from at least one crawlable anchor on another
+  //    real page — measured from the raw HTML, no JavaScript involved.
+  const linkGraph = {};
+  for (const page of routes) {
+    const body = (await text(`${base}${page.route}`)).body;
+    const paths = new Set();
+    for (const match of body.matchAll(/<a\b[^>]*\shref=["']([^"']+)["']/gi)) {
+      const href = match[1];
+      if (/^(mailto:|tel:|#|javascript:)/i.test(href)) continue;
+      const resolved = new URL(href, base);
+      if (resolved.host === baseHost) paths.add(resolved.pathname);
+    }
+    linkGraph[page.route] = [...paths];
   }
+  for (const page of routes) {
+    const inbound = routes.filter(other => other.route !== page.route && linkGraph[other.route].includes(page.route));
+    assert(inbound.length > 0, `No orphan page: ${page.route} is linked from at least one other real page`);
+  }
+  // The two conversion-critical routes must be reachable straight from the Homepage.
+  for (const critical of ['/product-overview/', '/demo/']) {
+    assert(linkGraph['/'].includes(critical), `Homepage links to ${critical} as a crawlable anchor`);
+  }
+  diagnostic.developmentExpectation.linkGraph = linkGraph;
 
   // 9. robots.txt in development (core behaviour with blog_public = 0).
   const robots = await text(`${base}/robots.txt`);
