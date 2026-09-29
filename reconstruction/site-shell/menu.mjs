@@ -42,6 +42,7 @@ export const footerMenu = {
     // Trust group (SITE-ARCHITECTURE §6.4): objection handling sits with the
     // conversion item, not in the primary navigation.
     { title: 'پرسش‌های متداول', slug: 'faq' },
+    { title: 'امنیت و دسترسی به داده', slug: 'security-data-access' },
     { title: 'درخواست دمو / مشاوره', slug: 'demo' },
   ],
 };

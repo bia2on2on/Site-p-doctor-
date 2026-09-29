@@ -186,6 +186,12 @@ else
 	ko "FAQ / buyer-objection page guardrails failed"
 fi
 
+if node "$root/tests/static/validate-security-data-access.mjs"; then
+	ok "Security & Data Access trust page native authoring, trust boundaries and no-badge/media/schema guardrails"
+else
+	ko "Security & Data Access trust page guardrails failed"
+fi
+
 if node "$root/tests/static/validate-site-shell.mjs"; then
 	ok "Site-shell navigation, menu-structure and honesty guardrails"
 else

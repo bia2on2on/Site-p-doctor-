@@ -1,0 +1,29 @@
+{
+  "publication": "TARGET — NOT PUBLICATION-APPROVED",
+  "scope": "Trust page: امنیت و دسترسی به داده — helps clinic decision-maker evaluate CPMS access/data model honestly before requesting a demo; bounded role/access/data-separation mechanisms at mechanism level only, REVERIFY BEFORE PUBLIC LAUNCH; not a capability/workflow page",
+  "canonical_recipe": "reconstruction/security-data-access/recipe.mjs",
+  "claim_register": "reconstruction/security-data-access/claims.md",
+  "browser_runner": "tests/browser/security-data-access.mjs",
+  "static_validator": "tests/static/validate-security-data-access.mjs",
+  "boundary_guardrails": "tests/static/boundary-security-data-access.mjs",
+  "seo": {
+    "title": "امنیت و دسترسی به داده در CPMS | برای مدیران کلینیک",
+    "description_source": "WordPress page excerpt via existing Koorosh mechanism",
+    "plugin": "none",
+    "intent": "Trust/informational intent only (SITE-ARCHITECTURE §5.2 Security & Data Access row). Does NOT own Cluster-1 clinic-software heads, does NOT chase «امن‌ترین نرم افزار مطب» or compliance/certification phrases or fear-based security terms (SEO-KEYWORD-MAP boundary). Links to Product Overview for complete picture rather than restating it."
+  },
+  "structured_data": "NONE — deliberately omitted. No security-related or FAQ structured data merely for SEO (project policy SITE-ARCHITECTURE §5.3, FAQ rich result deprecated May 2026). No JSON-LD, no FAQPage, no microdata is emitted.",
+  "media": "NONE — this page works without product screenshots or reserved frames. No padlock/shield cliché wall, no fake badges, no stock security photography, no giant gradients. Links to existing product/workflow pages instead.",
+  "conversion": "Primary CTA routes to real /demo/ page (hero and final panel); secondary to /product-overview/ and /faq/. Assisted-sale only; no pricing commitment, checkout or instant-signup promise.",
+  "lead_delivery": "NOT CONFIGURED / NOT AUTHORIZED — page states honestly in final panel caption that current request path does not reach Sales and no information is sent or stored in this preview.",
+  "navigation": "Footer trust/discovery area only, through canonical WordPress-native footer menu (reconstruction/site-shell/menu.mjs); primary navigation unchanged. Footer remains compact.",
+  "trust_boundaries": {
+    "forbidden_claims_absent": ["100% secure", "completely secure", "most secure", "medical-grade security", "certified", "compliant", "HIPAA compliant", "GDPR compliant", "ISO certified", "penetration tested", "encrypted everywhere", "zero-trust", "audited", "guaranteed privacy", "guaranteed confidentiality", "guaranteed data isolation", "امن‌ترین", "صددرصد امن as positive claim", "گواهی امنیتی as positive claim", "انطباق با استاندارد as positive claim"],
+    "not_invented": ["encryption", "backup", "hosting", "monitoring", "audit logging", "incident-response"],
+    "qualification_wording_present": ["سطح سازوکار", "سازوکارهای نقش", "پیش از انتشار عمومی بازتأیید می‌شود"]
+  },
+  "launch_blockers": [
+    "Live lead delivery must be configured and authorized",
+    "Every statement must be re-verified against launch product evidence at Launch Truth Gate (roles #4, data separation #5, medical-data access #6, multi-clinic #3)"
+  ]
+}

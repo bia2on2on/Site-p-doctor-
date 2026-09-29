@@ -15,6 +15,7 @@ import { pageIdentity as recordIdentity } from '../../reconstruction/patient-rec
 import { pageIdentity as workspaceIdentity } from '../../reconstruction/doctor-workspace/recipe.mjs';
 import { pageIdentity as portalIdentity } from '../../reconstruction/patient-portal/recipe.mjs';
 import { pageIdentity as faqIdentity } from '../../reconstruction/faq/recipe.mjs';
+import { pageIdentity as securityIdentity } from '../../reconstruction/security-data-access/recipe.mjs';
 
 const read = rel => readFileSync(new URL('../../' + rel, import.meta.url), 'utf8');
 
@@ -22,7 +23,7 @@ const read = rel => readFileSync(new URL('../../' + rel, import.meta.url), 'utf8
 const knownSlugs = new Set([
   homeIdentity.slug, overviewIdentity.slug, demoIdentity.slug,
   appointmentIdentity.slug, recordIdentity.slug, workspaceIdentity.slug, portalIdentity.slug,
-  faqIdentity.slug,
+  faqIdentity.slug, securityIdentity.slug,
 ]);
 for (const { slug } of slugReferences()) {
   assert(knownSlugs.has(slug), `Menu references a page that no recipe reconstructs: ${slug}`);
@@ -48,11 +49,12 @@ assert.deepEqual(
 assert(workflows.children.every(c => !c.children), 'Navigation depth stays at 2 (no nested submenus)');
 assert.deepEqual(
   footerMenu.items.map(i => i.slug),
-  ['cpms-home', 'product-overview', 'appointment-reception-queue', 'patient-record-continuity', 'doctor-workspace', 'patient-portal', 'faq', 'demo'],
+  ['cpms-home', 'product-overview', 'appointment-reception-queue', 'patient-record-continuity', 'doctor-workspace', 'patient-portal', 'faq', 'security-data-access', 'demo'],
   'Footer menu links only to real current pages',
 );
 // FAQ is a trust/objection destination: footer discovery, not a new header item.
 assert(!primaryMenu.items.some(i => i.slug === faqIdentity.slug || i.title === 'پرسش‌های متداول'), 'FAQ must not become a top-level header item');
+assert(!primaryMenu.items.some(i => i.slug === securityIdentity.slug || i.title === 'امنیت و دسترسی به داده'), 'Security page must not become a top-level header item');
 const allTitles = slugReferences().map(r => r.title).concat(primaryMenu.items.map(i => i.title), [primaryMenu.name, footerMenu.name]);
 for (const title of allTitles) {
   assert(!/mailto:|tel:|https?:\/\//.test(title), `No contact/URL invention inside menu labels: ${title}`);
