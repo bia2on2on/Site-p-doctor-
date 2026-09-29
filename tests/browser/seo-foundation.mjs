@@ -206,11 +206,16 @@ try {
   }
   diagnostic.developmentExpectation.linkGraph = linkGraph;
 
-  // 9. robots.txt in development (core behaviour with blog_public = 0).
+  // 9. robots.txt in development. The repository commits no robots rule, so
+  //    whatever is served is the running WordPress version's own behaviour.
+  //    That exact directive set is RECORDED as evidence rather than asserted
+  //    from memory; only the policy-relevant invariants are asserted.
   const robots = await text(`${base}/robots.txt`);
-  assert.equal(robots.status, 200, 'robots.txt is served');
-  assert(/Disallow:\s*\/\s*$/m.test(robots.body), 'DEVELOPMENT EXPECTATION: core serves Disallow: / while blog_public = 0');
   diagnostic.developmentExpectation.robotsTxt = robots.body.trim();
+  diagnostic.developmentExpectation.robotsTxtDisallowsEverything = /^\s*Disallow:\s*\/\s*$/mi.test(robots.body);
+  assert.equal(robots.status, 200, 'robots.txt is served');
+  assert(!/^\s*Sitemap:/mi.test(robots.body), 'DEVELOPMENT EXPECTATION: no sitemap is advertised while the site is intentionally non-public');
+  assert(/User-agent:/i.test(robots.body), 'robots.txt is a real robots file, not an error body');
   // Honest note recorded with the evidence, per Google's robots.txt guidance:
   diagnostic.developmentExpectation.robotsTxtLimit =
     'robots.txt controls crawling, not indexing. A disallowed URL can still be indexed without a description, and a compliant crawler that obeys Disallow will never read the noindex meta/X-Robots-Tag. The only robust protection for a non-public environment is the environment itself (not publicly reachable / access-controlled). No such production protection mechanism is claimed or configured by this repository.';
@@ -272,7 +277,8 @@ try {
     assert.equal([...launchPage.body.matchAll(/<link[^>]+rel=["']canonical["'][^>]*>/gi)].length, 1, 'SIMULATION: still exactly one canonical');
 
     const launchRobots = await text(`${base}/robots.txt`);
-    assert(!/Disallow:\s*\/\s*$/m.test(launchRobots.body), 'SIMULATION: the development Disallow: / does not persist into an indexable configuration');
+    assert(!/^\s*Disallow:\s*\/\s*$/mi.test(launchRobots.body), 'SIMULATION: no blanket Disallow: / persists into an indexable configuration');
+    assert.notEqual(launchRobots.body.trim(), robots.body.trim(), 'SIMULATION: robots.txt actually responds to the single launch switch');
 
     const sitemapIndex = await text(`${base}/wp-sitemap.xml`);
     assert.equal(sitemapIndex.status, 200, 'SIMULATION: the WordPress-native sitemap becomes available (no SEO plugin needed)');
@@ -315,7 +321,7 @@ try {
   assert.match(restored.headers['x-robots-tag'] || '', /noindex/i, 'X-Robots-Tag noindex restored');
   assert(/<meta[^>]+name=["']robots["'][^>]*noindex/i.test(restored.body), 'Core noindex robots meta restored');
   assert.equal((await text(`${base}/wp-sitemap.xml`)).status, 404, 'Sitemap disabled again with the site non-public');
-  assert(/Disallow:\s*\/\s*$/m.test((await text(`${base}/robots.txt`)).body), 'Development robots.txt restored');
+  assert.equal((await text(`${base}/robots.txt`)).body.trim(), robots.body.trim(), 'Development robots.txt restored byte-for-byte');
 
   // Visual evidence that the utility 404 renders the real shell for a human.
   const viewer = await context.newPage();
