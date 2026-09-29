@@ -21,7 +21,8 @@ for (const phrase of ['نرم‌افزار مدیریت مطب', 'نرم‌اف�
 assert(text.includes('جزئیات جریان نوبت، پذیرش و صف'), 'Contextual link to the appointment/reception/queue page');
 assert(text.includes('پرونده بیمار و تداوم اطلاعات'), 'Contextual link to the patient-record/continuity page');
 assert(text.includes('ادامهٔ جریان کار پزشک در کلینیک'), 'Contextual link to the doctor-workspace page');
-for (const href of ['/appointment-reception-queue/', '/patient-record-continuity/', '/doctor-workspace/']) {
+assert(text.includes('جایگاه بخش رو به بیمار در کنار جریان کار کلینیک'), 'Contextual link to the patient-portal page');
+for (const href of ['/appointment-reception-queue/', '/patient-record-continuity/', '/doctor-workspace/', '/patient-portal/']) {
   assert(text.includes(`href="${href}"`), `Missing inbound internal link: ${href}`);
   assert(!nodes.some(n => n.settings.title && n.settings.title.includes(href)), 'Links must stay inside copy, not become section titles');
 }

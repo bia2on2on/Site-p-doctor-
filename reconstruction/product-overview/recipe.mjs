@@ -142,6 +142,9 @@ export function productOverview(t) {
         // Contextual inbound link to the bounded doctor-workspace page: completes the
         // product map (reception → workspace → record) with one link, no narrative takeover.
         text('ادامهٔ جریان کار پزشک در کلینیک را در <a href="/doctor-workspace/">فضای کاری پزشک</a> دنبال کنید.', 'caption'),
+        // Contextual inbound link to the bounded patient-portal page: the patient-facing
+        // side beside the same clinic workflow, linked once without narrative takeover.
+        text('جایگاه بخش رو به بیمار در کنار جریان کار کلینیک را در <a href="/patient-portal/">پورتال بیمار</a> دنبال کنید.', 'caption'),
       ], 55, { flex_gap: gap(0) }),
     ])], { background_background: 'classic', background_color: color('background/subtle') }),
     band('Audience and operational fit', 'fit', [

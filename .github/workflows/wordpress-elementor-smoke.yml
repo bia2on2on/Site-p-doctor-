@@ -93,7 +93,10 @@ jobs:
       - name: Reconstruct native Free doctor-workspace page and capture browser evidence
         run: node tests/browser/doctor-workspace.mjs
 
-      - name: Upload homepage, Product Overview, Demo and workflow page evidence (also on failure; includes the patient-record/continuity and doctor-workspace pages)
+      - name: Reconstruct native Free patient-portal page and capture browser evidence
+        run: node tests/browser/patient-portal.mjs
+
+      - name: Upload homepage, Product Overview, Demo and workflow page evidence (also on failure; includes the patient-record/continuity, doctor-workspace and patient-portal pages)
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
