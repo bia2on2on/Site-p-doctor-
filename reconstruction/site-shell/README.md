@@ -5,12 +5,15 @@
 ## What this slice is
 
 The P0 sales-shell slice that unifies the already-implemented pages
-(`/`, `/product-overview/`, `/demo/` and the four workflow pages) into one
-coherent site:
+(`/`, `/product-overview/`, `/demo/`, the five workflow/capability pages and the
+global FAQ / buyer-objection page) into one coherent site:
 
 - a real WordPress **primary menu** (`menu.mjs` → WP-CLI `wp menu` commands in
   `tests/browser/site-shell.mjs`) assigned to the Koorosh `primary` location;
-- a compact truthful **footer menu** assigned to the `footer` location;
+- a compact truthful **footer menu** assigned to the `footer` location. The FAQ
+  (`/faq/`) is discovered from the footer only, as the trust route beside the
+  conversion route (`SITE-ARCHITECTURE §6.4`); it is deliberately **not** a
+  top-level header item;
 - a Koorosh fallback **header** (identity + primary nav + persistent
   `/demo/` CTA) with an accessible, progressively-enhanced mobile toggle and a
   compact accessible workflows submenu (`themes/koorosh/header.php`,

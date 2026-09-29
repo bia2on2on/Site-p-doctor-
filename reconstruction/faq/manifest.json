@@ -1,0 +1,42 @@
+{
+  "publication": "TARGET — NOT PUBLICATION-APPROVED",
+  "scope": "Global FAQ / buyer-objection page — trust and sales-conversion page that answers pre-demo clinic-buyer questions at the claim ceiling of the destination pages; it is not a capability, feature or workflow page and introduces no new product claim",
+  "canonical_recipe": "reconstruction/faq/recipe.mjs",
+  "claim_register": "reconstruction/faq/claims.md",
+  "browser_runner": "tests/browser/faq.mjs",
+  "static_validator": "tests/static/validate-faq.mjs",
+  "boundary_guardrails": "tests/static/boundary-faq.mjs",
+  "seo": {
+    "title": "پرسش‌های متداول درباره CPMS | برای مدیران کلینیک",
+    "description_source": "WordPress page excerpt via existing Koorosh mechanism",
+    "plugin": "none",
+    "intent": "Objection/evaluation intent only (SITE-ARCHITECTURE §5.2 FAQ row). It does not own the Cluster-1 clinic-software head terms, contains no «بهترین» self-award and no competitor comparison (SEO-KEYWORD-MAP §D / Cluster 9), and carries no keyword stuffing. Natural supporting terms around پرسش‌های متداول / تناسب با کلینیک / محدودهٔ قابلیت‌ها only."
+  },
+  "structured_data": "NONE — deliberately omitted. Google Search Central officially deprecated the FAQ rich result (May 2026: «Deprecating the FAQ rich result feature») and removed its documentation (June 2026: «Removing documentation for the FAQ rich result feature»); unused structured data has no visible Search effect. No JSON-LD, no FAQPage, no microdata is emitted on this page, and a guardrail enforces that. Repository policy (SITE-ARCHITECTURE §5.3) additionally defers structured data to the Hardening phase and performs no indexing work while the site is intentionally non-indexed.",
+  "layout": "Open question/answer layout — deliberately NOT an accordion. Answers are readable and crawlable without interaction, no <details>/toggle/script exists on the page, questions are H3 and answers are reading-size paragraphs.",
+  "question_model": {
+    "themes": 4,
+    "questions": 14,
+    "themes_and_counts": "شناخت CPMS و تناسب با کلینیک (4) / جریان‌های کاری و محدودهٔ قابلیت‌ها (5) / داده، دسترسی و ادعاهای امنیتی (2) / ارزیابی، دمو و مسیر تصمیم (3)",
+    "boundary_answers": [
+      "not merely appointment booking",
+      "full accounting not claimed (bounded manual payment recording and financial summaries only)",
+      "national Iranian e-prescription connection not claimed",
+      "insurance connection not claimed",
+      "online payment gateway not claimed",
+      "mobile app not claimed",
+      "AI not claimed (no clinical decision support or automatic diagnosis suggestion)",
+      "no security certificate, compliance claim or absolute guarantee"
+    ],
+    "redirect_rule": "Every boundary answer ends by pointing at what can be evaluated in the demo or the offered version; a guardrail also caps negated clauses so the page cannot become a disclaimer wall."
+  },
+  "pricing": "Public/fixed pricing NOT decided and NOT published. The answer states only that no fixed public price is announced and that the current sales path is needs review plus consultation — no figure, package, tier, subscription, per-user model, discount or comparison.",
+  "conversion": "Primary CTA routes to the real /demo/ page (hero and final panel). Assisted-sale only; no pricing commitment, checkout or instant-signup promise.",
+  "lead_delivery": "NOT CONFIGURED / NOT AUTHORIZED — the page states honestly (in the request-path answer and once in the final panel) that the current request path does not reach Sales and that no information is sent or stored.",
+  "navigation": "Footer discovery only, through the canonical WordPress-native footer menu (reconstruction/site-shell/menu.mjs); the primary navigation is unchanged and FAQ is not a new top-level header item.",
+  "media": "None. Accepted product-media reservations already exist elsewhere; this page deliberately adds no media frame, icon, stock image or decorative card.",
+  "launch_blockers": [
+    "Live lead delivery must be configured and authorized",
+    "Every answer must be re-verified against launch product evidence at the Launch Truth Gate"
+  ]
+}

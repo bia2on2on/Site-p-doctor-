@@ -180,6 +180,12 @@ else
 	ko "Prescriptions-and-documents page guardrails failed"
 fi
 
+if node "$root/tests/static/validate-faq.mjs"; then
+	ok "FAQ / buyer-objection page native authoring, objection boundaries and structured-data omission guardrails"
+else
+	ko "FAQ / buyer-objection page guardrails failed"
+fi
+
 if node "$root/tests/static/validate-site-shell.mjs"; then
 	ok "Site-shell navigation, menu-structure and honesty guardrails"
 else
