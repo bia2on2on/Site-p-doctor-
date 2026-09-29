@@ -102,10 +102,13 @@ jobs:
       - name: Reconstruct native Free FAQ / buyer-objection page and capture browser evidence
         run: node tests/browser/faq.mjs
 
+      - name: Reconstruct native Free Security & Data Access trust page and capture browser evidence
+        run: node tests/browser/security-data-access.mjs
+
       - name: Reconstruct WordPress navigation menus and capture site-shell evidence
         run: node tests/browser/site-shell.mjs
 
-      - name: Upload homepage, Product Overview, Demo, workflow, FAQ page and site-shell evidence (also on failure; includes the patient-record/continuity, doctor-workspace, patient-portal and prescriptions-documents pages)
+      - name: Upload homepage, Product Overview, Demo, workflow, FAQ, Security & Data Access page and site-shell evidence (also on failure; includes the patient-record/continuity, doctor-workspace, patient-portal and prescriptions-documents pages)
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:

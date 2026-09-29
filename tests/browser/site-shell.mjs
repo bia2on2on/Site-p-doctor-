@@ -106,9 +106,10 @@ assert.deepEqual(footerStructure.map(i => i.title), footerMenu.items.map(i => i.
 writeFileSync(resolve(out, 'menu-structure.json'), JSON.stringify({ primary: menuStructure, footer: footerStructure }, null, 2));
 
 const workflowRoutes = primaryMenu.items.find(i => i.title === 'جریان‌های کاری').children.map(c => `/${c.slug}/`);
-// Footer destinations: the product page, the FAQ/objection trust route and the conversion route.
+// Footer destinations: the product page, the FAQ/objection trust route, the security trust route and the conversion route.
 const faqRoute = '/faq/';
-const footerRoutes = ['/product-overview/', faqRoute, '/demo/'];
+const securityRoute = '/security-data-access/';
+const footerRoutes = ['/product-overview/', faqRoute, securityRoute, '/demo/'];
 const allRoutes = ['/', ...footerRoutes, ...workflowRoutes];
 
 // ---- Browser proof ----------------------------------------------------------
@@ -301,6 +302,16 @@ try {
   assert.equal(await page.locator('h1').count(), 1, 'FAQ destination serves one H1');
   assert.match(await page.locator('h1').innerText(), /پرسش‌های مدیران کلینیک/, 'Footer route reaches the FAQ / buyer-objection page');
   assert.equal(await page.locator('.site-navigation a[aria-current="page"]').count(), 0, 'FAQ stays a footer trust route, not a primary-navigation item');
+
+  // Footer discovery of the Security & Data Access trust page: same trust group.
+  await page.goto(base, { waitUntil: 'networkidle' });
+  const footerSecurity = page.locator('.footer-navigation').getByRole('link', { name: 'امنیت و دسترسی به داده', exact: true });
+  assert(await footerSecurity.isVisible(), 'Footer Security link visible');
+  await footerSecurity.click();
+  await page.waitForURL(`${base}${securityRoute}`);
+  assert.equal(await page.locator('h1').count(), 1, 'Security destination serves one H1');
+  assert.match(await page.locator('h1').innerText(), /دسترسی متناسب با نقش/, 'Footer route reaches the Security & Data Access page');
+  assert.equal(await page.locator('.site-navigation a[aria-current="page"]').count(), 0, 'Security page stays a footer trust route, not a primary-navigation item');
 
   // ---- Progressive enhancement: no JavaScript at all -------------------------
   const noJs = await browser.newContext({ reducedMotion: 'reduce', javaScriptEnabled: false });
