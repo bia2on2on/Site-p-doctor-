@@ -165,7 +165,9 @@ try {
     // WordPress-provided current-page state.
     const current = page.locator('.site-navigation a[aria-current="page"]');
     assert.equal(await current.count(), 1, `${name}: current-page state on the home item`);
-    assert.equal((await current.innerText()).trim(), 'خانه');
+    // On collapsed mobile widths the menu is display:none until toggled, so read the
+    // marker label via textContent (innerText would resolve to '').
+    assert.equal((await current.textContent()).trim(), 'خانه');
     assert(await page.locator('.site-navigation .current-menu-item > a').count() >= 1, `${name}: WordPress current-menu-item class present`);
 
     const footerNav = page.locator('.footer-navigation');
@@ -216,7 +218,10 @@ try {
   await page.waitForURL(`${base}/patient-record-continuity/`);
   assert.match(await page.locator('h1').innerText(), /پرونده/, 'Submenu link reaches the patient-record page');
   assert.equal(await page.locator('.site-navigation a[aria-current="page"]').count(), 1, 'Current-page state on a workflow child');
-  assert.equal((await page.locator('.site-navigation a[aria-current="page"]').innerText()).trim(), 'پرونده بیمار');
+  // The submenu re-closes after navigation, so read the marker label via textContent
+  // (innerText on the now-hidden submenu link resolves to '').
+  assert.equal(await page.locator('.site-navigation a[aria-current="page"]').getAttribute('aria-current'), 'page');
+  assert.equal((await page.locator('.site-navigation a[aria-current="page"]').textContent()).trim(), 'پرونده بیمار');
   await page.goBack({ waitUntil: 'networkidle' });
 
   // Keyboard path: Tab to the toggle, Enter to open, Tab into submenu, Escape to close.
