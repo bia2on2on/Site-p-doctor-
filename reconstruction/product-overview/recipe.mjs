@@ -145,6 +145,9 @@ export function productOverview(t) {
         // Contextual inbound link to the bounded patient-portal page: the patient-facing
         // side beside the same clinic workflow, linked once without narrative takeover.
         text('جایگاه بخش رو به بیمار در کنار جریان کار کلینیک را در <a href="/patient-portal/">پورتال بیمار</a> دنبال کنید.', 'caption'),
+        // Contextual inbound link to the bounded prescriptions-and-documents page: recording
+        // and management inside CPMS, linked once beside the record topic without narrative takeover.
+        text('جایگاه نسخه‌ها و اسناد در ادامهٔ پرونده و جریان کار را در <a href="/prescriptions-documents/">نسخه‌ها و اسناد در CPMS</a> دنبال کنید.', 'caption'),
       ], 55, { flex_gap: gap(0) }),
     ])], { background_background: 'classic', background_color: color('background/subtle') }),
     band('Audience and operational fit', 'fit', [
