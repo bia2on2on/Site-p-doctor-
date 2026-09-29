@@ -174,6 +174,18 @@ else
 	ko "Patient-portal page guardrails failed"
 fi
 
+if node "$root/tests/static/validate-site-shell.mjs"; then
+	ok "Site-shell navigation, menu-structure and honesty guardrails"
+else
+	ko "Site-shell navigation guardrails failed"
+fi
+
+if node --check "$root/themes/koorosh/nav.js"; then
+	ok "nav.js classic-script syntax (node --check)"
+else
+	ko "nav.js syntax check failed"
+fi
+
 printf '== Static validation result: %s passed, %s failed ==\n' "$pass" "$fail"
 [ "$fail" -eq 0 ] || exit 1
 exit 0

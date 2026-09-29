@@ -168,8 +168,8 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
     assert(await page.getByText('این قاب، تصویر محیط نرم‌افزار نیست', { exact: false }).count() > 0, 'Reserved media is explicitly not product UI');
     assert.equal(await page.locator('meta[name="description"]').count(), 1);
     assert.match(await page.locator('meta[name="robots"]').getAttribute('content'), /noindex/);
-    const cta = page.getByRole('link', { name: 'درخواست دمو / مشاوره', exact: true });
-    assert.equal(await cta.getAttribute('href'), '#demo-consultation');
+    const cta = page.locator('main').getByRole('link', { name: 'درخواست دمو / مشاوره', exact: true });
+    assert.equal(await cta.getAttribute('href'), '/demo/', 'Product Overview primary demo CTA routes to the real Demo page');
     const ctaBox = await cta.boundingBox();
     assert(ctaBox.y + ctaBox.height < height, `${name}: hero CTA must be in first viewport`);
     assert(ctaBox.height >= 44, 'CTA touch size');
@@ -181,14 +181,19 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
       fontLoaded: document.fonts.check('700 30px Vazirmatn'),
       headings: [...document.querySelectorAll('main h1, main h2, main h3')].map(n => ({ tag: n.tagName, text: n.textContent })),
       brokenAnchors: [...document.querySelectorAll('a[href^="#"]')].filter(a => !document.getElementById(decodeURIComponent(a.hash.slice(1)))).map(a => a.hash),
-      offsiteLinks: [...document.querySelectorAll('main a')].filter(a => a.origin !== location.origin || a.pathname !== location.pathname).map(a => a.href),
+      externalLinks: [...document.querySelectorAll('main a')].filter(a => a.origin !== location.origin).map(a => a.href),
+      crossPageLinks: [...document.querySelectorAll('main a')].filter(a => a.origin === location.origin && a.pathname !== location.pathname).map(a => a.pathname),
     }));
     assert(measures.scrollWidth <= measures.width, `${name}: horizontal overflow`);
     assert(measures.font.includes('Vazirmatn') && measures.fontLoaded, 'Local Persian font loaded');
     assert.deepEqual(measures.brokenAnchors, []);
-    // Cross-page links are limited to the four real detail pages; each destination is
-    // verified by its own runner later in this CI sequence (sort keeps this order-independent).
-    assert.deepEqual([...measures.offsiteLinks].sort(), [`${base}/appointment-reception-queue/`, `${base}/patient-record-continuity/`, `${base}/doctor-workspace/`, `${base}/patient-portal/`].sort(), 'Only the real workflow detail pages are linked');
+    assert.deepEqual(measures.externalLinks, [], 'No external links');
+    // Cross-page routes are limited to the real sales journey: the Demo page and
+    // the four workflow detail pages (each verified by its own runner + site-shell).
+    const crossRoutes = new Set(measures.crossPageLinks);
+    const allowedRoutes = new Set(['/demo/', '/appointment-reception-queue/', '/patient-record-continuity/', '/doctor-workspace/', '/patient-portal/']);
+    for (const route of crossRoutes) assert(allowedRoutes.has(route), `Unexpected cross-page link: ${route}`);
+    for (const route of allowedRoutes) assert(crossRoutes.has(route), `Expected cross-page route missing: ${route}`);
     const composition = await page.evaluate(() => {
       const rect = selector => {
         const r = document.querySelector(selector).getBoundingClientRect();
@@ -241,15 +246,18 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
     console.log(`::notice title=Product Overview composition ${name}::PASS: workflow ${width < 768 ? 'vertical' : 'RTL horizontal'}; minimum reading width ${Math.round(Math.min(...composition.reading.map(p => p.width)))}px; media ${Math.round(composition.media.width)}x${Math.round(composition.media.height)}px`);
     await page.screenshot({ path: resolve(out, `${name}.png`), fullPage: true });
     await page.screenshot({ path: resolve(out, `${name}-viewport.png`) });
-    // Keyboard reachability and focus style; no programmatic focus shortcut.
-    await page.keyboard.press('Tab'); // skip link
-    await page.keyboard.press('Tab'); // neutral shell home link
-    await page.keyboard.press('Tab'); // first content link = demo CTA
-    assert(await cta.evaluate(a => a === document.activeElement), 'CTA reachable in reading order');
+    // Keyboard reachability through the real shell (skip link, identity, header
+    // CTA, then content): bounded Tab presses until the demo CTA holds focus.
+    let ctaFocused = false;
+    for (let tab = 0; tab < 12 && !ctaFocused; tab++) {
+      await page.keyboard.press('Tab');
+      ctaFocused = await cta.evaluate(a => a === document.activeElement);
+    }
+    assert(ctaFocused, 'CTA reachable by keyboard in reading order');
     assert(await cta.evaluate(a => getComputedStyle(a).outlineStyle !== 'none'), 'Visible keyboard focus');
-    await page.keyboard.press('Enter');
-    await page.waitForURL(/#demo-consultation$/);
-    assert(await page.locator('#demo-consultation').isVisible());
+    // /demo/ serving proof lives in tests/browser/site-shell.mjs; the in-page
+    // consultation section itself stays present and honest.
+    assert(await page.locator('#demo-consultation').count() >= 1, 'In-page demo/consultation section remains');
     diagnostic.views.push({ name, width, height, ...measures, ctaBox, composition });
   }
   assert.deepEqual(diagnostic.frontendErrors, [], 'Frontend console/page errors');

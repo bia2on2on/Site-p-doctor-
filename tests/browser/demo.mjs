@@ -232,13 +232,16 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
       font: getComputedStyle(document.querySelector('h1')).fontFamily,
       fontLoaded: document.fonts.check('700 30px Vazirmatn'),
       brokenAnchors: [...document.querySelectorAll('a[href^="#"]')].filter(a => !document.getElementById(decodeURIComponent(a.hash.slice(1)))).map(a => a.hash),
-      offsiteLinks: [...document.querySelectorAll('main a')].filter(a => a.origin !== location.origin || a.pathname !== location.pathname).map(a => a.href),
+      externalLinks: [...document.querySelectorAll('main a')].filter(a => a.origin !== location.origin).map(a => a.href),
+      crossPageLinks: [...document.querySelectorAll('main a')].filter(a => a.origin === location.origin && a.pathname !== location.pathname).map(a => a.pathname),
       inputHeights: [...document.querySelectorAll('.cpms-form-input, .cpms-form-select, .cpms-form-submit-button')].map(el => el.getBoundingClientRect().height),
     }));
     assert(measures.scrollWidth <= measures.width, `${name}: horizontal overflow detected`);
     assert(measures.font.includes('Vazirmatn') && measures.fontLoaded, `${name}: Vazirmatn font loaded`);
     assert.deepEqual(measures.brokenAnchors, [], `${name}: broken in-page anchors`);
-    assert.deepEqual(measures.offsiteLinks, [], `${name}: offsite links`);
+    assert.deepEqual(measures.externalLinks, [], `${name}: external links`);
+    assert.deepEqual(measures.crossPageLinks, ['/product-overview/'], `${name}: Demo keeps exactly its contextual route back to Product Overview`);
+    assert.equal(await page.locator('main a[href$="/product-overview/"]').count(), 1, `${name}: return route renders as a normal crawlable link`);
     assert(measures.inputHeights.every(h => h >= 44), `${name}: all inputs and submit button touch targets >= 44px`);
 
     await page.screenshot({ path: resolve(out, `${name}.png`), fullPage: true });
@@ -249,11 +252,15 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
   // Keyboard navigation & visible focus
   await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto(base, { waitUntil: 'networkidle' });
-  await page.keyboard.press('Tab'); // skip link
-  await page.keyboard.press('Tab'); // home link
-  await page.keyboard.press('Tab'); // hero CTA
+  // Keyboard reachability through the real shell (skip link, identity, header
+  // CTA, then content): bounded Tab presses until the hero CTA holds focus.
   const heroCta = page.getByRole('link', { name: 'تکمیل فرم درخواست دمو', exact: true }).first();
-  assert(await heroCta.evaluate(a => a === document.activeElement), 'Hero CTA keyboard reachable');
+  let heroCtaFocused = false;
+  for (let tab = 0; tab < 12 && !heroCtaFocused; tab++) {
+    await page.keyboard.press('Tab');
+    heroCtaFocused = await heroCta.evaluate(a => a === document.activeElement);
+  }
+  assert(heroCtaFocused, 'Hero CTA keyboard reachable');
   assert(await heroCta.evaluate(a => getComputedStyle(a).outlineStyle !== 'none'), 'Visible focus ring on CTA');
   await page.keyboard.press('Enter');
   await page.waitForURL(/#qualification-form$/);

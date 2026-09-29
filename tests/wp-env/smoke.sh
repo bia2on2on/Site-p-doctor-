@@ -184,8 +184,11 @@ home_body="$(curl --fail --silent --show-error "$BASE_URL/")" \
 for asset in 'koorosh/style.css' 'koorosh/foundation.css'; do
   if [[ "$home_body" == *"/themes/$asset"* ]]; then ok "Homepage references $asset"; else ko "Homepage missing $asset"; fi
 done
-for marker in 'skip-link' '<main id="content"' 'site-header' 'site-footer'; do
+for marker in 'skip-link' '<main id="content"' 'site-header' 'site-footer' 'site-title' 'header-cta'; do
   if [[ "$home_body" == *"$marker"* ]]; then ok "Homepage contains shell marker: $marker"; else ko "Homepage missing shell marker: $marker"; fi
+done
+for asset in 'koorosh/nav.js'; do
+  if [[ "$home_body" == *"/themes/$asset"* ]]; then ok "Homepage references $asset"; else ko "Homepage missing $asset"; fi
 done
 for font in Vazirmatn-Regular.woff2 Vazirmatn-Bold.woff2; do
   response="$(curl --silent --show-error --output /dev/null --write-out '%{http_code} %{content_type}' "$BASE_URL/wp-content/themes/koorosh/fonts/$font")"

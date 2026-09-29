@@ -9,10 +9,13 @@ assert(nodes.every(n => ['container', 'heading', 'text-editor', 'button'].includ
 assert.equal(nodes.filter(n => n.kind === 'heading' && n.settings.header_size === 'h1').length, 1);
 const ids = nodes.map(n => n.settings._element_id).filter(Boolean);
 assert.equal(ids.length, new Set(ids).size);
-for (const n of nodes.filter(n => n.kind === 'button')) {
-  assert(n.settings.link.url.startsWith('#'));
-  assert(ids.includes(n.settings.link.url.slice(1)), 'Every CTA has a real in-page destination');
+const buttons = nodes.filter(n => n.kind === 'button');
+for (const n of buttons) {
+  const url = n.settings.link.url;
+  assert(url.startsWith('#') || url === '/demo/', `CTA destinations are in-page anchors or the real Demo page: ${url}`);
+  if (url.startsWith('#')) assert(ids.includes(url.slice(1)), 'Every in-page CTA has a real destination');
 }
+assert(buttons.some(n => n.settings.link.url === '/demo/'), 'Primary demo CTA routes to /demo/ (no informational dead end)');
 const copy = nodes.map(n => n.settings.title || n.settings.editor || n.settings.text || '').join('\n');
 for (const pattern of [/۱۰۰٪/, /۱۰۰ درصد/, /100%/, /۲۴\s*[\/×]\s*۷/, /24\s*[\/×]\s*7/, /درگاه پرداخت/, /حسابداری کامل/, /اتصال به بیمه/, /نسخه الکترونیک ملی/, /هوش مصنوعی/, /اپلیکیشن موبایل/, /گواهی امنیت/, /تضمین/, /بهترین/, /امن‌ترین/, /mailto:|tel:|https?:\/\//, /تومان|ریال/]) {
   assert(!pattern.test(copy), `Forbidden/unapproved claim or contact matched: ${pattern}`);
