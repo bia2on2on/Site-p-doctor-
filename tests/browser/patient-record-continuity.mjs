@@ -195,7 +195,7 @@ echo wp_json_encode(array('id' => $id, 'status' => get_post_status($id), 'editab
     assert(await page.getByText('پشتیبانی تصمیم بالینی، هشدار خودکار یا پیشنهاد تشخیص', { exact: false }).count() >= 1, 'No clinical decision support invented');
     assert(await page.getByText('دسترسی و تفکیک داده', { exact: false }).count() >= 1, 'Mechanism-level access section visible');
     assert(await page.getByText('غیرزنده', { exact: false }).count() >= 1, 'Non-live conversion reality stated');
-    const cta = page.getByRole('link', { name: 'درخواست دمو / مشاوره', exact: true });
+    const cta = page.locator('main').getByRole('link', { name: 'درخواست دمو / مشاوره', exact: true });
     assert.equal(await cta.getAttribute('href'), '/demo/');
     const ctaBox = await cta.boundingBox();
     assert(ctaBox.y + ctaBox.height < height, `${name}: hero CTA must be in first viewport`);
@@ -288,11 +288,15 @@ echo wp_json_encode(array('id' => $id, 'status' => get_post_status($id), 'editab
   // Keyboard reachability and visible focus; no programmatic focus shortcut.
   await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto(pageUrl, { waitUntil: 'networkidle' });
-  await page.keyboard.press('Tab'); // skip link
-  await page.keyboard.press('Tab'); // neutral shell home link
-  await page.keyboard.press('Tab'); // first content link = demo CTA
-  const cta = page.getByRole('link', { name: 'درخواست دمو / مشاوره', exact: true });
-  assert(await cta.evaluate(a => a === document.activeElement), 'CTA reachable in reading order');
+  // Keyboard reachability through the real shell (skip link, identity, header
+  // CTA, then content): bounded Tab presses until the demo CTA holds focus.
+  const cta = page.locator('main').getByRole('link', { name: 'درخواست دمو / مشاوره', exact: true });
+  let ctaFocused = false;
+  for (let tab = 0; tab < 12 && !ctaFocused; tab++) {
+    await page.keyboard.press('Tab');
+    ctaFocused = await cta.evaluate(a => a === document.activeElement);
+  }
+  assert(ctaFocused, 'CTA reachable by keyboard in reading order');
   assert(await cta.evaluate(a => getComputedStyle(a).outlineStyle !== 'none'), 'Visible keyboard focus');
   await page.keyboard.press('Enter');
   await page.waitForURL(/\/demo\/?$/);

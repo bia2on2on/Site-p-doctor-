@@ -1,0 +1,10 @@
+{
+  "scope": "Site shell navigation + conversion routing — WordPress-native menus assigned to the Koorosh-registered primary/footer locations; not a Theme Builder part and not hardcoded menu HTML",
+  "canonical_definition": "reconstruction/site-shell/menu.mjs",
+  "browser_runner": "tests/browser/site-shell.mjs",
+  "static_validator": "tests/static/validate-site-shell.mjs",
+  "publication": "TARGET — NOT PUBLICATION-APPROVED",
+  "claims": "NONE — navigation labels/routes only; no product capability, customer, pricing or contact claims are introduced anywhere in this slice",
+  "lead_delivery": "NOT CONFIGURED / NOT AUTHORIZED — menus and the header CTA navigate to /demo/ only; the qualification form there stays in its documented safe non-live test mode and no request is implied to reach Sales",
+  "elementor_pro_precedence": "The Koorosh fallback header/footer continue to yield to Elementor Pro Theme Builder locations via elementor_theme_do_location() — unchanged"
+}

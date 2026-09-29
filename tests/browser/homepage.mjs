@@ -164,8 +164,8 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
     assert.match(await page.title(), /CPMS/);
     assert.equal(await page.locator('meta[name="description"]').count(), 1);
     assert.match(await page.locator('meta[name="robots"]').getAttribute('content'), /noindex/);
-    const cta = page.getByRole('link', { name: 'درخواست دمو / مشاوره', exact: true });
-    assert.equal(await cta.getAttribute('href'), '#demo-consultation');
+    const cta = page.locator('main').getByRole('link', { name: 'درخواست دمو / مشاوره', exact: true });
+    assert.equal(await cta.getAttribute('href'), '/demo/', 'Homepage primary demo CTA routes to the real Demo page');
     const ctaBox = await cta.boundingBox();
     assert(ctaBox.y + ctaBox.height < height, `${name}: hero CTA must be in first viewport`);
     assert(ctaBox.height >= 44, 'CTA touch size');
@@ -177,12 +177,14 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
       fontLoaded: document.fonts.check('700 30px Vazirmatn'),
       headings: [...document.querySelectorAll('main h1, main h2, main h3')].map(n => ({ tag: n.tagName, text: n.textContent })),
       brokenAnchors: [...document.querySelectorAll('a[href^="#"]')].filter(a => !document.getElementById(decodeURIComponent(a.hash.slice(1)))).map(a => a.hash),
-      offsiteLinks: [...document.querySelectorAll('main a')].filter(a => a.origin !== location.origin || a.pathname !== location.pathname).map(a => a.href),
+      externalLinks: [...document.querySelectorAll('main a')].filter(a => a.origin !== location.origin).map(a => a.href),
+      crossPageLinks: [...document.querySelectorAll('main a')].filter(a => a.origin === location.origin && a.pathname !== location.pathname).map(a => a.pathname),
     }));
     assert(measures.scrollWidth <= measures.width, `${name}: horizontal overflow`);
     assert(measures.font.includes('Vazirmatn') && measures.fontLoaded, 'Local Persian font loaded');
     assert.deepEqual(measures.brokenAnchors, []);
-    assert.deepEqual(measures.offsiteLinks, []);
+    assert.deepEqual(measures.externalLinks, []);
+    assert(measures.crossPageLinks.length > 0 && measures.crossPageLinks.every(p => p === '/demo/'), 'Only cross-page route from Homepage content is /demo/');
     const composition = await page.evaluate(() => {
       const rect = selector => {
         const r = document.querySelector(selector).getBoundingClientRect();
@@ -235,15 +237,19 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
     console.log(`::notice title=Homepage composition ${name}::PASS: workflow ${width < 768 ? 'vertical' : 'RTL horizontal'}; minimum reading width ${Math.round(Math.min(...composition.reading.map(p => p.width)))}px; media ${Math.round(composition.media.width)}x${Math.round(composition.media.height)}px`);
     await page.screenshot({ path: resolve(out, `${name}.png`), fullPage: true });
     await page.screenshot({ path: resolve(out, `${name}-viewport.png`) });
-    // Keyboard reachability and focus style; no programmatic focus shortcut.
-    await page.keyboard.press('Tab'); // skip link
-    await page.keyboard.press('Tab'); // neutral shell home link
-    await page.keyboard.press('Tab'); // first content link = demo CTA
-    assert(await cta.evaluate(a => a === document.activeElement), 'CTA reachable in reading order');
+    // Keyboard reachability through the real shell (skip link, identity, header
+    // CTA, then content): bounded Tab presses until the demo CTA holds focus.
+    let ctaFocused = false;
+    for (let tab = 0; tab < 12 && !ctaFocused; tab++) {
+      await page.keyboard.press('Tab');
+      ctaFocused = await cta.evaluate(a => a === document.activeElement);
+    }
+    assert(ctaFocused, 'CTA reachable by keyboard in reading order');
     assert(await cta.evaluate(a => getComputedStyle(a).outlineStyle !== 'none'), 'Visible keyboard focus');
-    await page.keyboard.press('Enter');
-    await page.waitForURL(/#demo-consultation$/);
-    assert(await page.locator('#demo-consultation').isVisible());
+    // The CTA destination /demo/ is reconstructed by a later runner in this CI
+    // sequence, so cross-page serving proof lives in tests/browser/site-shell.mjs;
+    // the in-page consultation section itself stays present and honest.
+    assert(await page.locator('#demo-consultation').count() >= 1, 'In-page demo/consultation section remains');
     diagnostic.views.push({ name, width, height, ...measures, ctaBox, composition });
   }
   assert.deepEqual(diagnostic.frontendErrors, [], 'Frontend console/page errors');

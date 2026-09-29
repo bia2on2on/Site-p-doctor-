@@ -10,6 +10,10 @@
 - **REFERENCE HOST:** recorded versions are test/evidence facts, not architecture locks.
 
 
+## Site shell — navigation & conversion routing
+
+WordPress-native menus (`primary`/`footer`), the Koorosh fallback sales header (identity + nav + persistent `/demo/` CTA, accessible mobile toggle and workflows submenu) and the `/` ↔ `/product-overview/` ↔ `/demo/` conversion routes are reconstructed in CI from [reconstruction/site-shell](reconstruction/site-shell/README.md) (`menu.mjs` canonical definition, `tests/browser/site-shell.mjs` runner). Elementor Pro Theme Builder location precedence is preserved.
+
 ## Homepage — Milestone A
 
 The first Persian/RTL homepage is reconstructed as native **Elementor Free** content, not hardcoded theme markup. See [reconstruction instructions](reconstruction/homepage/README.md), [claim boundaries](reconstruction/homepage/claims.md), and the [Milestone A evidence/limitations](docs/MILESTONE-A-HOMEPAGE.md).

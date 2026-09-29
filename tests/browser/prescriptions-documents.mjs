@@ -212,7 +212,9 @@ echo wp_json_encode(array('id' => $id, 'status' => get_post_status($id), 'editab
       ...boundary.distinctionPhrases, 'غیرزنده', 'این قاب، تصویر محیط نرم‌افزار نیست', 'سطح سازوکار است', 'ادعایی ندارد',
       'راهنمای بیماران برای دریافت یا پیگیری نسخه نیست', 'نمایان‌بودن همهٔ نسخه‌ها و اسناد فرض نمی‌شود', 'توضیحی مفهومی است',
     ]) assert(mainText.includes(phrase), `${name}: bounded wording rendered on the page: ${phrase}`);
-    const cta = page.getByRole('link', { name: 'درخواست دمو / مشاوره', exact: true });
+    // The page's own hero CTA lives inside <main>; scope the lookup so the global site-shell
+    // header CTA (present after the site-shell merge) cannot create a strict-mode duplicate match.
+    const cta = page.locator('main').getByRole('link', { name: 'درخواست دمو / مشاوره', exact: true });
     assert.equal(await cta.getAttribute('href'), '/demo/');
     const ctaBox = await cta.boundingBox();
     assert(ctaBox.y + ctaBox.height < height, `${name}: hero CTA must be in first viewport`);
@@ -352,10 +354,25 @@ echo wp_json_encode(array('id' => $id, 'status' => get_post_status($id), 'editab
   await page.goto(pageUrl, { waitUntil: 'networkidle' });
   await page.keyboard.press('Tab'); // skip link
   await page.keyboard.press('Tab'); // neutral shell home link
-  await page.keyboard.press('Tab'); // first content link = demo CTA
-  const cta = page.getByRole('link', { name: 'درخواست دمو / مشاوره', exact: true });
-  assert(await cta.evaluate(a => a === document.activeElement), 'CTA reachable in reading order');
-  assert(await cta.evaluate(a => getComputedStyle(a).outlineStyle !== 'none'), 'Visible keyboard focus');
+  // The merged site shell adds a header CTA before the nav, so traverse tabbable items
+  // (bounded) until focus lands on the first link inside the page's own <main> content;
+  // that link must remain this page's authored consultation CTA (found by accessible name,
+  // scoped to main so the shell header CTA cannot create a strict-mode duplicate match).
+  const cta = page.locator('main').getByRole('link', { name: 'درخواست دمو / مشاوره', exact: true });
+  let focus = null;
+  for (let i = 0; i < 14; i += 1) {
+    await page.keyboard.press('Tab');
+    focus = await page.evaluate(() => {
+      const el = document.activeElement;
+      if (!el || el.tagName !== 'A' || !el.closest('main')) return null;
+      return { href: el.getAttribute('href'), text: el.textContent.trim(), outline: getComputedStyle(el).outlineStyle };
+    });
+    if (focus) break;
+  }
+  assert(focus, 'First page-content link takes focus after the neutral shell');
+  assert.equal(focus.href, await cta.getAttribute('href'), 'First content link remains the consultation CTA');
+  assert.match(focus.text, /درخواست دمو/);
+  assert.notEqual(focus.outline, 'none', 'Visible keyboard focus');
   await page.keyboard.press('Enter');
   await page.waitForURL(/\/demo\/?$/);
   assert.equal(await page.locator('h1').count(), 1, 'Demo CTA destination serves one H1');

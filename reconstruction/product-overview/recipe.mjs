@@ -81,7 +81,7 @@ export function productOverview(t) {
         eyebrow('نرم‌افزار مدیریت مطب و کلینیک'),
         heading('نرم‌افزار مدیریت مطب و کلینیک، فراتر از نوبت‌دهی', 'h1'),
         text(`${cpms} یک نرم‌افزار مدیریت کلینیک برای دنبال‌کردن جریان‌های کاری مرتبط است؛ از نوبت و پذیرش تا فضای کاری پزشک، پرونده و مستندات مراجعه.`, 'lede'),
-        row('Hero actions', [button('درخواست دمو / مشاوره', '#demo-consultation'), button('دیدن بخش‌های محصول', '#workflow', false)], { flex_gap: gap(12), flex_gap_mobile: gap(12), flex_direction_tablet: 'row', flex_direction_mobile: 'column', flex_wrap: 'wrap' }),
+        row('Hero actions', [button('درخواست دمو / مشاوره', '/demo/'), button('دیدن بخش‌های محصول', '#workflow', false)], { flex_gap: gap(12), flex_gap_mobile: gap(12), flex_direction_tablet: 'row', flex_direction_mobile: 'column', flex_wrap: 'wrap' }),
         text('گفت‌وگو را از جریان کار کلینیک خود شروع کنید.', 'caption'),
       ], 46, { _element_id: 'hero-copy' }),
       column('MEDIA REQUIRED — reserved frame, NOT product UI', [
@@ -171,7 +171,8 @@ export function productOverview(t) {
         row('Consultation preparation and honest route', [
           column('Prepare a relevant conversation', [text('تعداد پزشکان، نقش‌های پذیرش و اولویت‌های کاری مرکز را آماده کنید. هدف، بررسی تناسب CPMS با نیاز شماست.', 'lede')], 60),
           column('No live lead submission', [
-            button('مرور موضوعات گفت‌وگو', '#evaluation'),
+            button('رفتن به صفحهٔ دمو و مشاوره', '/demo/'),
+            button('مرور موضوعات گفت‌وگو', '#evaluation', false),
             text('مسیر ثبت درخواست هنوز متصل نشده است. در این پیش‌نمایش اطلاعاتی دریافت یا ارسال نمی‌شود.', 'caption'),
           ], 40),
         ]),

@@ -322,6 +322,8 @@ Core = کمیتۀ صفحاتی که بدون آن‌ها یک سایت فروش�
 
 ## 6. قرارداد Navigation
 
+**۶.۰ وضعیت فعلی پیاده‌سازی (ثبت‌شده پس از ساخت):** Subset واقعی و درست‌گویانهٔ این قرارداد اکنون به‌شکل منوی واقعی WordPress (`primary`/`footer`) در `reconstruction/site-shell/menu.mjs` تعریف و در CI بازسازی می‌شود (`tests/browser/site-shell.mjs`)؛ Fallback هدر/فوتر Koorosh شامل هویت سایت، ناوبری اولیه و CTA ثابت `/demo/` است و تا فعال‌شدن Elementor Pro Theme Builder سرو می‌کند — اولویت locationها (`elementor_theme_do_location`) حفظ شده است. ساختار فعلی عمداً از آیتم‌های §6.۱ کوچک‌تر است (خانه · محصول · جریان‌های کاری + زیرمنوی چهار صفحهٔ workflow موجود · دمو/مشاوره)؛ آیتم‌هایی که هنوز صفحه ندارند (Features، Solutions، Support، Blog، Contact، Privacy/Terms) طبق قاعدۀ «صفحه خالی ممنوع» در منو نیامده‌اند.
+
 **۶.۱ Primary Desktop (سطح اول — حداکثر ۵ آیتم):**
 
 1. **محصول / CPMS** (→ Product Overview؛ آیتم‌های Feature داخل پنل ساده — تنها اگر صفحات Feature ساخته شده باشند)

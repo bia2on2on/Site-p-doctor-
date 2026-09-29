@@ -99,7 +99,10 @@ jobs:
       - name: Reconstruct native Free prescriptions-and-documents page and capture browser evidence
         run: node tests/browser/prescriptions-documents.mjs
 
-      - name: Upload homepage, Product Overview, Demo and workflow page evidence (also on failure; includes the patient-record/continuity, doctor-workspace, patient-portal and prescriptions-documents pages)
+      - name: Reconstruct WordPress navigation menus and capture site-shell evidence
+        run: node tests/browser/site-shell.mjs
+
+      - name: Upload homepage, Product Overview, Demo, workflow page and site-shell evidence (also on failure; includes the patient-record/continuity, doctor-workspace, patient-portal and prescriptions-documents pages)
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:

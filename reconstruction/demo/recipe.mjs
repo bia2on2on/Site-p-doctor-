@@ -172,7 +172,7 @@ export function demoPage(t) {
         button('تکمیل فرم درخواست دمو', '#qualification-form', true),
         button('مرور شرایط و موضوعات جلسه', '#who-is-this-for', false),
       ], { flex_gap: gap(12), flex_gap_mobile: gap(12), flex_direction_tablet: 'row', flex_direction_mobile: 'column', flex_wrap: 'wrap' }),
-      text('می‌توانید همچنین معرفی محصول را در سایت مطالعه کرده و با دیدی کامل‌تر وارد گفت‌وگوی مشاوره‌ای شوید.', 'caption'),
+      text('می‌توانید همچنین <a href="/product-overview/">معرفی محصول</a> را در سایت مطالعه کرده و با دیدی کامل‌تر وارد گفت‌وگوی مشاوره‌ای شوید.', 'caption'),
     ], { background_background: 'classic', background_color: color('background/subtle') }),
   ];
 }

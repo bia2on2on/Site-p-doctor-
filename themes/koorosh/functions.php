@@ -47,7 +47,29 @@ add_action(
 			$version,
 			true
 		);
+		// Tiny vanilla navigation enhancement; in <head> so the "koorosh-js"
+		// class lands before paint and the collapsed mobile menu never flashes.
+		wp_enqueue_script(
+			'koorosh-nav',
+			get_stylesheet_directory_uri() . '/nav.js',
+			array(),
+			$version,
+			false
+		);
 	}
+);
+
+// Expose the current-page state WordPress already computes for menu items.
+add_filter(
+	'nav_menu_link_attributes',
+	function ( $atts, $menu_item ) {
+		if ( ! empty( $menu_item->current ) && empty( $atts['aria-current'] ) ) {
+			$atts['aria-current'] = 'page';
+		}
+		return $atts;
+	},
+	10,
+	2
 );
 
 add_filter(

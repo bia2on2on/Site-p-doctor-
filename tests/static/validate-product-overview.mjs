@@ -9,10 +9,13 @@ assert.equal(nodes.filter(n => n.kind === 'heading' && n.settings.header_size ==
 assert(nodes.every(n => ['container', 'heading', 'text-editor', 'button'].includes(n.kind)));
 const ids = nodes.map(n => n.settings._element_id).filter(Boolean);
 assert.equal(ids.length, new Set(ids).size);
-for (const n of nodes.filter(n => n.kind === 'button')) {
-  assert(n.settings.link.url.startsWith('#'));
-  assert(ids.includes(n.settings.link.url.slice(1)));
+const buttons = nodes.filter(n => n.kind === 'button');
+for (const n of buttons) {
+  const url = n.settings.link.url;
+  assert(url.startsWith('#') || url === '/demo/', `CTA destinations are in-page anchors or the real Demo page: ${url}`);
+  if (url.startsWith('#')) assert(ids.includes(url.slice(1)), 'Every in-page CTA has a real destination');
 }
+assert(buttons.some(n => n.settings.link.url === '/demo/'), 'Primary demo CTA routes to /demo/ (no informational dead end)');
 const text = nodes.map(n => n.settings.title || n.settings.editor || n.settings.text || '').join('\n');
 for (const pattern of [/درگاه پرداخت آنلاین/, /اتصال به بیمه/, /نسخه الکترونیک ملی/, /هوش مصنوعی/, /اپلیکیشن موبایل/, /گواهی امنیت/, /۱۰۰٪|۱۰۰ درصد|100%/, /۲۴\s*[\/×]\s*۷|24\s*[\/×]\s*7/, /تومان|ریال/, /mailto:|tel:/]) assert(!pattern.test(text), `Forbidden claim/contact: ${pattern}`);
 for (const phrase of ['نرم‌افزار مدیریت مطب', 'نرم‌افزار مدیریت کلینیک', 'فقط نرم‌افزار نوبت‌دهی است؟', 'جایگزین حسابداری کامل است؟', 'نمای واقعی نرم‌افزار CPMS', 'تصویر محیط نرم‌افزار نیست']) assert(text.includes(phrase), `Missing bounded page identity: ${phrase}`);
@@ -27,7 +30,7 @@ for (const href of ['/appointment-reception-queue/', '/patient-record-continuity
   assert(text.includes(`href="${href}"`), `Missing inbound internal link: ${href}`);
   assert(!nodes.some(n => n.settings.title && n.settings.title.includes(href)), 'Links must stay inside copy, not become section titles');
 }
-assert(!text.includes('href="/demo/"'), 'Product Overview keeps its on-page conversion anchor rather than a cross-page CTA');
+// Product Overview keeps its in-page review anchors AND routes demo intent to the real /demo/ page.
 assert(!nodes.some(n => n.kind === 'image'), 'Reserved media must not fabricate product imagery');
 assert(!readFileSync(new URL('../../tests/browser/product-overview.mjs', import.meta.url), 'utf8').includes('_elementor_data'));
 const manifest = JSON.parse(readFileSync(new URL('../../reconstruction/product-overview/manifest.json', import.meta.url)));

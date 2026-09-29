@@ -94,6 +94,7 @@ assert(copy.includes('اطلاعات لازم برای هماهنگی جلسهٔ
 assert(copy.includes('عدم دریافت اطلاعات بیماران و پرونده‌های درمانی'), 'Section 5 privacy guidance header present');
 assert(copy.includes('پاسخ به سؤالات متداول پیش از ثبت درخواست'), 'Section 6 FAQ header present');
 assert(copy.includes('بررسی بیشتر پیش از تصمیم‌گیری'), 'Section 7 return path header present');
+assert(copy.includes('href="/product-overview/"'), 'Demo page keeps a real contextual route back to /product-overview/');
 assert(copy.includes('لطفاً از وارد کردن اطلاعات بیماران یا داده‌های پزشکی خودداری کنید'), 'Explicit PHI warning in copy');
 
 // 7. No fabricated image UI
