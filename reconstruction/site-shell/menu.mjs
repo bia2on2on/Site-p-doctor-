@@ -39,6 +39,9 @@ export const footerMenu = {
     { title: 'پرونده بیمار', slug: 'patient-record-continuity' },
     { title: 'فضای کاری پزشک', slug: 'doctor-workspace' },
     { title: 'پورتال بیمار', slug: 'patient-portal' },
+    // Trust group (SITE-ARCHITECTURE §6.4): objection handling sits with the
+    // conversion item, not in the primary navigation.
+    { title: 'پرسش‌های متداول', slug: 'faq' },
     { title: 'درخواست دمو / مشاوره', slug: 'demo' },
   ],
 };

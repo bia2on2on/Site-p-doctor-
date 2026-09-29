@@ -6,7 +6,8 @@
  * Koorosh primary/footer locations, then verifies in a real browser:
  * menu existence/assignment, top-level + workflow destinations, current-page
  * state, conversion routes (/ -> /demo/, /product-overview/ -> /demo/,
- * /demo/ -> /product-overview/), mobile toggle without hover, submenu access
+ * /demo/ -> /product-overview/), footer discovery of the FAQ/objection route
+ * without adding a header item, mobile toggle without hover, submenu access
  * without hover, crawlable rendered HTML, responsive behavior and clean
  * console/network. Ephemeral wp-env only; no DB payload authoring.
  */
@@ -105,7 +106,10 @@ assert.deepEqual(footerStructure.map(i => i.title), footerMenu.items.map(i => i.
 writeFileSync(resolve(out, 'menu-structure.json'), JSON.stringify({ primary: menuStructure, footer: footerStructure }, null, 2));
 
 const workflowRoutes = primaryMenu.items.find(i => i.title === 'جریان‌های کاری').children.map(c => `/${c.slug}/`);
-const allRoutes = ['/', '/product-overview/', '/demo/', ...workflowRoutes];
+// Footer destinations: the product page, the FAQ/objection trust route and the conversion route.
+const faqRoute = '/faq/';
+const footerRoutes = ['/product-overview/', faqRoute, '/demo/'];
+const allRoutes = ['/', ...footerRoutes, ...workflowRoutes];
 
 // ---- Browser proof ----------------------------------------------------------
 const browser = await chromium.launch({ headless: true });
@@ -130,7 +134,7 @@ try {
 
   // Crawlability: the navigation is plain rendered HTML anchors, no JS-only menu.
   const rawHome = await (await visitor.request.get(base)).text();
-  for (const route of ['/product-overview/', '/demo/', ...workflowRoutes]) {
+  for (const route of [...footerRoutes, ...workflowRoutes]) {
     assert(rawHome.includes(route), `Raw homepage HTML exposes crawlable navigation to ${route}`);
   }
   assert(rawHome.includes('id="site-primary-navigation"'), 'Semantic primary nav container in raw HTML');
@@ -173,8 +177,10 @@ try {
     const footerNav = page.locator('.footer-navigation');
     assert.equal(await footerNav.count(), 1, `${name}: footer navigation present`);
     const footerHtml = await footerNav.innerHTML();
-    for (const route of ['/product-overview/', '/demo/', ...workflowRoutes]) assert(footerHtml.includes(route), `${name}: footer links to ${route}`);
-    assert.equal(await footerNav.locator('a').count(), footerMenu.items.length, `${name}: footer stays compact (7 truthful links)`);
+    for (const route of [...footerRoutes, ...workflowRoutes]) assert(footerHtml.includes(route), `${name}: footer links to ${route}`);
+    assert.equal(await footerNav.locator('a').count(), footerMenu.items.length, `${name}: footer stays compact (${footerMenu.items.length} truthful links)`);
+    const footerFaq = footerNav.getByRole('link', { name: 'پرسش‌های متداول', exact: true });
+    assert.equal(await footerFaq.getAttribute('href'), `${base}${faqRoute}`, `${name}: FAQ is discoverable from the footer`);
 
     const measures = await page.evaluate(() => ({
       width: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth,
@@ -284,6 +290,17 @@ try {
   await footerDemo.click();
   await page.waitForURL(`${base}/demo/`);
   assert.match(await page.locator('h1').innerText(), /بررسی تناسب CPMS/, 'Footer route reaches the Demo page');
+
+  // Footer discovery of the FAQ / buyer-objection page: a trust route beside the
+  // conversion route, reachable without changing the primary navigation.
+  await page.goto(base, { waitUntil: 'networkidle' });
+  const footerFaq = page.locator('.footer-navigation').getByRole('link', { name: 'پرسش‌های متداول', exact: true });
+  assert(await footerFaq.isVisible(), 'Footer FAQ link visible');
+  await footerFaq.click();
+  await page.waitForURL(`${base}${faqRoute}`);
+  assert.equal(await page.locator('h1').count(), 1, 'FAQ destination serves one H1');
+  assert.match(await page.locator('h1').innerText(), /پرسش‌های مدیران کلینیک/, 'Footer route reaches the FAQ / buyer-objection page');
+  assert.equal(await page.locator('.site-navigation a[aria-current="page"]').count(), 0, 'FAQ stays a footer trust route, not a primary-navigation item');
 
   // ---- Progressive enhancement: no JavaScript at all -------------------------
   const noJs = await browser.newContext({ reducedMotion: 'reduce', javaScriptEnabled: false });

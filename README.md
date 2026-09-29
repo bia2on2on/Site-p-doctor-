@@ -12,7 +12,7 @@
 
 ## Site shell — navigation & conversion routing
 
-WordPress-native menus (`primary`/`footer`), the Koorosh fallback sales header (identity + nav + persistent `/demo/` CTA, accessible mobile toggle and workflows submenu) and the `/` ↔ `/product-overview/` ↔ `/demo/` conversion routes are reconstructed in CI from [reconstruction/site-shell](reconstruction/site-shell/README.md) (`menu.mjs` canonical definition, `tests/browser/site-shell.mjs` runner). Elementor Pro Theme Builder location precedence is preserved.
+WordPress-native menus (`primary`/`footer`), the Koorosh fallback sales header (identity + nav + persistent `/demo/` CTA, accessible mobile toggle and workflows submenu) and the `/` ↔ `/product-overview/` ↔ `/demo/` conversion routes are reconstructed in CI from [reconstruction/site-shell](reconstruction/site-shell/README.md) (`menu.mjs` canonical definition, `tests/browser/site-shell.mjs` runner). The global FAQ / buyer-objection page (`/faq/`) is discovered from the footer trust group only, and the compact primary navigation is unchanged. Elementor Pro Theme Builder location precedence is preserved.
 
 ## Homepage — Milestone A
 
