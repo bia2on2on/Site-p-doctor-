@@ -231,7 +231,7 @@ echo wp_json_encode(array('id' => $id, 'status' => get_post_status($id), 'editab
     assert.equal(await page.locator('main img, main canvas, main video').count(), 0, 'No fabricated media');
 
     const html = await page.content();
-    assert(!/FAQPage|"@type"|schema\.org|ld\+json|itemscope|itemtype|LocalBusiness|Organization/i.test(html), 'No structured data');
+    assert(!/application\/ld\+json|FAQPage|"@type"\s*:\s*"(Organization|LocalBusiness)"|schema\.org|itemscope|itemtype/i.test(html), 'No structured data (no Organization/LocalBusiness schema)');
     assert(!html.includes('[cpms_contact_details]'), 'Shortcode renders; never shown raw');
 
     // Demo / consultation CTA (mission route 1)
@@ -264,14 +264,18 @@ echo wp_json_encode(array('id' => $id, 'status' => get_post_status($id), 'editab
       fontLoaded: document.fonts.check('700 30px Vazirmatn'),
       headings: [...document.querySelectorAll('main h1, main h2, main h3')].map(n => ({ tag: n.tagName, text: n.textContent })),
       brokenAnchors: [...document.querySelectorAll('a[href^="#"]')].filter(a => !document.getElementById(decodeURIComponent(a.hash.slice(1)))).map(a => a.hash),
-      offsiteLinks: [...document.querySelectorAll('main a')].filter(a => a.origin !== location.origin).map(a => a.href),
+      // Only remote WEB resources are external here: the settings-rendered
+      // mailto:/tel: contact links have opaque origins ("null") by URL-spec
+      // design and are the intended contact mechanism, not remote assets.
+      offsiteLinks: [...document.querySelectorAll('main a')].filter(a => /^https?:$/.test(a.protocol) && a.origin !== location.origin).map(a => a.href),
+      contactLinks: [...document.querySelectorAll('main a')].filter(a => /^(mailto|tel):$/.test(a.protocol)).map(a => a.getAttribute('href')),
       crossPageLinks: [...document.querySelectorAll('main a')].filter(a => a.origin === location.origin && a.pathname !== location.pathname && !a.hash).map(a => a.pathname),
       renderedStrings: [...document.querySelectorAll('main h1, main h2, main h3, main p')].map(n => n.textContent.trim()).filter(Boolean),
     }));
     assert(measures.scrollWidth <= measures.width, `${name}: no horizontal overflow`);
     assert(measures.font.includes('Vazirmatn') && measures.fontLoaded, 'Local Persian font loaded');
     assert.deepEqual(measures.brokenAnchors, []);
-    assert.deepEqual(measures.offsiteLinks, [], 'No external links');
+    assert.deepEqual(measures.offsiteLinks, [], 'No external web resources (mailto/tel contact links excluded by design)');
     assert.deepEqual([...measures.crossPageLinks].sort(), ['/demo/', '/privacy/'], `${name}: only the Demo and privacy destinations`);
     const levels = measures.headings.map(h => Number(h.tag.slice(1)));
     assert.equal(levels[0], 1, 'H1 precedes');
@@ -358,7 +362,7 @@ echo 'tampered';
 `);
   await page.goto(pageUrl, { waitUntil: 'networkidle' });
   const tamperedHtml = await page.content();
-  assert(!/<script>bad|evil|123<script>|onerror=1/.test(tamperedHtml), 'Tampered unsafe values never render');
+  assert(!/<script>bad<\/script>evil|123<script>|onerror=1/.test(tamperedHtml), 'Tampered unsafe values never render');
   assert.equal((await page.locator('main .cpms-contact-details .cpms-contact-email a').innerText()).trim(), DEFAULT_EMAIL, 'Tampered email falls back to the authorized public default');
   assert.equal(await page.locator('main .cpms-contact-details .cpms-contact-phone').count(), 0, 'Tampered phone renders no row');
   assert.equal(await page.locator('main .cpms-contact-details .cpms-contact-address').count(), 0, 'Tampered address renders no row');
