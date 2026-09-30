@@ -26,36 +26,6 @@
 
   const mobileNavigation = document.querySelector("#mobile-navigation");
   const desktopWorkflow = document.querySelector("#desktop-workflows");
-  const desktopHover = window.matchMedia("(hover: hover) and (min-width: 901px)");
-
-  if (desktopWorkflow) {
-    const desktopWorkflowSummary = desktopWorkflow.querySelector(":scope > summary");
-    desktopWorkflowSummary?.addEventListener("click", (event) => {
-      if (desktopHover.matches && desktopWorkflow.matches(":hover")) {
-        event.preventDefault();
-        desktopWorkflow.open = true;
-      }
-    });
-    desktopWorkflow.addEventListener("pointerenter", (event) => {
-      if (desktopHover.matches && event.pointerType === "mouse") desktopWorkflow.open = true;
-    });
-    desktopWorkflow.addEventListener("pointerleave", (event) => {
-      if (!desktopHover.matches || event.pointerType !== "mouse") return;
-      if (event.relatedTarget && desktopWorkflow.contains(event.relatedTarget)) return;
-      window.setTimeout(() => {
-        if (!desktopWorkflow.matches(":hover") && !desktopWorkflow.contains(document.activeElement)) {
-          desktopWorkflow.open = false;
-        }
-      }, 140);
-    });
-    desktopWorkflow.addEventListener("focusout", () => {
-      window.setTimeout(() => {
-        if (!desktopWorkflow.matches(":hover") && !desktopWorkflow.contains(document.activeElement)) {
-          desktopWorkflow.open = false;
-        }
-      }, 0);
-    });
-  }
 
   document.addEventListener("pointerdown", (event) => {
     if (desktopWorkflow && !desktopWorkflow.contains(event.target)) desktopWorkflow.open = false;
