@@ -5,11 +5,10 @@
 #
 # Checks:
 #   1. .wp-env.json parses as strict JSON.
-#   2. .wp-env.json pins are well-formed (core ref, Elementor plugin ZIP URL,
-#      phpVersion) so the smoke test can always derive expected versions.
-#      phpVersion must be major.minor (wp-env documents the "0.0" format;
-#      host patch levels such as 8.1.34 are not configurable, so only family
-#      parity is representable and patch-level parity is never claimed).
+#   2. .wp-env.json pins and compatibility configuration are well-formed
+#      (core ref, Elementor plugin ZIP URL, PHP family, single-site/debug/memory
+#      settings). The selected official wp-env/WordPress image path supports
+#      PHP family tags only for this setup; exact patch parity is not claimed.
 #   3. reconstruction/manifest.json parses as strict JSON and passes
 #      reconstruction/evidence validation (tests/static/validate-manifest.mjs):
 #      owner-reported host evidence with OWNER_REPORTED status, honesty
@@ -48,7 +47,7 @@ const c = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
 let bad = 0;
 const err = (m) => { console.error(m); bad = 1; };
 if (!/^WordPress\/WordPress#\d+(\.\d+)+$/.test(c.core || "")) err("core pin malformed: " + c.core);
-if (!/^\d+\.\d+$/.test(c.phpVersion || "")) err("phpVersion pin must be major.minor (wp-env format 0.0): " + c.phpVersion);
+if (!/^\d+\.\d+$/.test(c.phpVersion || "")) err("phpVersion pin must be the supported major.minor family for this official WordPress image path: " + c.phpVersion);
 if (!Array.isArray(c.plugins) || c.plugins.length !== 1) err("plugins must be the single Elementor ZIP pin");
 else if (!/^https:\/\/downloads\.wordpress\.org\/plugin\/elementor\.\d+(\.\d+)+\.zip$/.test(c.plugins[0])) err("plugins[0] must be a pinned elementor ZIP URL: " + c.plugins[0]);
 if (!Array.isArray(c.themes) || c.themes.length !== 1 || c.themes[0] !== "./themes/koorosh") err("themes must map only the standalone Koorosh theme");
@@ -57,7 +56,11 @@ const mKeys = Object.keys(m);
 if (mKeys.length !== 1 || mKeys[0] !== "wp-content/mu-plugins" || m[mKeys[0]] !== "./tests/wp-env/mu-plugins") {
   err("mappings must be exactly the CI mu-plugins bind mount (wp-content/mu-plugins -> ./tests/wp-env/mu-plugins): " + JSON.stringify(m));
 }
-if (JSON.stringify(Object.keys(c).sort()) !== JSON.stringify(["$schema", "core", "phpVersion", "plugins", "themes", "mappings"].sort())) err("unexpected/missing top-level keys: " + Object.keys(c).join(","));
+if (c.multisite !== false) err("multisite must be explicitly false for the single-site compatibility target");
+const cfg = c.config || {};
+if (cfg.WP_DEBUG !== true || cfg.WP_DEBUG_DISPLAY !== true || cfg.WP_DEBUG_LOG !== true || cfg.WP_MEMORY_LIMIT !== "40M") err("wp-env compatibility config must enable bounded diagnostics and set WP_MEMORY_LIMIT=40M");
+if (Object.hasOwn(cfg, "WP_MAX_MEMORY_LIMIT")) err("do not force the reported 4048M host maximum in GitHub CI");
+if (JSON.stringify(Object.keys(c).sort()) !== JSON.stringify(["$schema", "core", "phpVersion", "multisite", "config", "plugins", "themes", "mappings"].sort())) err("unexpected/missing top-level keys: " + Object.keys(c).join(","));
 process.exit(bad);
 ' "$root/.wp-env.json" \
 	&& ok ".wp-env.json pins are well-formed (core ref, phpVersion, single Elementor ZIP, Koorosh theme, mu-plugins mount)" \
@@ -96,18 +99,33 @@ else
 fi
 
 # ---- 4. Workflow YAML parses ---------------------------------------------------
+yaml_parser="python"
 if ! python3 -c 'import yaml' 2>/dev/null; then
 	echo "PyYAML not present; installing pyyaml (host-local, not committed)"
-	python3 -m pip install --quiet --user pyyaml >/dev/null 2>&1 || {
-		echo "SKIP: could not make PyYAML available; workflow YAML not parsed here (GitHub still parses workflows at push time)"
-	}
+	python3 -m pip install --quiet --user pyyaml >/dev/null 2>&1 || true
 fi
-if python3 -c 'import yaml' 2>/dev/null; then
+
+yaml_tmp=""
+if ! python3 -c 'import yaml' 2>/dev/null; then
+	yaml_parser="js-yaml"
+	yaml_tmp="$(mktemp -d)"
+	if ! npm install --prefix "$yaml_tmp" --no-save --no-package-lock --ignore-scripts js-yaml@4.1.0 >/dev/null 2>&1; then
+		rm -rf "$yaml_tmp"
+		yaml_tmp=""
+		yaml_parser=""
+	fi
+fi
+if [ -n "$yaml_parser" ]; then
 	yaml_bad=0
 	yaml_files=0
 	while IFS= read -r -d '' f; do
 		yaml_files=$((yaml_files + 1))
-		if python3 -c 'import sys, yaml; yaml.safe_load(open(sys.argv[1], encoding="utf-8"))' "$f" 2>/dev/null; then
+		if [ "$yaml_parser" = "python" ]; then
+			python3 -c 'import sys, yaml; yaml.safe_load(open(sys.argv[1], encoding="utf-8"))' "$f" 2>/dev/null
+		else
+			node -e 'const yaml=require(process.argv[1]); yaml.load(require("fs").readFileSync(process.argv[2], "utf8"));' "$yaml_tmp/node_modules/js-yaml" "$f" 2>/dev/null
+		fi
+		if [ "$?" -eq 0 ]; then
 			echo "PASS: YAML parses: ${f#"$root"/}"
 		else
 			echo "FAIL: YAML does not parse: ${f#"$root"/}"
@@ -117,11 +135,12 @@ if python3 -c 'import yaml' 2>/dev/null; then
 	if [ "$yaml_files" -eq 0 ]; then
 		ko "no workflow YAML files found under .github/workflows (nothing validated)"
 	else
-		[ "$yaml_bad" -eq 0 ] && ok "all $yaml_files workflow YAML file(s) parse" || ko "workflow YAML failed to parse"
+		[ "$yaml_bad" -eq 0 ] && ok "all $yaml_files workflow YAML file(s) parse with $yaml_parser" || ko "workflow YAML failed to parse"
 	fi
 else
-	ko "workflow YAML check NOT RUN (no YAML parser available)"
+	ko "workflow YAML check NOT RUN (PyYAML and pinned js-yaml parser unavailable)"
 fi
+[ -z "$yaml_tmp" ] || rm -rf "$yaml_tmp"
 
 # ---- 5. Design tokens + artifact integrity ------------------------------------
 if node "$root/tests/static/validate-tokens.mjs"; then
@@ -135,6 +154,12 @@ if node "$root/tests/static/validate-manifest.mjs"; then
 	ok "host evidence, sentinels and CI/host version parity validated (tests/static/validate-manifest.mjs)"
 else
 	ko "manifest evidence/parity validation failed (tests/static/validate-manifest.mjs)"
+fi
+
+if node "$root/tests/static/validate-reference-host-compatibility.mjs"; then
+	ok "reference-host compatibility CI boundaries, parity gaps and runtime checks are validated"
+else
+	ko "reference-host compatibility CI static validation failed"
 fi
 
 if node "$root/tests/static/validate-homepage.mjs"; then
@@ -292,6 +317,12 @@ if node --check "$root/tests/browser/theme-settings.mjs"; then
 	ok "theme-settings.mjs module syntax (node --check)"
 else
 	ko "theme-settings.mjs syntax check failed"
+fi
+
+if node --check "$root/tests/wp-env/reference-host-compatibility.mjs"; then
+	ok "reference-host-compatibility.mjs module syntax (node --check)"
+else
+	ko "reference-host-compatibility.mjs syntax check failed"
 fi
 
 printf '== Static validation result: %s passed, %s failed ==\n' "$pass" "$fail"

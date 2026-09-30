@@ -127,6 +127,8 @@ These CI pins are aligned to owner-reported evidence but remain **CI evidence on
 
 **NOT TESTED / NOT PROVEN by this slice:** the smoke ran locally only as far as graceful-failure error paths (sandbox has no Docker/PHP; full run is proven by GitHub Actions, see PR report); Elementor Pro; agent-verified host acceptance; PHP patch-level parity (8.1.34); database and web-server parity; kit export/import (canonical reconstruction pilot §4); browser/visual/RTL behavior; performance. No marketing page, design system, header/footer, theme, or product claim is implemented here.
 
+**Update:** the preceding §5.1 state is the 2026-09-28 foundation snapshot. The later bounded runtime/browser evidence, RTL checks and host-parity limitations are recorded in §10 (2026-09-30); §10 does not change the separate Pro/kit/real-host acceptance gates.
+
 ## 6. Security / environment notes (recorded 2026-09-28)
 
 - **Debug Mode:** ACTIVE on the test host is acceptable **only as current test-host evidence** (owner-reported). Production/public launch requires debug exposure to be disabled or configured safely (no publicly displayed PHP/WordPress errors, no debug endpoints reachable by visitors).
@@ -214,3 +216,53 @@ Titles and meta descriptions come from the existing page conventions (`pageIdent
 **Business input still required before launch:** the final production domain and host form (protocol, www vs non-www, trailing slash); the environment-protection method for staging; real business identity/contact facts if any `Organization` markup is ever wanted; formal legal review (`LEGAL REVIEW REQUIRED BEFORE PUBLIC LAUNCH`) and unprovided corporate/legal facts (`BUSINESS/LEGAL INPUT REQUIRED`) for `/privacy/` and `/terms/`.
 
 **CI limit (unchanged):** green checks prove the ephemeral test environment at an exact SHA. They are **not** production crawling/indexing proof and **not** publication authorization.
+
+## 10. Reference-host compatibility CI / host-parity simulation (2026-09-30)
+
+**Status:** a bounded compatibility phase now runs at the end of the existing clean `wp-env` job. Its label is **REFERENCE-HOST COMPATIBILITY CI / HOST-PARITY SIMULATION**. It is not real-host acceptance, production verification, Elementor Pro acceptance, or LiteSpeed verification. The owner-reported host remains **OWNER-REPORTED — NOT INDEPENDENTLY VERIFIED BY AGENT**. The phase reuses the existing WordPress 7.1.2 + Elementor Free 4.3.2 environment and existing page-editor/Theme Settings browser suites; it does not create a second WordPress stack or expand the normal CI matrix.
+
+**Official sources checked 2026-09-30 UTC:**
+
+- [`@wordpress/env` reference](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/): documents `core`, `phpVersion`, `multisite`, `config`, plugin/theme mappings and custom config files. The documented config has no database engine/image/version field. It documents the Docker runtime and identifies Playground as experimental (and SQLite-based), so Playground was not substituted for MariaDB.
+- [`@wordpress/env@11.16.0` source, locked by this repository](https://github.com/WordPress/gutenberg/tree/56d8058eda6e30c4cc8bfc37818fa6ed972f7dc2/packages/env): generated Docker configuration uses `mariadb:lts`; PHP selection becomes `wordpress:php<phpVersion>`. This project pins `8.1`, reads actual `PHP_VERSION` at runtime, and records **FAMILY_ONLY**. Although source validation can accept a three-component string, that does not create an exact PHP patch image; the selected official WordPress image path exposes the PHP family tag, not a demonstrated `8.1.34` runtime image. No exact patch claim is made.
+- [Docker Official MariaDB tags](https://hub.docker.com/_/mariadb/tags?name=11.4.13): an exact `11.4.13` tag is available. It is **not** consumed because the supported `wp-env` configuration/source defaults to `mariadb:lts` and offers no database-image override. A custom Compose overlay solely to pin one patch would add an unsupported orchestration layer, so report **NO EXACT DB PARITY** and collect `SELECT VERSION()` informationally instead.
+- [Docker Official WordPress tags](https://hub.docker.com/_/wordpress/tags): image variants are published by PHP family/flavor in the selected `wp-env` path; the workflow does not fabricate an exact PHP 8.1.34 tag.
+- [WordPress requirements](https://wordpress.org/about/requirements/): current recommendations list PHP 8.3+ and MariaDB 10.11+ / MySQL 8.0+. The owner-reported values and the pinned CI runtime are compatibility evidence, not a recommendation that a public launch use legacy versions.
+- [Elementor system requirements](https://elementor.com/help/requirements/): WordPress 6.5+, PHP 7.4+ and a 256 MB WordPress memory limit (512 MB recommended; 768 MB best performance) are currently documented. The owner-reported `WP_MEMORY_LIMIT=40M` is below that vendor-stated Elementor memory requirement. CI sets the same WordPress constant to 40M but does **not** lower the PHP/container memory ceiling; its report includes `WP_MAX_MEMORY_LIMIT` and `ini_get('memory_limit')`. Therefore this does not prove Elementor is safe under an effective 40 MB process limit. This is an explicit host risk to resolve before launch, not a reason to force the reported 4048M maximum into GitHub CI.
+- [Elementor theme location registration](https://developers.elementor.com/docs/themes/registering-locations/): Koorosh uses the documented public registration action and `register_location()` method with object/method guards. Header/footer rendering checks `function_exists('elementor_theme_do_location')` and retains the WordPress/Koorosh fallback when Pro is absent. Static guards plus normal Free-theme frontend requests prove safe absence, not a Pro Theme Builder runtime.
+
+### 10.1 What the compatibility phase executes
+
+- Reuses the existing exact WordPress 7.1.2 and free Elementor 4.3.2 pins, existing 12-page native Elementor reconstruction/editor save-and-reload tests, and existing Theme Settings assertions; it checks the resulting runtime pages again after applying the blog-post permalink setting.
+- Makes single-site intent explicit (`multisite: false`), installs/activates `fa_IR`, checks `get_locale()`, `is_rtl()`, frontend `lang`/`dir`, Persian Settings labels and an RTL admin document. It configures `Asia/Tehran` and checks the observed `+03:30` offset as **SIMULATED** behavior; this does not establish the host's exact timezone option.
+- Sets the exact reported post permalink pattern `/index.php/%year%/%monthnum%/%day%/%postname%/`, creates one disposable synthetic dated post and requests its generated URL. It separately rechecks all canonical marketing-page routes (including `/demo/`) so blog permalinks do not gain an `index.php` prefix.
+- Enables `WP_DEBUG`, `WP_DEBUG_DISPLAY`, and `WP_DEBUG_LOG` in the disposable runtime. It checks selected rendered pages for visible PHP diagnostic markers and, when readable, scans only new debug-log entries attributable to Koorosh; an unreadable log is explicitly recorded as NOT_TESTED. This is scoped observability for tested flows, not a proof of no runtime issues.
+- Models `WP_MEMORY_LIMIT=40M`; does not set `WP_MAX_MEMORY_LIMIT=4048M`, alter GitHub runner limits, or claim equivalent effective PHP memory. Runtime values are recorded.
+- Checks PHP `ZipArchive`/ZIP and GD availability and versions. **ZIP RUNTIME SMOKE** creates, opens, and extracts a synthetic archive. A synthetic GD smoke creates and reads a tiny PNG. Neither is an Elementor kit import test, and neither disproves the historical `Invalid or uninitialized Zip object` import report.
+- Rechecks active/standalone Koorosh metadata, no Hello parent, local Vazirmatn font responses, fallback shell, registered menu locations, Elementor Free activation/version, persisted Elementor-authored pages, and Theme Settings default-off/recipient/environment-gate/no-secret/RTL evidence.
+- Does not send email; existing lead tests remain synthetic and intercepted. No SMTP, inbox, host network, Elementor Library login, Pro package, private URL, license, clean Pro kit import, or Pro-only Theme Builder template is accessed.
+
+### 10.2 Parity record and feature-flag triage
+
+The machine-readable status record lives in `reconstruction/manifest.json` → `reference_host_compatibility_ci`. Statuses are strictly `EXACT`, `FAMILY_ONLY`, `SIMULATED`, `NOT_TESTED`, or `NOT_APPLICABLE`; CI test success is recorded separately and is never used to relabel an untested host dimension. GitHub uploads a SHA-bound concise `README.md` plus `report.json` to the `reference-host-compatibility-<exact-head-sha>` artifact (14-day retention).
+
+| Dimension | Declared status | Evidence / exact limitation |
+|---|---|---|
+| Operating system | **SIMULATED** | GitHub `ubuntu-latest` is Linux; distribution/kernel/filesystem parity is not claimed. |
+| WordPress | **EXACT** | CI pins and runtime asserts 7.1.2; not agent-verified on owner host. |
+| Elementor Free | **EXACT** | CI pins/runtime asserts 4.3.2; native page/editor persistence tested. It does not imply Pro. |
+| PHP | **FAMILY_ONLY** | CI selects 8.1 and records actual patch at runtime; no exact 8.1.34 parity. |
+| Database | **SIMULATED; exact version NOT_TESTED** | wp-env default `mariadb:lts`, runtime version logged; **NO EXACT DB PARITY** with 11.4.13. |
+| LiteSpeed | **NOT_TESTED** | wp-env uses the official WordPress Docker web-server image; no LiteSpeed substitute or claim. |
+| Elementor Pro 4.3.0 | **NOT_TESTED** | No public Pro package/license/private download; Pro acceptance remains a host/private gate. |
+| Single-site / fa_IR | **EXACT** | Explicit single-site config, language pack install, locale and RTL checks in CI. |
+| Tehran timezone / rewrite routing | **SIMULATED** | Reported offset and exact permalink setting modeled; actual routes are exercised on Apache, not LiteSpeed. |
+| Koorosh / Theme Settings | **SIMULATED** | Standalone theme, metadata, fonts, fallback, option model, safe defaults, dual gate, no secret storage and Persian RTL admin exercised. |
+| ZIP / GD | **SIMULATED** | Extension/version and synthetic behavior evidence only. **ZIP RUNTIME SMOKE is not an Elementor import proof.** |
+| Host network, SMTP/inbox, Library, clean Pro kit import | **NOT_TESTED** | Explicitly remains untested; CI performs no real email or external host access. |
+
+Feature triage is in the same record: stable native **Containers** and nested containers are used by recipes and editor save/reload; standard viewport behavior is exercised without requiring additional custom breakpoints. Optimized markup is observed only through normal rendered output, not pinned as a feature flag. Atomic widgets, Editor V4, Atomic Form, Loop, Elementor Menu and additional custom breakpoints are not current hard dependencies. WordPress menus are tested instead of Elementor Menu; the Demo flow is the theme-owned shortcode, not Atomic Form. Theme Builder is Pro-dependent and **NOT_TESTED**; Koorosh's public integration is statically guarded and Free fallback rendering is exercised. Custom kit import/export is **NOT_TESTED**; there is no kit fixture. No unstable/version-sensitive feature flag is forced on to manufacture parity.
+
+### 10.3 What green compatibility CI does not prove
+
+A green run proves only the assertions against the ephemeral GitHub-hosted wp-env stack at the tested commit. It does not verify the owner-reported host facts, PHP patch-level behavior, exact MariaDB version, LiteSpeed rewrites/cache, actual host networking, SMTP/inbox delivery, connected Elementor Library, Elementor Pro 4.3.0, Pro Theme Builder rendering, or a clean Pro kit import. It also does not establish production safety, legal approval, public indexing, or launch authorization. The separate `clean_import_pilot` and `authorized_pro_host_acceptance` sentinels remain **NOT RUN**.

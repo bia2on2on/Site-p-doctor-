@@ -128,7 +128,7 @@ for (const rel of scanned) {
   // Nothing in the site composition may hardcode an absolute site origin.
   for (const url of body.match(/https?:\/\/[^\s"'`)>\]]+/g) || []) {
     const host = new URL(url).host;
-    const allowed = ['github.com', 'www.gnu.org', 'scripts.sil.org', 'elementor.com', 'developers.elementor.com', 'developers.google.com', 'schemas.wp.org', 'wordpress.org', 'developer.wordpress.org', 'downloads.wordpress.org'];
+    const allowed = ['github.com', 'www.gnu.org', 'scripts.sil.org', 'elementor.com', 'developers.elementor.com', 'developers.google.com', 'schemas.wp.org', 'wordpress.org', 'developer.wordpress.org', 'downloads.wordpress.org', 'hub.docker.com'];
     assert(allowed.includes(host), `Only documentation/licence hosts may appear in committed files: ${rel} → ${url}`);
   }
 }
