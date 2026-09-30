@@ -111,7 +111,7 @@ curl --silent --output /dev/null -c "$jar" -b 'wordpress_test_cookie=WP%20Cookie
 # Warm-up: Elementor redirects the FIRST admin load (onboarding); follow it once so the settings request is direct.
 warm="$(mktemp)"
 curl --silent --location -b "$jar" -c "$jar" "$BASE_URL/wp-admin/" > "$warm"
-grep -aq 'id="wpadminbar"' "$warm" && ok "admin login succeeded (disposable wp-env admin)" || ko "admin login failed or admin bar missing"
+# (No assertion here: the landing page may be Elementor's onboarding. Authentication is proven by the settings screen returning 200 below; an anonymous request would redirect.)
 rm -f "$warm"
 page="$(mktemp)"
 pcode="$(curl --silent --output "$page" --write-out '%{http_code}' -b "$jar" "$BASE_URL/wp-admin/admin.php?page=koorosh-settings")"
