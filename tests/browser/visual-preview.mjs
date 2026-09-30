@@ -1,7 +1,7 @@
 /** Direct Playwright review of the isolated HTML design preview (no WordPress runtime). */
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
-import { createReadStream, existsSync, statSync } from 'node:fs';
+import { createReadStream, existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -50,7 +50,7 @@ await new Promise((resolveListen, reject) => {
 });
 const address = server.address();
 const base = `http://127.0.0.1:${address.port}`;
-const browser = await chromium.launch({ headless: true });
+let browser;
 const diagnostics = { consoleErrors: [], pageErrors: [], failedRequests: [], badResponses: [], externalRequests: [] };
 
 function watch(page) {
@@ -70,6 +70,7 @@ async function assertNoOverflow(page, label) {
 }
 
 try {
+  browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 1366, height: 900 } });
   watch(page);
   let response = await page.goto(`${base}/index.html`, { waitUntil: 'networkidle' });
@@ -195,7 +196,16 @@ try {
   assert.deepEqual(diagnostics.pageErrors, [], `no browser page errors: ${diagnostics.pageErrors.join(' | ')}`);
 
   console.log('PASS: interactive visual preview (responsive widths, mobile/desktop navigation, CTA, scroll motion, reduced motion, Settings tabs, no-JavaScript fallback, no external requests/errors)');
+} catch (error) {
+  const detail = String(error?.stack || error).replaceAll(process.cwd(), "<workspace>").slice(0, 6000);
+  const artifactDir = resolve(import.meta.dirname, "artifacts/visual-preview");
+  mkdirSync(artifactDir, { recursive: true });
+  writeFileSync(resolve(artifactDir, "failure.txt"), `${detail}\n\nDiagnostics: ${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
+  const annotation = detail.replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
+  console.error(`::error title=Interactive visual preview::${annotation}`);
+  console.error(detail);
+  process.exitCode = 1;
 } finally {
-  await browser.close();
+  if (browser) await browser.close();
   await new Promise((resolveClose, rejectClose) => server.close((error) => error ? rejectClose(error) : resolveClose()));
 }
