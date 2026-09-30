@@ -2,13 +2,23 @@
  * Progressive enhancement for CPMS Demo Qualification Form.
  *
  * When JavaScript is active, intercepts submit for instant accessible feedback
- * without full page reload. Focuses error summary or non-live notice.
+ * without full page reload. Focuses error summary or the delivery-state notice.
+ * All user-facing wording comes from the server response (single source of
+ * truth), including the terminal delivery states:
+ *   - delivery_disabled  (safe non-live mode; nothing sent or stored)
+ *   - handoff_accepted   (mail layer accepted the handoff only)
+ *   - handoff_failed     (server-side handoff failed; shown as an error)
  * Falls back naturally to standard HTTP POST if JavaScript is disabled.
  */
 document.addEventListener('DOMContentLoaded', function () {
   var form = document.getElementById('cpms-demo-form');
   var wrapper = document.getElementById('cpms-demo-form-wrapper');
   if (!form || !wrapper) return;
+
+  // Fallbacks mirror the safe non-live mode wording; the server response
+  // overrides them whenever it provides title/message.
+  var FALLBACK_TITLE = 'درخواست آزمایشی شما با موفقیت بررسی شد';
+  var FALLBACK_MESSAGE = 'با توجه به وضعیت پیش‌نمایش فنی سایت، تحویل زندهٔ لیدها به ایمیل یا CRM هنوز فعال نشده و هیچ داده‌ای ذخیره یا ارسال نگردید. پس از اتصال نهایی کانال رسمی ارتباطی، درخواست‌های واقعی دریافت خواهند شد.';
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -49,6 +59,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (result.ok && result.data && result.data.success) {
+          var payload = (result.data && result.data.data) || {};
+
           var notice = document.createElement('div');
           notice.className = 'cpms-form-notice cpms-form-notice--success';
           notice.id = 'cpms-form-success-notice';
@@ -58,13 +70,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
           var title = document.createElement('p');
           title.className = 'cpms-form-notice__title';
-          title.innerHTML = '<strong>درخواست آزمایشی شما با موفقیت بررسی شد</strong>';
+          var titleStrong = document.createElement('strong');
+          titleStrong.textContent = payload.title || FALLBACK_TITLE;
+          title.appendChild(titleStrong);
           notice.appendChild(title);
 
           var desc = document.createElement('p');
           desc.className = 'cpms-form-notice__desc';
-          desc.textContent = (result.data.data && result.data.data.message) ||
-            'با توجه به وضعیت پیش‌نمایش فنی سایت، تحویل زندهٔ لیدها به ایمیل یا CRM هنوز فعال نشده و هیچ داده‌ای ذخیره یا ارسال نگردید. پس از اتصال نهایی کانال رسمی ارتباطی، درخواست‌های واقعی دریافت خواهند شد.';
+          desc.textContent = payload.message || FALLBACK_MESSAGE;
           notice.appendChild(desc);
 
           form.parentNode.insertBefore(notice, form);
@@ -83,7 +96,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
           var sumTitle = document.createElement('p');
           sumTitle.className = 'cpms-form-notice__title';
-          sumTitle.innerHTML = '<strong>' + globalMessage + '</strong>';
+          var sumStrong = document.createElement('strong');
+          sumStrong.textContent = globalMessage;
+          sumTitle.appendChild(sumStrong);
           summary.appendChild(sumTitle);
 
           var fieldKeys = Object.keys(errors);
@@ -93,23 +108,31 @@ document.addEventListener('DOMContentLoaded', function () {
             fieldKeys.forEach(function (fieldKey) {
               var errText = errors[fieldKey];
               var li = document.createElement('li');
-              var a = document.createElement('a');
-              a.href = '#cpms-field-' + fieldKey;
-              a.textContent = errText;
-              li.appendChild(a);
+
+              if (fieldKey === 'global') {
+                // Global (non-field) failure: no anchor, the message stands alone.
+                li.textContent = errText;
+              } else {
+                var a = document.createElement('a');
+                a.href = '#cpms-field-' + fieldKey;
+                a.textContent = errText;
+                li.appendChild(a);
+              }
               list.appendChild(li);
 
-              var fieldDiv = document.getElementById('cpms-field-' + fieldKey);
-              if (fieldDiv) {
-                var input = fieldDiv.querySelector('input, select, textarea');
-                if (input) {
-                  input.setAttribute('aria-invalid', 'true');
-                  var errP = document.createElement('p');
-                  errP.id = 'cpms-err-' + fieldKey.replace(/_/g, '-');
-                  errP.className = 'cpms-form-error';
-                  errP.setAttribute('role', 'alert');
-                  errP.textContent = errText;
-                  fieldDiv.appendChild(errP);
+              if (fieldKey !== 'global') {
+                var fieldDiv = document.getElementById('cpms-field-' + fieldKey);
+                if (fieldDiv) {
+                  var input = fieldDiv.querySelector('input, select, textarea');
+                  if (input) {
+                    input.setAttribute('aria-invalid', 'true');
+                    var errP = document.createElement('p');
+                    errP.id = 'cpms-err-' + fieldKey.replace(/_/g, '-');
+                    errP.className = 'cpms-form-error';
+                    errP.setAttribute('role', 'alert');
+                    errP.textContent = errText;
+                    fieldDiv.appendChild(errP);
+                  }
                 }
               }
             });

@@ -3,13 +3,28 @@
   "canonical_recipe": "reconstruction/demo/recipe.mjs",
   "claim_register": "reconstruction/demo/claims.md",
   "browser_runner": "tests/browser/demo.mjs",
+  "delivery_runner": "tests/browser/demo-delivery.mjs",
   "seo": {
     "title": "درخواست دمو و مشاوره | CPMS",
     "description_source": "WordPress page excerpt via existing Koorosh mechanism",
     "plugin": "none"
   },
-  "conversion": "Assisted-sale qualification; safe non-live test mode; delivery destination NOT AUTHORIZED",
-  "delivery_destination": "NOT CONFIGURED / NOT AUTHORIZED — launch blocker",
+  "conversion": "Assisted-sale qualification; delivery default OFF with environment-owned activation; live host activation NOT DONE",
+  "lead_delivery": {
+    "authorized_recipient": "biatoweb@gmail.com",
+    "default_state": "OFF — safe non-live mode (no mail, no persistence, no logging)",
+    "activation": "environment-owned wp-config constant CPMS_LEAD_DELIVERY_ENABLED (boolean true); theme never defines it",
+    "transport": "WordPress-native wp_mail only; SMTP/deliverability configuration is environment-owned and outside Git",
+    "states": [
+      "validation_failure",
+      "delivery_disabled",
+      "handoff_accepted",
+      "handoff_failed"
+    ],
+    "persistence": "none — submissions are never stored in the WordPress database or logs",
+    "inbox_delivery": "NOT VERIFIED — wp_mail acceptance proves mail-layer handoff only",
+    "live_host_activation": "NOT DONE — requires an explicit environment decision plus real host acceptance"
+  },
   "form_fields": [
     "cpms_contact_name",
     "cpms_org_name",

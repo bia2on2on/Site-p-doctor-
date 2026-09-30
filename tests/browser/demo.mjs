@@ -199,9 +199,16 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
 
     // Qualification Form & Banners check
     assert.equal(await page.locator('#cpms-demo-form-wrapper').count(), 1, 'Form wrapper present');
-    assert.equal(await page.locator('#cpms-non-live-banner').count(), 1, 'Technical preview notice present');
+    assert.equal(await page.locator('#cpms-non-live-banner').count(), 1, 'Technical preview notice present (default delivery OFF)');
     assert.equal(await page.locator('#cpms-privacy-banner').count(), 1, 'Privacy guidance banner present');
+    assert.equal(await page.locator('#cpms-data-use-note').count(), 1, 'Minimal data-use disclosure present beside the form');
+    assert((await page.locator('#cpms-data-use-note').innerText()).includes('اطلاعات بیماران یا داده‌های پزشکی وارد نکنید'), 'Data-use disclosure repeats the PHI prohibition');
     assert.equal(await page.locator('form#cpms-demo-form').count(), 1, 'Form element present');
+    const honeypot = page.locator('#cpms-website-url');
+    assert.equal(await honeypot.count(), 1, 'Honeypot field present exactly once');
+    assert(!(await honeypot.isVisible()), 'Honeypot field hidden from users');
+    assert.equal(await honeypot.evaluate(el => el.tabIndex), -1, 'Honeypot not keyboard focusable');
+    assert.equal(await page.locator('div.cpms-form-honeypot[hidden][aria-hidden="true"]').count(), 1, 'Honeypot container hidden and aria-hidden');
 
     // All 6 qualification fields and their programmatic labels
     const fieldChecks = [
