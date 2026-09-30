@@ -8,10 +8,13 @@
  *
  *   DEVELOPMENT EXPECTATION (must hold now, in CI)
  *     blog_public = 0; every real page carries a core `noindex` robots meta and
- *     the theme's `X-Robots-Tag: noindex, nofollow` header; core serves a
- *     `Disallow: /` robots.txt; the core sitemap is not served; exactly one
- *     canonical per page pointing at the environment's own home_url; a missing
- *     route is a real HTTP 404 with a usable recovery page.
+ *     the theme's `X-Robots-Tag: noindex, nofollow` header — those are the
+ *     indexing-control mechanisms actually tested. The development robots.txt
+ *     response is observed and recorded as evidence (crawl guidance, not the
+ *     indexing guarantee), with only policy invariants asserted. The core
+ *     sitemap is not served; exactly one canonical per page pointing at the
+ *     environment's own home_url; a missing route is a real HTTP 404 with a
+ *     usable recovery page.
  *
  *   FUTURE PRODUCTION EXPECTATION (simulated here, NOT authorized, NOT proven)
  *     Flipping the single core switch `blog_public` to 1 — an explicit
@@ -333,7 +336,7 @@ try {
 
   await context.close();
   diagnostic.result = 'PASS';
-  console.log('::notice title=SEO foundation::PASS: development non-indexability (blog_public=0 + core noindex meta + X-Robots-Tag + core Disallow robots.txt + no sitemap), one environment-derived canonical per page, unique titles/descriptions, single H1, crawlable anchors, real 404 with recovery, single-hop trailing-slash redirect, no structured data, no staging-host leak; launch switch simulated and restored. CI evidence only — NOT production indexing proof.');
+  console.log('::notice title=SEO foundation::PASS: development non-indexability from the mechanisms actually tested (blog_public=0 + core noindex robots meta + X-Robots-Tag noindex header + no core sitemap); development robots.txt response observed/recorded with policy invariants asserted (crawl guidance, not the indexing guarantee), one environment-derived canonical per page, unique titles/descriptions, single H1, crawlable anchors, real 404 with recovery, single-hop trailing-slash redirect, no structured data, no staging-host leak; launch switch simulated and restored. CI evidence only — NOT production indexing proof.');
 } catch (error) {
   diagnostic.result = 'FAIL';
   diagnostic.error = String(error.stack || error);
