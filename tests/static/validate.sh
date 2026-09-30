@@ -198,6 +198,12 @@ else
 	ko "Site-shell navigation guardrails failed"
 fi
 
+if node "$root/tests/static/validate-seo-foundation.mjs"; then
+	ok "Technical-SEO foundation guardrails (metadata audit, staging-leak scan, canonical/robots/sitemap ownership, utility 404, structured-data omission)"
+else
+	ko "Technical-SEO foundation guardrails failed"
+fi
+
 if node --check "$root/themes/koorosh/nav.js"; then
 	ok "nav.js classic-script syntax (node --check)"
 else

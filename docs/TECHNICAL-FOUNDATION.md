@@ -129,3 +129,58 @@ Executing this pilot is explicitly **out of scope for the environment-alignment 
 ## 8. Homepage-only Free reconstruction exception (2026-09-28)
 
 The explicit Milestone A task authorizes version-insensitive homepage work without retrying the inaccessible Pro host pilot. This narrows the historical pilot gating statement for **this slice only**; `clean_import_pilot` and `authorized_pro_host_acceptance` stay **NOT RUN**. The homepage uses a Git-owned authoring recipe and the documented public Elementor editor Commands API in a clean Free wp-env runtime, not a fabricated kit or private database payload. See [`reconstruction/homepage/README.md`](../reconstruction/homepage/README.md) for vendor evidence, native-control validation, exact reconstruction and limitations. The full-site canonical Website Template/Kit contract is unchanged; this is not a successful kit pilot or host acceptance.
+
+## 9. Technical-SEO / launch-hardening foundation (2026-09-29)
+
+**This section is evidence, not authorization.** The site stays intentionally non-public and intentionally non-indexed (`ROADMAP §3`, `PRODUCT-TRUTH §1`, `SITE-ARCHITECTURE §19.1`). Nothing here opens the Publication Gate, and no production domain is established: `begoobehesh.ir` remains an **owner-reported TEST host** and is deliberately absent from every committed site file (enforced by `tests/static/validate-seo-foundation.mjs`).
+
+**Official documentation consulted (retrieved 2026-09-29 UTC, no model memory used for current-sensitive rules):** Google Search Central — *Block Search indexing with `noindex`* (meta robots and `X-Robots-Tag` are the two supported implementations; robots.txt `noindex` is not supported), *Introduction to robots.txt* (robots.txt manages crawling and is explicitly **not** a mechanism for keeping a page out of Google), *How to specify a canonical URL with `rel="canonical"` and other methods*, *What is a sitemap*, *How to write meta descriptions*, *Link best practices for Google* (crawlable `<a href>`), *How HTTP status codes affect Google's crawlers* (all `4xx` content is treated as non-existent). WordPress — core `rel_canonical()` on `wp_head`, core `wp_robots` noindex for non-public sites, core XML sitemaps (`wp_sitemaps_enabled`, default enabled for public sites only).
+
+### 9.1 Indexability model (exact, layered, non-contradictory)
+
+| Mechanism | What it actually does | State today |
+|---|---|---|
+| WordPress `blog_public` option | The **single switch**. 0 ⇒ core prints `noindex, nofollow` robots meta and serves a `Disallow: /` robots.txt, and core sitemaps are disabled | **0** in wp-env/CI; asserted by tests |
+| `<meta name="robots" content="noindex">` | Indexing control that Google supports — only effective if the page is crawled | Present on every rendered page in dev |
+| `X-Robots-Tag: noindex, nofollow` HTTP header (Koorosh, `wp_headers`) | Same `noindex` rule in the other form Google documents; covers non-HTML responses | Added **only while `blog_public` is 0** |
+| robots.txt (WordPress core, no committed rule) | **Crawl** control, not an indexing control | Whatever the running core version serves for a non-public site; the exact directive set is **recorded from the live response in CI evidence**, not asserted from memory. CI asserts only the policy-relevant invariants: no sitemap advertised while non-public, and no blanket `Disallow: /` surviving the launch switch |
+| Authenticated / non-public environment | The only robust protection for a non-public site | **NOT IMPLEMENTED HERE, NOT CLAIMED** — hosting/environment decision (`SITE-ARCHITECTURE §19.1`, R3) |
+
+**Honest limit, stated per Google's own documentation:** robots.txt alone does **not** prevent indexing, and a crawler that obeys `Disallow: /` never reads the `noindex` meta or header. The layers above are defence in depth for a development environment; they are not a substitute for the environment itself being non-public.
+
+**Launch activation is a configuration decision, not a code change:** flip `blog_public` to 1 on the production environment. The repository has no indexable default and no theme code that flips the switch. CI simulates that flip inside the disposable container (`tests/browser/seo-foundation.mjs`) purely to prove the development posture cannot become a permanent launch blocker, then restores `blog_public = 0` and re-asserts the non-indexed state.
+
+### 9.2 Canonical, sitemap, robots, 404
+
+- **Canonical:** WordPress-native `rel_canonical()` only — one tag per page, derived from the environment's own `home_url`, so no development or staging URL can ever be committed as a production canonical. The theme neither prints nor removes a canonical, and **no SEO plugin is installed** for canonicals. CI asserts exactly one canonical tag per real page and that it equals the page's own permalink.
+- **Sitemap:** WordPress-native core sitemaps, unmodified. Disabled while the site is non-public (consistent with intentional non-indexing) and available after the launch switch — verified in the CI simulation, including that the reconstructed pages appear and that no utility/reconstruction artifact is represented as public content. Any environment fixture content that appears (for example default sample content or user archives) is recorded in the CI artifact as a **production launch-checklist item**, not asserted away. **No plugin was added for a sitemap.**
+- **Robots:** core behaviour, unchanged, driven only by `blog_public`. No custom robots.txt rule is committed, so no rule can survive into production and silently block launch. The development response body is captured in the CI artifact (`tests/browser/artifacts/seo-foundation/results.json`) as the authoritative record of what this WordPress version actually serves; CI additionally proves the file changes with the launch switch and then returns byte-for-byte to its development form.
+- **404:** `themes/koorosh/404.php` — a **theme utility page** (not Elementor-composed; the current architecture composes marketing pages from recipes and a missing-route handler must work with no page at all). Real HTTP 404 status, Persian recovery message, normal shell/navigation, links to Homepage plus Product Overview and Demo resolved from **real existing pages only**, no search UI, no marketing claim. Soft-404 and fallback-to-home behaviour are asserted against.
+
+### 9.3 Metadata and structured-data decisions
+
+Titles and meta descriptions come from the existing page conventions (`pageIdentity.title` → post title → `title-tag`; `pageIdentity.description` → page excerpt → the existing Koorosh `meta description` output). The audit found one real gap: WordPress core uses the **site name** as the front-page document title, leaving the Homepage without its authored title. Fixed with the core `document_title_parts` filter (no plugin, no second `<title>`). No copy was rewritten for keywords; anti-cannibalization is enforced by test — **Product Overview alone** carries the primary clinic/practice-management head cluster in its title.
+
+**Structured data remains entirely absent** (no JSON-LD, no microdata). FAQ structured data stays omitted under the already accepted current-Google decision (`reconstruction/faq/claims.md`), and no `Organization` markup is added because no verified business identity/contact facts exist. This slice added none.
+
+### 9.4 Status ledger
+
+| Item | IMPLEMENTED IN REPOSITORY / CI | REQUIRES PRODUCTION VALIDATION | REQUIRES SEARCH CONSOLE AFTER LAUNCH |
+|---|---|---|---|
+| `blog_public = 0` development posture | ✅ asserted | ✅ production must make the opposite decision explicitly | — |
+| noindex meta + `X-Robots-Tag` in dev | ✅ asserted | ✅ absence of leftover noindex on production | ✅ Page Indexing report |
+| Non-public environment protection | ❌ not implemented, not claimed | ✅ hosting/access decision (R3) | — |
+| One canonical per page, environment-derived | ✅ asserted in CI | ✅ final host (protocol / www / trailing slash) not decided | ✅ canonical vs indexed-URL consistency |
+| Core sitemap behaviour | ✅ dev-disabled, launch-simulated | ✅ real sitemap on the real domain | ✅ submission + processing |
+| robots.txt | ✅ core behaviour asserted | ✅ production robots.txt review | ✅ robots.txt report |
+| Unique titles / meta descriptions, one H1 | ✅ asserted for 10 pages | ✅ real SERP rendering is Google's decision | ✅ appearance monitoring |
+| Real 404, no soft 404, no redirect loop | ✅ asserted in CI | ✅ host-level rewrites/redirects not in this repository | ✅ crawl-error findings |
+| Crawlable navigation anchors | ✅ asserted (no-JS shell + raw HTML) | ✅ production rendering | — |
+| Structured data | ✅ deliberately absent | ✅ re-decide only against visible content | — |
+| Staging/test-host leak prevention | ✅ static scan + rendered-HTML scan | ✅ launch review against the real domain | — |
+
+**Deferred to launch operations (explicitly NOT done here and NOT authorized):** Search Console property creation, ownership verification, sitemap submission, indexing requests, URL inspection, analytics/GTM/pixels. No verification token, credential or external crawler SaaS exists in this repository.
+
+**Business input still required before launch:** the final production domain and host form (protocol, www vs non-www, trailing slash); the environment-protection method for staging; real business identity/contact facts if any `Organization` markup is ever wanted; legal pages.
+
+**CI limit (unchanged):** green checks prove the ephemeral test environment at an exact SHA. They are **not** production crawling/indexing proof and **not** publication authorization.
