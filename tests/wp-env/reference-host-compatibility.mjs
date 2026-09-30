@@ -201,22 +201,22 @@ echo wp_json_encode( array(
   check('Tehran timezone behavior is UTC+03:30 in the current runtime', initial.timezone_string === 'Asia/Tehran' && initial.timezone_offset === '+03:30', `${initial.timezone_string}; ${initial.timezone_offset}`);
   check('reference permalink option is exact', initial.permalink_structure === referencePermalink, initial.permalink_structure);
   check('CI models WP_MEMORY_LIMIT=40M without forcing a 4048M WP/PHP maximum', initial.wp_memory_limit === '40M' && initial.wp_max_memory_limit !== '4048M' && initial.php_memory_limit !== '4048M', `${initial.wp_memory_limit}; max=${initial.wp_max_memory_limit}; PHP ini=${initial.php_memory_limit}`);
-  check('diagnostic CI has WordPress debug, display, and log enabled', initial.wp_debug === true && initial.wp_debug_display === true && initial.wp_debug_log === true, JSON.stringify(report.runtime_observations.debug));
+  check('diagnostic CI runs with WP_DEBUG enabled; display/log settings are recorded without forcing new logging behavior', initial.wp_debug === true, JSON.stringify(report.runtime_observations.debug));
   check('Koorosh is active, has expected metadata, and has no parent', initial.theme.stylesheet === 'koorosh' && initial.theme.name === 'کوروش' && initial.theme.template === 'koorosh' && (initial.theme.parent === null || initial.theme.parent === ''), JSON.stringify(initial.theme));
   check('standalone theme metadata declares PHP 8.1', initial.theme.requires_php === '8.1', String(initial.theme.requires_php));
   check('Elementor Free is active at exact 4.3.2', initial.elementor_active === true && initial.elementor_version === '4.3.2', `${initial.elementor_active}; ${initial.elementor_version}`);
   check('Theme Settings option is registered and has safe, non-persisting defaults', initial.theme_settings_option_registered === true && initial.theme_settings_default?.lead_site_enabled === false && initial.theme_settings_default?.version === 1 && initial.environment_gate_enabled === false);
   check('Koorosh primary/footer fallback menu locations are registered', ['primary', 'footer'].every(location => initial.fallback_menu_locations.includes(location)), JSON.stringify(initial.fallback_menu_locations));
 
-  // Ensure a readable diagnostic target exists, then take a byte-offset baseline
-  // so only selected requests below are evaluated.
+  // Observe debug.log only if WP_DEBUG_LOG is already enabled and readable;
+  // do not alter the ordinary wp-env logging policy to make this assertion pass.
   const diagnosticBaseline = parseJsonLine(wpEval(`
 $path = WP_CONTENT_DIR . '/debug.log';
-if ( ! file_exists( $path ) ) { file_put_contents( $path, '' ); }
-echo wp_json_encode( array( 'readable' => is_readable( $path ), 'offset' => is_readable( $path ) ? filesize( $path ) : 0 ) );
+$enabled = defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG;
+$readable = $enabled && is_readable( $path );
+echo wp_json_encode( array( 'enabled' => (bool) $enabled, 'readable' => (bool) $readable, 'offset' => $readable ? filesize( $path ) : 0 ) );
 `));
   report.runtime_observations.debug_log_baseline = diagnosticBaseline;
-  check('WP_DEBUG_LOG diagnostic target is readable before selected requests', diagnosticBaseline.readable === true);
 
   // The only created content is a synthetic post with an ephemeral slug.
   const syntheticSlug = `cpms-host-parity-${randomBytes(6).toString('hex')}`;
@@ -322,19 +322,21 @@ echo wp_json_encode( array( 'zip_loaded' => $zipLoaded, 'zip_version' => $zipVer
   check('selected frontend responses expose no visible PHP warning/notice/deprecation/fatal markers', rendered.every(html => !diagnosticPhpErrors.test(html)));
   const logDelta = parseJsonLine(wpEval(`
 $path = WP_CONTENT_DIR . '/debug.log';
+$enabled = defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG;
+$readable = $enabled && is_readable( $path );
 $offset = ${Number(diagnosticBaseline.offset || 0)};
-$delta = is_readable( $path ) ? substr( (string) file_get_contents( $path ), $offset ) : '';
+$delta = $readable ? substr( (string) file_get_contents( $path ), $offset ) : '';
 $lines = preg_split( '/\\r?\\n/', $delta );
 $matched = array_values( array_filter( $lines, function ( $line ) { return false !== stripos( $line, '/themes/koorosh/' ) && preg_match( '/(?:Warning|Notice|Deprecated|Fatal error|Parse error)\\s*:/i', $line ); } ) );
-echo wp_json_encode( array( 'readable' => is_readable( $path ), 'koorosh_php_diagnostic_count' => count( $matched ) ) );
+echo wp_json_encode( array( 'enabled' => (bool) $enabled, 'readable' => (bool) $readable, 'koorosh_php_diagnostic_count' => count( $matched ) ) );
 `));
   report.runtime_observations.debug_log_scan = logDelta.readable === true
     ? { status: 'SIMULATED', koorosh_php_diagnostic_count: logDelta.koorosh_php_diagnostic_count }
-    : { status: 'NOT_TESTED', reason: 'debug.log was not readable in this runtime' };
+    : { status: 'NOT_TESTED', reason: logDelta.enabled ? 'debug.log was not readable in this runtime' : 'WP_DEBUG_LOG is disabled in wp-env defaults' };
   if (logDelta.readable === true) {
     check('WP_DEBUG_LOG exposes no Koorosh-attributed PHP warning/notice/deprecation/fatal in this selected flow', logDelta.koorosh_php_diagnostic_count === 0, JSON.stringify(logDelta));
   } else {
-    check('WP_DEBUG_LOG unreadable: diagnostic gap is reported; visible response-marker checks remain active', true);
+    check('WP_DEBUG_LOG disabled/unreadable: log scan is reported NOT_TESTED; visible response-marker checks remain active', true);
   }
 
   // Verify existing native editor save/reload and Theme Settings browser evidence
@@ -376,7 +378,7 @@ echo wp_json_encode( array( 'readable' => is_readable( $path ), 'koorosh_php_dia
     theme_settings: { status: 'SIMULATED', reference_value: 'Safe settings model and Persian RTL admin', ci_value: themeSettings.result, limitation: 'Synthetic CI state only; no host database/settings are read.' },
     elementor_pages: { status: 'SIMULATED', reference_value: 'Owner-host-authored content/runtime', ci_value: `${Object.values(pageEvidence).filter(page => page.elementor_authored).length}/${pageSlugs.length} CI pages built with Elementor Free`, limitation: 'Reconstructed native Free pages and editor save/reload suites; not the owner host DB, Pro pages, or kit import.' },
     elementor_library: { status: 'NOT_TESTED', reference_value: 'Connected (owner-reported)', ci_value: 'No authenticated Library connection in public CI', limitation: 'No credential or account connection is attempted.' },
-    debug_mode: { status: 'SIMULATED', reference_value: 'ACTIVE (owner-reported test host)', ci_value: 'WP_DEBUG, WP_DEBUG_DISPLAY and WP_DEBUG_LOG enabled', limitation: 'Only selected CI flows are checked for visible/theme-attributed diagnostics; not proof of no runtime issues.' },
+    debug_mode: { status: 'SIMULATED', reference_value: 'ACTIVE (owner-reported test host)', ci_value: `WP_DEBUG=${initial.wp_debug}; WP_DEBUG_DISPLAY=${initial.wp_debug_display}; WP_DEBUG_LOG=${initial.wp_debug_log}; log scan=${report.runtime_observations.debug_log_scan.status}`, limitation: 'Only selected flows are checked for visible/theme-attributed diagnostics; an unavailable log scan remains NOT_TESTED; not proof of no runtime issues.' },
     host_network_smtp: { status: 'NOT_TESTED', reference_value: 'Owner host/network and SMTP', ci_value: 'No host requests; synthetic intercepted lead tests only', limitation: 'No real email, inbox delivery, DNS, firewall, LiteSpeed, host cache, or network parity.' },
     clean_elementor_pro_kit_import: { status: 'NOT_TESTED', reference_value: 'Clean Pro kit import; historical ZipArchive failure', ci_value: 'No kit fixture imported', limitation: 'Requires authorized private Pro environment; synthetic ZIP smoke is not import proof.' },
   };

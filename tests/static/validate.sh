@@ -58,7 +58,7 @@ if (mKeys.length !== 1 || mKeys[0] !== "wp-content/mu-plugins" || m[mKeys[0]] !=
 }
 if (c.multisite !== false) err("multisite must be explicitly false for the single-site compatibility target");
 const cfg = c.config || {};
-if (cfg.WP_DEBUG !== true || cfg.WP_DEBUG_DISPLAY !== true || cfg.WP_DEBUG_LOG !== true || cfg.WP_MEMORY_LIMIT !== "40M") err("wp-env compatibility config must enable bounded diagnostics and set WP_MEMORY_LIMIT=40M");
+if (cfg.WP_DEBUG !== true || cfg.WP_MEMORY_LIMIT !== "40M") err("wp-env compatibility config must enable WP_DEBUG and model WP_MEMORY_LIMIT=40M");
 if (Object.hasOwn(cfg, "WP_MAX_MEMORY_LIMIT")) err("do not force the reported 4048M host maximum in GitHub CI");
 if (JSON.stringify(Object.keys(c).sort()) !== JSON.stringify(["$schema", "core", "phpVersion", "multisite", "config", "plugins", "themes", "mappings"].sort())) err("unexpected/missing top-level keys: " + Object.keys(c).join(","));
 process.exit(bad);
