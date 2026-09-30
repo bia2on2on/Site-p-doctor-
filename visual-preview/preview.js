@@ -41,7 +41,12 @@
     });
     desktopWorkflow.addEventListener("pointerleave", (event) => {
       if (!desktopHover.matches || event.pointerType !== "mouse") return;
-      if (!desktopWorkflow.contains(document.activeElement)) desktopWorkflow.open = false;
+      if (event.relatedTarget && desktopWorkflow.contains(event.relatedTarget)) return;
+      window.setTimeout(() => {
+        if (!desktopWorkflow.matches(":hover") && !desktopWorkflow.contains(document.activeElement)) {
+          desktopWorkflow.open = false;
+        }
+      }, 140);
     });
     desktopWorkflow.addEventListener("focusout", () => {
       window.setTimeout(() => {
