@@ -506,20 +506,29 @@ function cpms_render_demo_form() {
 		</div>
 
 		<?php if ( ! empty( $errors ) ) : ?>
-			<div class="cpms-form-notice cpms-form-notice--error" id="cpms-form-error-summary" role="alert" tabindex="-1">
-				<p class="cpms-form-notice__title"><strong>لطفاً خطاهای مشخص‌شده در فرم را اصلاح فرمایید:</strong></p>
-				<ul class="cpms-form-notice__list">
-					<?php foreach ( $errors as $field => $err ) : ?>
-						<li>
-							<?php if ( 'global' === $field ) : ?>
-								<?php echo esc_html( $err ); ?>
-							<?php else : ?>
-								<a href="#cpms-field-<?php echo esc_attr( $field ); ?>"><?php echo esc_html( $err ); ?></a>
-							<?php endif; ?>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-			</div>
+			<?php if ( array( 'global' ) === array_keys( $errors ) && CPMS_FORM_STATE_HANDOFF_FAILED === $state ) : ?>
+				<!-- Non-validation server failure (mail-layer handoff failed): an
+				     honest failure notice, NOT a "fix the form fields" summary. -->
+				<div class="cpms-form-notice cpms-form-notice--error" id="cpms-form-error-summary" role="alert" tabindex="-1">
+					<p class="cpms-form-notice__title"><strong><?php echo esc_html( $wording['title'] ); ?></strong></p>
+					<p class="cpms-form-notice__desc"><?php echo esc_html( $wording['message'] ); ?></p>
+				</div>
+			<?php else : ?>
+				<div class="cpms-form-notice cpms-form-notice--error" id="cpms-form-error-summary" role="alert" tabindex="-1">
+					<p class="cpms-form-notice__title"><strong><?php echo esc_html( 'لطفاً خطاهای مشخص‌شده در فرم را اصلاح فرمایید:' ); ?></strong></p>
+					<ul class="cpms-form-notice__list">
+						<?php foreach ( $errors as $field => $err ) : ?>
+							<li>
+								<?php if ( 'global' === $field ) : ?>
+									<?php echo esc_html( $err ); ?>
+								<?php else : ?>
+									<a href="#cpms-field-<?php echo esc_attr( $field ); ?>"><?php echo esc_html( $err ); ?></a>
+								<?php endif; ?>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				</div>
+			<?php endif; ?>
 		<?php endif; ?>
 
 		<?php if ( $is_success ) : ?>

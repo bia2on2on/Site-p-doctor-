@@ -341,8 +341,9 @@ try {
   writeFileSync(resolve(muDir, forceFailMarker), 'force wp_mail failure for this phase\n');
   const failedResponse = await postDemoForm(validSubmission({ cpms_demo_nonce: nonce }));
   check(
-    'wp_mail failure surfaced as HANDOFF_FAILED (HTTP 500, success=false, honest message)',
-    failedResponse.status === 500 && failedResponse.json?.success === false && failedResponse.json?.data?.state === 'handoff_failed' && (failedResponse.json?.data?.message || '').includes('انجام نشد'),
+    'wp_mail failure surfaced as HANDOFF_FAILED (HTTP 500, success=false, honest title+message)',
+    failedResponse.status === 500 && failedResponse.json?.success === false && failedResponse.json?.data?.state === 'handoff_failed' &&
+    (failedResponse.json?.data?.title || '').includes('انجام نشد') && (failedResponse.json?.data?.message || '').includes('اطلاعات شما ارسال نگردید'),
     `status=${failedResponse.status} body=${failedResponse.text.slice(0, 300)}`
   );
   entries = mailEntries();
