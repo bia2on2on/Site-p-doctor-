@@ -158,8 +158,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     # Test build only: NOT a production release, NOT publication authorization, NOT Elementor Pro /
-    # LiteSpeed / real-host acceptance. No GitHub Release or tag is created; the artifact is a
-    # bounded-retention workflow artifact bound to the exact source SHA.
+    # LiteSpeed / real-host acceptance. Top-level workflow permissions stay read-only; only this job
+    # grants job-scoped write permission so that on `main` (and only after validation and ZIP-install
+    # proof succeed) it publishes/updates the GitHub PRE-RELEASE `koorosh-test-v<version>` with direct
+    # clickable assets (`koorosh-<version>-test-build-<sha12>.zip`, `koorosh-transfer-manifest.json`,
+    # `SHA256SUMS`) in addition to the 14-day workflow artifact.
+    permissions:
+      contents: write
     steps:
       - name: Check out the exact source SHA (not the PR merge ref)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -226,6 +231,78 @@ jobs:
           path: dist/transfer/
           if-no-files-found: error
           retention-days: 14
+
+      - name: Publish TEST-HOST TRANSFER PACKAGE pre-release (main only, after validation and ZIP-install proof)
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          eval "$(node -e '
+            const fs = require("fs");
+            const m = JSON.parse(fs.readFileSync("dist/transfer/koorosh-transfer-manifest.json", "utf8"));
+            if (m.elementor_pro_included !== false || m.production_release !== false || m.publication_authorized !== false) {
+              process.exit(1);
+            }
+            const tag = `koorosh-test-v${m.theme_version}`;
+            const title = `Koorosh ${m.theme_version} — Test Host Transfer Build`;
+            const repo = m.repository || process.env.GITHUB_REPOSITORY;
+            const notes = [
+              "**TEST-HOST TRANSFER PACKAGE (PRE-RELEASE / TEST BUILD ONLY)**",
+              "",
+              "- **Not a production release (`production_release: false`).**",
+              "- **Not publication or search-engine indexing authorization (`publication_authorized: false`).**",
+              "- **Not Elementor Pro, LiteSpeed, or real-host acceptance (`NOT RUN`).**",
+              "- **No Elementor Pro package/license (`elementor_pro_included: false`) and no secrets/credentials are included.**",
+              "",
+              "### Package Identity",
+              `- **Theme:** کوروش (\`koorosh\`) \`${m.theme_version}\` (standalone WordPress theme; no parent theme required)`,
+              `- **Source commit (\`main\`):** \`${m.source_commit_sha}\``,
+              `- **Installable theme ZIP:** \`${m.zip_file}\``,
+              `- **Theme ZIP SHA-256:** \`${m.zip_sha256}\``,
+              "- **Manifest:** `koorosh-transfer-manifest.json`",
+              "- **Checksums:** `SHA256SUMS`",
+              "",
+              "### Direct Download & WordPress Upload (Test Host Only)",
+              `1. Download **\`${m.zip_file}\`** directly from **Assets** below (no outer wrapper ZIP to extract).`,
+              `2. In WordPress Admin on the authorized non-public test host: **Appearance → Themes → Add New → Upload Theme** → choose \`${m.zip_file}\` → **Install Now** → **Activate**.`,
+              `3. Follow the procedure and safety boundaries in [\`docs/TEST-HOST-TRANSFER.md\`](https://github.com/${repo}/blob/${m.source_commit_sha}/docs/TEST-HOST-TRANSFER.md) (keep lead delivery OFF and keep search-engine indexing discouraged).`,
+              "",
+            ].join("\n");
+            fs.writeFileSync("dist/transfer-release-notes.md", notes, "utf8");
+            console.log("TAG=" + JSON.stringify(tag));
+            console.log("TITLE=" + JSON.stringify(title));
+            console.log("ZIP_FILE=" + JSON.stringify(m.zip_file));
+            console.log("SOURCE_SHA=" + JSON.stringify(m.source_commit_sha));
+          ')"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release delete "$TAG" --repo "$GITHUB_REPOSITORY" --cleanup-tag --yes
+          fi
+          gh api -X DELETE "repos/${GITHUB_REPOSITORY}/git/refs/tags/${TAG}" >/dev/null 2>&1 || true
+          gh release create "$TAG" \
+            "dist/transfer/${ZIP_FILE}" \
+            "dist/transfer/koorosh-transfer-manifest.json" \
+            "dist/transfer/SHA256SUMS" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$SOURCE_SHA" \
+            --title "$TITLE" \
+            --notes-file dist/transfer-release-notes.md \
+            --prerelease
+          rm -f dist/transfer-release-notes.md
+          REL_JSON="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}")"
+          REL_JSON="$REL_JSON" EXPECT_TAG="$TAG" EXPECT_SHA="$SOURCE_SHA" EXPECT_ZIP="$ZIP_FILE" node -e '
+            const r = JSON.parse(process.env.REL_JSON);
+            if (r.tag_name !== process.env.EXPECT_TAG) throw new Error("tag mismatch: " + r.tag_name);
+            if (r.target_commitish !== process.env.EXPECT_SHA) throw new Error("target_commitish mismatch: " + r.target_commitish);
+            if (r.prerelease !== true || r.draft !== false) throw new Error("release must be published prerelease");
+            const names = (r.assets || []).map(a => a.name).sort();
+            const want = [process.env.EXPECT_ZIP, "SHA256SUMS", "koorosh-transfer-manifest.json"].sort();
+            if (JSON.stringify(names) !== JSON.stringify(want)) throw new Error("unexpected assets: " + JSON.stringify(names));
+            const zipAsset = r.assets.find(a => a.name === process.env.EXPECT_ZIP);
+            console.log(`::notice title=TEST-HOST PRE-RELEASE::tag=${r.tag_name} prerelease=${r.prerelease} target=${r.target_commitish} release_url=${r.html_url} zip_asset_url=${zipAsset.browser_download_url}`);
+            require("fs").appendFileSync(process.env.GITHUB_STEP_SUMMARY, `\n### Owner Direct Download (GitHub Pre-release)\n\n- Tag: \`${r.tag_name}\` (pre-release: \`${r.prerelease}\`)\n- Release page: ${r.html_url}\n- Direct installable ZIP: ${zipAsset.browser_download_url}\n`);
+          '
 
       - name: Collect container logs on failure
         if: failure()
