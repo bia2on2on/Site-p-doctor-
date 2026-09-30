@@ -108,14 +108,16 @@ jar="$(mktemp)"
 curl --silent --output /dev/null -c "$jar" -b 'wordpress_test_cookie=WP%20Cookie%20check' \
 	--data-urlencode 'log=admin' --data-urlencode 'pwd=password' --data-urlencode 'wp-submit=Log In' \
 	--data-urlencode "redirect_to=$BASE_URL/wp-admin/" --data-urlencode 'testcookie=1' "$BASE_URL/wp-login.php"
-dash="$(mktemp)"
-curl --silent -b "$jar" "$BASE_URL/wp-admin/" > "$dash"
-grep -aq 'page=koorosh-settings' "$dash" && ok "admin menu exposes the Koorosh settings page link" || ko "admin menu lacks page=koorosh-settings"
 page="$(mktemp)"
 pcode="$(curl --silent --output "$page" --write-out '%{http_code}' -b "$jar" "$BASE_URL/wp-admin/admin.php?page=koorosh-settings")"
 expect_eq "settings screen HTTP status" "200" "$pcode"
 grep -aq 'تنظیمات کوروش' "$page" && ok "settings screen renders 'تنظیمات کوروش'" || ko "settings screen title missing"
-grep -aq 'koorosh_settings_group' "$page" && ok "settings screen carries the Settings API form group" || ko "settings form group missing"
+grep -Eaq "href=['\"]admin\.php\?page=koorosh-settings['\"]" "$page" && ok "admin menu exposes the Koorosh settings page link" || ko "admin menu lacks page=koorosh-settings"
+# The default tab is a read-only hub; a form tab carries the Settings API group field.
+form="$(mktemp)"
+curl --silent -b "$jar" "$BASE_URL/wp-admin/admin.php?page=koorosh-settings&tab=sales" > "$form"
+grep -aq 'koorosh_settings_group' "$form" && ok "settings form tab carries the Settings API option group" || ko "settings form group missing on tab=sales"
+rm -f "$form"
 if grep -Eaq '(Fatal error|Parse error)(</b>)?:|Uncaught ' "$page"; then ko "PHP fatal visible on settings screen"; else ok "no PHP fatal on settings screen"; fi
 
 # 7. Lead delivery stays OFF by default; nothing persisted; no mail path exercised
@@ -129,7 +131,7 @@ wp option update blog_public 0 >/dev/null 2>&1
 curl --silent --output /dev/null --dump-header "$hdr_file" "$BASE_URL/"
 grep -iaq '^x-robots-tag:.*noindex' "$hdr_file" && ok "blog_public=0 -> X-Robots-Tag noindex served by ZIP-installed theme" || ko "X-Robots-Tag noindex missing with blog_public=0"
 
-rm -f "$body_file" "$hdr_file" "$jar" "$dash" "$page"
+rm -f "$body_file" "$hdr_file" "$jar" "$page"
 echo "== Package install result: $pass passed, $fail failed =="
 printf '::notice title=Package install result::%s passed, %s failed (ZIP install into clean WordPress; NOT host, Pro or LiteSpeed acceptance)\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]
