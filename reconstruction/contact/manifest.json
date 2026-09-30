@@ -1,0 +1,83 @@
+{
+  "page": {
+    "id": "contact",
+    "title": "تماس با ما | CPMS",
+    "slug": "contact",
+    "route": "/contact/",
+    "language": "fa-IR",
+    "direction": "rtl",
+    "status": "target-not-publication-approved",
+    "role": "utility-trust",
+    "purpose": "Two truthful routes only: (1) demo/consultation evaluation via /demo/; (2) general communication via the public contact details rendered from Koorosh Theme Settings. NOT a second lead form and NOT a support channel."
+  },
+  "authoring": {
+    "model": "elementor-editor-command-api",
+    "recipe": "reconstruction/contact/recipe.mjs",
+    "claims": "reconstruction/contact/claims.md",
+    "tokens": "design-system/tokens.json",
+    "siteShell": "reconstruction/site-shell/manifest.json",
+    "elementorEdition": "free",
+    "allowedElementTypes": ["container", "heading", "text-editor", "button"],
+    "proWidgets": "none",
+    "thirdPartyAddons": "none",
+    "rawHtmlWidgets": "none",
+    "customCssWidgets": "none",
+    "mediaPlaceholders": "none",
+    "iconBadges": "none",
+    "mapIntegration": "none",
+    "structuredData": "none",
+    "forms": "none — the Demo form on /demo/ remains the only lead form",
+    "seo": {
+      "pageRole": "utility-trust",
+      "commercialKeywordOptimization": "none",
+      "developmentIndexability": "noindex-until-launch-approval",
+      "futureProductionDefault": "normal-crawlable-utility-page",
+      "schema": "none — no Organization, no LocalBusiness, no invented address/phone"
+    }
+  },
+  "dynamicContactIntegration": {
+    "renderer": "themes/koorosh/contact-details.php",
+    "shortcode": "[cpms_contact_details]",
+    "shortcodeAttributes": "none accepted or interpreted (fixed template)",
+    "why": "Elementor keeps the editable page layout while the actual contact values stay global Koorosh Theme Settings rendered at runtime; changing a value needs no page rebuild and never edits Elementor copy.",
+    "publicContactRole": {
+      "setting": "contact_email",
+      "resolver": "cpms_contact_public_email()",
+      "defaultSource": "cpms_contact_public_default_email()",
+      "authorizedDefault": "biatoweb@gmail.com",
+      "decision": "Product Owner decision 2026-09-30: the currently authorized public/general contact email. Configuration evidence only; NOT a registered-company identity and NOT a support channel.",
+      "rendering": "always resolved (empty/invalid setting falls back to the authorized default); normal mailto: link; value escaped at output"
+    },
+    "leadRecipientRole": {
+      "setting": "lead_recipient",
+      "resolver": "cpms_lead_delivery_recipient() (themes/koorosh/demo-form.php)",
+      "defaultSource": "cpms_lead_delivery_default_recipient() (themes/koorosh/demo-form.php)",
+      "relationship": "SEPARATE sales/demo delivery role. It may currently equal the public contact email, but the settings, defaults and resolvers are independent: changing one never silently changes the other."
+    },
+    "optionalFields": {
+      "contact_phone": "row rendered ONLY when configured; tel: destination normalized to ASCII digits (Persian/Arabic digits converted, separators dropped, one leading + kept)",
+      "contact_address": "row rendered ONLY when configured; plain text; no map integration",
+      "emptyOptionalFields": "produce NO row, card or placeholder"
+    },
+    "socialSettings": "deliberately NOT rendered (no real URL configured; no icons or libraries)",
+    "sanitization": "every read passes through koorosh_get_setting() re-sanitization; every output fragment escaped (esc_html / esc_attr / esc_url); request data never read"
+  },
+  "unprovenOrUnverified": {
+    "supportModel": "UNVERIFIED / UNDEFINED — this page is not a support channel and claims no support, response time or SLA",
+    "demoFormDelivery": "NOT GUARANTEED — delivery is dual-gated and default OFF; the page copy makes no delivery or response-time promise",
+    "phoneOrAddressPresence": "NOT INVENTED — rendered only if an administrator configures them"
+  },
+  "sections": [
+    { "order": 0, "id": "review-notice", "role": "Internal design review notice" },
+    { "order": 1, "id": "hero", "role": "Hero: H1 and the two-route explanation" },
+    { "order": 2, "id": "demo-route", "role": "Demo / consultation route with CTA to /demo/" },
+    { "order": 3, "id": "general-contact", "role": "General contact: settings-driven details via [cpms_contact_details]" },
+    { "order": 4, "id": "privacy-note", "role": "Short no-PHI clarification and privacy link to /privacy/" }
+  ],
+  "links": {
+    "primaryCta": "/demo/",
+    "privacyLink": "/privacy/",
+    "footerRoute": "تماس با ما → /contact/ (footer menu; primary navigation unchanged)",
+    "demoAlternativeRoute": "/demo/ links back here as the alternative to the form path"
+  }
+}

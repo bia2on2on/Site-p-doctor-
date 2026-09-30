@@ -24,6 +24,7 @@ _spec.loader.exec_module(packager)
 REQUIRED = [
     "koorosh/style.css", "koorosh/functions.php", "koorosh/index.php", "koorosh/header.php",
     "koorosh/footer.php", "koorosh/404.php", "koorosh/page-elementor.php", "koorosh/demo-form.php",
+    "koorosh/contact-details.php",
     "koorosh/demo-form.js", "koorosh/nav.js", "koorosh/foundation.css", "koorosh/inc/theme-settings.php",
     "koorosh/fonts/Vazirmatn-Regular.woff2", "koorosh/fonts/Vazirmatn-Bold.woff2", "koorosh/fonts/OFL.txt",
 ]

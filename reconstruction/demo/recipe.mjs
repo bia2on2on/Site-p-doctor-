@@ -131,6 +131,7 @@ export function demoPage(t) {
         editor: '[cpms_demo_form]',
         _element_id: 'qualification-form-widget',
       }),
+      text('اگر مسیر فرم برای شما مناسب نیست، از صفحهٔ <a href="/contact/">تماس با ما</a> استفاده کنید.', 'caption'),
     ], { background_background: 'classic', background_color: color('background/subtle') }),
 
     // Section 5: Privacy / Data Guidance

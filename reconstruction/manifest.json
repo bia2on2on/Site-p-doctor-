@@ -231,7 +231,7 @@
       "elementor_pages_and_persistence": {
         "status": "SIMULATED",
         "reference_value": "Owner-host Elementor-authored pages",
-        "ci_value": "Twelve native Elementor Free pages rebuilt; editor save/reload checks run; persisted pages queried under reference permalink setting",
+        "ci_value": "Thirteen native Elementor Free pages rebuilt; editor save/reload checks run; persisted pages queried under reference permalink setting",
         "evidence_method": "Existing Playwright reconstruction suite plus compatibility runtime/page-route queries",
         "limitation": "Not the owner host database, Elementor Pro pages, or a clean exported-kit import."
       },

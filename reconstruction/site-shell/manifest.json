@@ -6,6 +6,6 @@
   "publication": "TARGET — NOT PUBLICATION-APPROVED",
   "claims": "NONE — navigation labels/routes only; no product capability, customer, pricing or contact claims are introduced anywhere in this slice",
   "lead_delivery": "NOT CONFIGURED / NOT AUTHORIZED — menus and the header CTA navigate to /demo/ only; the qualification form there stays in its documented safe non-live test mode and no request is implied to reach Sales",
-  "discovery": "The FAQ / buyer-objection page (/faq/), Security & Data Access page (/security-data-access/), Privacy utility page (/privacy/), and Website Terms utility page (/terms/) are reachable from the footer menu beside the conversion route (SITE-ARCHITECTURE §6.4). The primary navigation is unchanged.",
+  "discovery": "The FAQ / buyer-objection page (/faq/), Security & Data Access page (/security-data-access/), Contact page (/contact/), Privacy utility page (/privacy/), and Website Terms utility page (/terms/) are reachable from the footer menu beside the conversion route (SITE-ARCHITECTURE §6.4). The primary navigation is unchanged.",
   "elementor_pro_precedence": "The Koorosh fallback header/footer continue to yield to Elementor Pro Theme Builder locations via elementor_theme_do_location() — unchanged"
 }

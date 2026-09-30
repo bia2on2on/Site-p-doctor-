@@ -244,6 +244,37 @@ $check( 'status: no row claims launch readiness', 0 === count( array_filter( $ro
 	return (bool) preg_match( '/آماده انتشار|launch[- ]ready/iu', $r['label'] . ' ' . $r['note'] );
 } ) ) );
 
+/* ---- 9. Public contact role (Contact page renderer) ----------------------- */
+delete_option( $opt );
+$check( 'public contact: default public email resolves to the authorized address', 'biatoweb@gmail.com' === cpms_contact_public_default_email() && 'biatoweb@gmail.com' === cpms_contact_public_email() );
+update_option( $opt, array( 'contact_email' => 'hello@example.test' ) );
+$check( 'public contact: configured contact_email is used at render time', 'hello@example.test' === cpms_contact_public_email() );
+update_option( $opt, array( 'lead_recipient' => 'sales@example.test' ) );
+$check( 'lead recipient change does NOT change the public contact email', 'hello@example.test' === cpms_contact_public_email() && 'sales@example.test' === cpms_lead_delivery_recipient() );
+update_option( $opt, array( 'contact_email' => '', 'lead_recipient' => '' ) );
+$check( 'empty contact_email falls back to the authorized PUBLIC default, never to lead_recipient', 'biatoweb@gmail.com' === cpms_contact_public_email() && 'biatoweb@gmail.com' === cpms_lead_delivery_recipient() );
+update_option( $opt, array( 'contact_phone' => '', 'contact_address' => '' ) );
+$html = cpms_render_contact_details();
+$check( 'phone/address rows absent when empty; no empty rows; email renders as mailto', false === strpos( $html, 'cpms-contact-phone' ) && false === strpos( $html, 'cpms-contact-address' ) && false !== strpos( $html, 'mailto:biatoweb@gmail.com' ) && 1 === substr_count( $html, 'cpms-contact-row' ) );
+update_option( $opt, array( 'contact_phone' => '۰۹۱۲ ۳۴۵ ۶۷۸۹', 'contact_address' => 'تهران' ) );
+$html = cpms_render_contact_details();
+$check( 'phone/address appear when configured; tel: normalized to ASCII digits', false !== strpos( $html, 'tel:09123456789' ) && false !== strpos( $html, '۰۹۱۲ ۳۴۵ ۶۷۸۹' ) && false !== strpos( $html, 'تهران' ) && 3 === substr_count( $html, 'cpms-contact-row' ) );
+$check( 'rendered fragments are labeled with accessible names', false !== strpos( $html, 'cpms-contact-label' ) && false !== strpos( $html, 'aria-label=' ) );
+update_option( $opt, array( 'contact_phone' => '', 'contact_address' => '' ) );
+$check( 'clearing optional fields removes their rows entirely', false === strpos( cpms_render_contact_details(), 'cpms-contact-phone' ) && false === strpos( cpms_render_contact_details(), 'cpms-contact-address' ) );
+
+/* Tampered unsafe stored values (raw DB write bypassing the Settings API). */
+global $wpdb;
+$wpdb->update(
+	$wpdb->options,
+	array( 'option_value' => maybe_serialize( array( 'version' => 1, 'contact_email' => '<script>bad</script>evil', 'contact_phone' => '123<script>', 'contact_address' => '<img src=x onerror=1>' ) ) ),
+	array( 'option_name' => $opt )
+);
+wp_cache_delete( $opt, 'options' );
+$html = cpms_render_contact_details();
+$check( 'tampered unsafe stored values never render (read path re-sanitizes)', false === strpos( $html, '<script' ) && false === strpos( $html, 'evil' ) && false === strpos( $html, 'onerror' ) && false === strpos( $html, 'cpms-contact-phone' ) && false === strpos( $html, 'cpms-contact-address' ) && false !== strpos( $html, 'mailto:biatoweb@gmail.com' ), $html );
+$check( 'shortcode exists and is narrowly scoped (attributes ignored)', shortcode_exists( 'cpms_contact_details' ) && ! shortcode_exists( 'cpms_contact' ) && do_shortcode( '[cpms_contact_details evil="1"]' ) === do_shortcode( '[cpms_contact_details]' ) );
+
 /* ---- cleanup -------------------------------------------------------------- */
 delete_option( $opt );
 wp_set_current_user( 0 );
