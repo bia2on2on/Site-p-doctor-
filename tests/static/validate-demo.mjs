@@ -2,7 +2,7 @@
  * Static validation of Demo / Consultation conversion page recipe,
  * manifest, claims, security/privacy boundaries, and the two-mode
  * lead-delivery model (default OFF; environment-owned activation;
- * code-bounded authorized recipient).
+ * administrator-configured recipient with the authorized default as fallback; dual gate).
  */
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -112,7 +112,7 @@ const lead = manifest.lead_delivery;
 assert(lead, 'manifest.lead_delivery block required');
 assert.equal(lead.authorized_recipient, 'biatoweb@gmail.com', 'Authorized recipient recorded as project configuration evidence');
 assert.equal(lead.default_state, 'OFF — safe non-live mode (no mail, no persistence, no logging)');
-assert.equal(lead.activation, 'environment-owned wp-config constant CPMS_LEAD_DELIVERY_ENABLED (boolean true); theme never defines it');
+assert(lead.activation.startsWith('DUAL GATE') && lead.activation.includes('CPMS_LEAD_DELIVERY_ENABLED (boolean true; theme never defines it)') && lead.activation.includes('site-level switch'), 'Activation = environment constant AND administrator site-level switch (dual gate)');
 assert.equal(lead.transport, 'WordPress-native wp_mail only; SMTP/deliverability configuration is environment-owned and outside Git');
 assert.deepEqual(lead.states, ['validation_failure', 'delivery_disabled', 'handoff_accepted', 'handoff_failed']);
 assert.equal(lead.persistence, 'none — submissions are never stored in the WordPress database or logs');
@@ -149,6 +149,8 @@ assert(formPhp.includes('sanitize_textarea_field'), 'Form handler must sanitize 
 // Delivery activation is environment-owned and default OFF
 assert(formPhp.includes('function cpms_lead_delivery_enabled()'), 'Explicit activation control function required');
 assert(formPhp.includes("defined( 'CPMS_LEAD_DELIVERY_ENABLED' ) && true === CPMS_LEAD_DELIVERY_ENABLED"), 'Activation must require the environment-owned boolean constant');
+assert(formPhp.includes('function cpms_lead_delivery_environment_authorized()') && formPhp.includes('function cpms_lead_delivery_site_switch_enabled()'), 'Dual gate: environment authorization and site switch are separate functions');
+assert(/function cpms_lead_delivery_enabled\(\) \{\s*return cpms_lead_delivery_environment_authorized\(\) && cpms_lead_delivery_site_switch_enabled\(\);\s*\}/.test(formPhp), 'Effective delivery requires BOTH the environment gate AND the site switch');
 // Comment-stripped source: the theme may DOCUMENT the wp-config mechanism, but its
 // executable code must never define the activation constant.
 const executablePhp = formPhp.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
@@ -160,9 +162,14 @@ const deliveryGuardPos = executablePhp.indexOf('if ( ! cpms_lead_delivery_enable
 const wpMailPos = executablePhp.indexOf('wp_mail(');
 assert(deliveryGuardPos !== -1 && wpMailPos > deliveryGuardPos, 'The single wp_mail call must sit after the delivery-disabled guard');
 
-// Recipient: code-bounded to the authorized value, never request-derived or filter-overridable
-assert.equal((formPhp.match(/biatoweb@gmail\.com/g) || []).length, 1, 'Authorized recipient must appear exactly once');
-assert(formPhp.indexOf('function cpms_lead_delivery_recipient()') !== -1 && formPhp.indexOf('biatoweb@gmail.com') > formPhp.indexOf('function cpms_lead_delivery_recipient()'), 'Recipient literal must live inside the dedicated recipient function');
+// Recipient: authorized default lives in ONE dedicated function; the effective recipient is the
+// administrator setting (manage_options) with that default as fallback — never request-derived or filter-overridable
+assert.equal((formPhp.match(/biatoweb@gmail\.com/g) || []).length, 1, 'Authorized recipient must appear exactly once in the Demo handler');
+const defaultRecipientFn = formPhp.indexOf('function cpms_lead_delivery_default_recipient()');
+assert(defaultRecipientFn !== -1 && formPhp.indexOf('biatoweb@gmail.com') > defaultRecipientFn && formPhp.indexOf('biatoweb@gmail.com') < formPhp.indexOf('function cpms_lead_delivery_recipient()'), 'Recipient literal must live inside the dedicated default-recipient function');
+const recipientFnBody = formPhp.slice(formPhp.indexOf('function cpms_lead_delivery_recipient()'), formPhp.indexOf('The strict allowlist of POST field names'));
+assert(recipientFnBody.includes("koorosh_get_setting( 'lead_recipient' )") && recipientFnBody.includes('cpms_lead_delivery_default_recipient()'), 'Effective recipient = validated admin setting with the authorized default as fallback');
+assert(!/\$_(GET|POST|REQUEST|COOKIE|SERVER)/.test(recipientFnBody), 'Recipient resolution must not touch any request superglobal');
 assert(!/\$_(POST|GET|REQUEST|COOKIE)\[[^\]]*(recipient|to|email)/i.test(formPhp), 'Recipient must never be read from the request');
 assert(!formPhp.includes('apply_filters'), 'Delivery-relevant values must not be filter-overridable');
 

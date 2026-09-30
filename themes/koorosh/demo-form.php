@@ -14,16 +14,20 @@
  *    - no payload persistence (no DB writes) and no payload logging;
  *    - honest non-live notice + DELIVERY_DISABLED state for valid submissions.
  *
- * B. AUTHORIZED LIVE ENVIRONMENT (explicit environment-owned activation):
- *    - the environment owner defines CPMS_LEAD_DELIVERY_ENABLED as (boolean)
- *      true in wp-config.php (or an equivalent environment-owned bootstrap);
+ * B. AUTHORIZED LIVE ENVIRONMENT (DUAL GATE — both required):
+ *    - gate A (environment): the environment owner defines
+ *      CPMS_LEAD_DELIVERY_ENABLED as (boolean) true in wp-config.php (or an
+ *      equivalent environment-owned bootstrap);
+ *    - gate B (site): an administrator turns on the site-level switch in
+ *      تنظیمات کوروش (default OFF). It can only narrow gate A, never replace it;
  *    - deploying this code alone NEVER enables delivery — the theme only
  *      reads the constant and never defines it;
  *    - delivery goes through the WordPress-native mail layer (wp_mail());
  *      SMTP/transport/deliverability configuration remains environment-owned
  *      and outside this repository (no credentials exist in Git);
- *    - the recipient is the single authorized value bounded by code and can
- *      never be overridden by any request parameter.
+ *    - the recipient is the administrator-configured value (manage_options
+ *      only) falling back to the authorized default, and can never be
+ *      overridden by any request parameter.
  *
  * HONESTY CONTRACT FOR THE LIVE MODE:
  * wp_mail() returning true proves only that the configured WordPress mail
@@ -51,33 +55,72 @@ if ( ! defined( 'CPMS_FORM_STATE_HANDOFF_FAILED' ) ) {
 }
 
 /**
- * Environment-owned activation control for live lead delivery.
+ * ENVIRONMENT gate (gate A) for live lead delivery.
  *
- * Default OFF. The only way to enable delivery is an explicit
+ * Default OFF. The only way to authorize delivery is an explicit
  * `define( 'CPMS_LEAD_DELIVERY_ENABLED', true );` (boolean true, exactly) in
  * the environment's wp-config.php or an equivalent environment-owned
  * bootstrap (e.g. a must-use plugin placed by the host operator). This theme
  * never defines the constant, so neither deploying nor updating this code can
  * enable delivery by itself. A non-boolean truthy value (e.g. the string
- * 'false') intentionally does NOT activate delivery.
+ * 'false') intentionally does NOT authorize delivery.
  *
- * @return bool True only when the environment has explicitly activated delivery.
+ * @return bool True only when the environment has explicitly authorized delivery.
  */
-function cpms_lead_delivery_enabled() {
+function cpms_lead_delivery_environment_authorized() {
 	return defined( 'CPMS_LEAD_DELIVERY_ENABLED' ) && true === CPMS_LEAD_DELIVERY_ENABLED;
 }
 
 /**
- * The single authorized lead recipient (product-owner commercial decision,
- * recorded 2026-09-30). Bounded by code on purpose: the value is not read
- * from any request parameter, database option, or filter, and therefore
- * cannot be overridden per request. Changing the recipient is a source-code
- * review, not a form input.
+ * SITE gate (gate B): the administrator's switch in تنظیمات کوروش → فروش و
+ * درخواست دمو. Default OFF. It can only ever NARROW what the environment
+ * allows; it cannot authorize delivery on its own. Fails closed if the
+ * settings layer is unavailable.
  *
- * @return string Authorized recipient email address.
+ * @return bool True only when the stored site switch is exactly boolean true.
+ */
+function cpms_lead_delivery_site_switch_enabled() {
+	return function_exists( 'koorosh_get_setting' ) && true === koorosh_get_setting( 'lead_site_enabled' );
+}
+
+/**
+ * Effective live-delivery activation = environment gate AND site gate.
+ * Disabling either gate stops all mail; with either gate off wp_mail() is
+ * never called, nothing is stored and nothing is logged.
+ *
+ * @return bool
+ */
+function cpms_lead_delivery_enabled() {
+	return cpms_lead_delivery_environment_authorized() && cpms_lead_delivery_site_switch_enabled();
+}
+
+/**
+ * The authorized lead recipient recorded as a commercial decision by the
+ * Product Owner (2026-09-30). This is the safe default/fallback used until an
+ * administrator configures a recipient, and whenever a stored value is empty
+ * or invalid, so the site never becomes recipient-less. Project
+ * configuration evidence only — NOT a registered-company identity.
+ *
+ * @return string Authorized default recipient email address.
+ */
+function cpms_lead_delivery_default_recipient() {
+	return 'biatoweb@gmail.com';
+}
+
+/**
+ * The effective lead recipient: the validated administrator setting
+ * (تنظیمات کوروش, `manage_options` only) or the authorized default.
+ * It is NEVER read from a request parameter and is not filterable, so no
+ * form payload, query string or cookie can change where a lead is sent.
+ *
+ * @return string Recipient email address.
  */
 function cpms_lead_delivery_recipient() {
-	return 'biatoweb@gmail.com';
+	$recipient = function_exists( 'koorosh_get_setting' ) ? koorosh_get_setting( 'lead_recipient' ) : '';
+	if ( is_string( $recipient ) && '' !== $recipient && is_email( $recipient ) ) {
+		return $recipient;
+	}
+	return cpms_lead_delivery_default_recipient();
 }
 
 /**

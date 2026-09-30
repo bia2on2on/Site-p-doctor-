@@ -120,6 +120,9 @@ jobs:
       - name: Capture technical-SEO / indexability evidence (development expectation + simulated launch switch)
         run: node tests/browser/seo-foundation.mjs
 
+      - name: Prove Koorosh Theme Settings (admin screen, sanitization, capabilities, dual-gate status, read-only site status)
+        run: node tests/browser/theme-settings.mjs
+
       - name: Upload homepage, Product Overview, Demo, lead-delivery, workflow, FAQ, Security & Data Access page and site-shell evidence (also on failure; includes the patient-record/continuity, doctor-workspace, patient-portal and prescriptions-documents pages)
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7

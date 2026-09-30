@@ -213,5 +213,9 @@ add_filter(
  * non-indexing above. No SEO plugin is installed for a sitemap.
  */
 
+// Theme Settings v1 (تنظیمات کوروش): one bounded option array, Settings API,
+// `manage_options` only. Loaded before the Demo handler, which reads it.
+require_once get_template_directory() . '/inc/theme-settings.php';
+
 // Demo / consultation qualification form handler (safe non-live test mode).
 require_once get_template_directory() . '/demo-form.php';

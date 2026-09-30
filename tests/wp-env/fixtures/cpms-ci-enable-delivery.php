@@ -8,8 +8,9 @@
  * disposable environment only, the environment-owned activation control for
  * lead delivery. On the authorized live host the environment owner sets the
  * SAME constant in wp-config.php; this fixture carries no recipient address,
- * no mail transport, and no credentials of any kind — the recipient stays the
- * single code-bounded authorized value inside the theme.
+ * no mail transport, and no credentials of any kind. This fixture simulates
+ * ONLY the environment gate; effective delivery additionally requires the
+ * site-level switch in تنظیمات کوروش (default OFF), which tests set separately.
  *
  * Must-use plugins load before the theme, so the constant is defined before
  * themes/koorosh/demo-form.php reads it, exactly as a wp-config constant

@@ -215,6 +215,12 @@ else
 	ko "Site-shell navigation guardrails failed"
 fi
 
+if node "$root/tests/static/validate-theme-settings.mjs"; then
+	ok "Koorosh Theme Settings guardrails (compact option, Settings API + manage_options, no secrets, dual-gate delivery, evidence-honest read-only status)"
+else
+	ko "Koorosh Theme Settings guardrails failed"
+fi
+
 if node "$root/tests/static/validate-seo-foundation.mjs"; then
 	ok "Technical-SEO foundation guardrails (metadata audit, staging-leak scan, canonical/robots/sitemap ownership, utility 404, structured-data omission)"
 else
@@ -280,6 +286,12 @@ if node --check "$root/tests/browser/terms.mjs"; then
 	ok "terms.mjs module syntax (node --check)"
 else
 	ko "terms.mjs syntax check failed"
+fi
+
+if node --check "$root/tests/browser/theme-settings.mjs"; then
+	ok "theme-settings.mjs module syntax (node --check)"
+else
+	ko "theme-settings.mjs syntax check failed"
 fi
 
 printf '== Static validation result: %s passed, %s failed ==\n' "$pass" "$fail"

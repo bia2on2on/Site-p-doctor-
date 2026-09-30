@@ -30,12 +30,15 @@ Still NOT authorized / NOT configured:
 never called, nothing is persisted or logged, and valid submissions receive the honest
 non-live notice. Deploying or updating the code can never enable delivery by itself.
 
-**B. AUTHORIZED LIVE ENVIRONMENT:** delivery can be activated only by the environment owner
+**B. AUTHORIZED LIVE ENVIRONMENT (dual gate):** delivery requires BOTH (A) the environment owner
 defining `CPMS_LEAD_DELIVERY_ENABLED` as (boolean) `true` in wp-config.php (or an equivalent
-environment-owned bootstrap). The theme only reads the constant and never defines it. When
-activated, delivery uses the WordPress-native mail layer (`wp_mail()`) with the single
-code-bounded authorized recipient; SMTP/transport/deliverability configuration remains
-environment-owned and outside Git. **Live host activation has NOT been done.**
+environment-owned bootstrap) AND (B) the administrator's site-level switch in تنظیمات کوروش → فروش و
+درخواست دمو (default OFF). The theme only reads the constant and never defines it; the site switch can
+only narrow the environment gate, never replace it. When both are on, delivery uses the
+WordPress-native mail layer (`wp_mail()`) with the recipient configured by an administrator
+(`manage_options`) — falling back to the Product-Owner-authorized default — and never from a request
+parameter. SMTP/transport/deliverability configuration remains environment-owned and outside Git.
+**Live host activation has NOT been done.**
 
 ### Delivery states (single vocabulary)
 

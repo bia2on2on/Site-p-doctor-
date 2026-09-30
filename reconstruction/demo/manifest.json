@@ -13,7 +13,7 @@
   "lead_delivery": {
     "authorized_recipient": "biatoweb@gmail.com",
     "default_state": "OFF — safe non-live mode (no mail, no persistence, no logging)",
-    "activation": "environment-owned wp-config constant CPMS_LEAD_DELIVERY_ENABLED (boolean true); theme never defines it",
+    "activation": "DUAL GATE — environment-owned wp-config constant CPMS_LEAD_DELIVERY_ENABLED (boolean true; theme never defines it) AND the administrator site-level switch in Koorosh Theme Settings (default OFF)",
     "transport": "WordPress-native wp_mail only; SMTP/deliverability configuration is environment-owned and outside Git",
     "states": [
       "validation_failure",

@@ -175,7 +175,7 @@ menu_locations="$(run_wp wp eval '$m = get_registered_nav_menus(); echo (isset($
 run_wp wp plugin is-active elementor >/dev/null 2>&1 \
   && ok "Free Elementor still active with Koorosh active" \
   || ko "Free Elementor no longer active after Koorosh activation"
-for php_file in functions.php index.php header.php footer.php page-elementor.php demo-form.php 404.php; do
+for php_file in functions.php index.php header.php footer.php page-elementor.php demo-form.php 404.php inc/theme-settings.php; do
   run_wp php -l "/var/www/html/wp-content/themes/koorosh/$php_file" \
     && ok "PHP lint: $php_file" || ko "PHP lint failed: $php_file"
 done
