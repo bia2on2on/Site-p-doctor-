@@ -114,7 +114,7 @@ try {
   assert.match(await page.locator('#preview-toast').innerText(), /هیچ درخواستی ثبت یا ارسال نمی‌شود/);
   await page.locator('#workflow').scrollIntoViewIfNeeded();
   await page.locator('.workflow-track').waitFor({ state: 'visible' });
-  await page.waitForFunction(() => document.querySelector('.workflow-track')?.classList.contains('is-visible'));
+  await page.waitForFunction(() => document.querySelector('#workflow .section-heading')?.classList.contains('is-visible'));
   await page.locator('.question-item').nth(1).locator('summary').click();
   assert.equal(await page.locator('.question-item').nth(1).evaluate((node) => node.open), true, 'objection details disclosure opens');
 
