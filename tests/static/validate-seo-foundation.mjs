@@ -40,18 +40,21 @@ import { pageIdentity as patientPortal } from '../../reconstruction/patient-port
 import { pageIdentity as prescriptions } from '../../reconstruction/prescriptions-documents/recipe.mjs';
 import { pageIdentity as faq } from '../../reconstruction/faq/recipe.mjs';
 import { pageIdentity as security } from '../../reconstruction/security-data-access/recipe.mjs';
+import { pageIdentity as privacy } from '../../reconstruction/privacy/recipe.mjs';
+import { pageIdentity as terms } from '../../reconstruction/terms/recipe.mjs';
 
 const root = resolve(import.meta.dirname, '../..');
 const read = rel => readFileSync(resolve(root, rel), 'utf8');
 
-/** Every implemented, publicly routable sales page in the current site. */
+/** Every implemented, publicly routable sales and utility page in the current site. */
 export const implementedPages = [
   homepage, productOverview, demo, appointment, patientRecord,
   doctorWorkspace, patientPortal, prescriptions, faq, security,
+  privacy, terms,
 ];
 
 // ---- 1. Title / meta-description audit --------------------------------------
-assert.equal(implementedPages.length, 10, 'The audit must cover every implemented sales page');
+assert.equal(implementedPages.length, 12, 'The audit must cover every implemented sales and utility page');
 
 for (const page of implementedPages) {
   assert(typeof page.title === 'string' && page.title.trim().length > 0, `Title present: ${page.slug}`);

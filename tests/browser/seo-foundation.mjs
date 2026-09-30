@@ -56,6 +56,8 @@ import { pageIdentity as patientPortal } from '../../reconstruction/patient-port
 import { pageIdentity as prescriptions } from '../../reconstruction/prescriptions-documents/recipe.mjs';
 import { pageIdentity as faq } from '../../reconstruction/faq/recipe.mjs';
 import { pageIdentity as security } from '../../reconstruction/security-data-access/recipe.mjs';
+import { pageIdentity as privacy } from '../../reconstruction/privacy/recipe.mjs';
+import { pageIdentity as terms } from '../../reconstruction/terms/recipe.mjs';
 
 const root = resolve(import.meta.dirname, '../..');
 const out = resolve(import.meta.dirname, 'artifacts/seo-foundation');
@@ -82,7 +84,7 @@ assert.equal(wp('option', 'get', 'home'), base, 'Only the disposable default wp-
 assert.equal(wp('theme', 'list', '--status=active', '--field=name'), 'koorosh');
 assert.equal(wp('option', 'get', 'permalink_structure'), '/%postname%/', 'Stable post-name permalinks');
 
-const identities = [homepage, productOverview, demo, appointment, patientRecord, doctorWorkspace, patientPortal, prescriptions, faq, security];
+const identities = [homepage, productOverview, demo, appointment, patientRecord, doctorWorkspace, patientPortal, prescriptions, faq, security, privacy, terms];
 const frontId = wp('post', 'list', '--post_type=page', '--name=cpms-home', '--field=ID');
 assert.match(frontId, /^\d+$/);
 assert.equal(wp('option', 'get', 'page_on_front'), frontId, 'The reconstructed Homepage is the front page');

@@ -1,0 +1,83 @@
+{
+  "page": {
+    "id": "terms",
+    "title": "شرایط استفاده از وب‌سایت | CPMS",
+    "slug": "terms",
+    "route": "/terms/",
+    "language": "fa-IR",
+    "direction": "rtl",
+    "status": "target-not-publication-approved",
+    "legalReviewStatus": "LEGAL REVIEW REQUIRED BEFORE PUBLIC LAUNCH",
+    "businessLegalInputStatus": "BUSINESS/LEGAL INPUT REQUIRED",
+    "role": "utility-legal"
+  },
+  "authoring": {
+    "model": "elementor-editor-command-api",
+    "recipe": "reconstruction/terms/recipe.mjs",
+    "claims": "reconstruction/terms/claims.md",
+    "tokens": "design-system/tokens.json",
+    "siteShell": "reconstruction/site-shell/manifest.json",
+    "elementorEdition": "free",
+    "allowedElementTypes": ["container", "heading", "text-editor", "button"],
+    "proWidgets": "none",
+    "thirdPartyAddons": "none",
+    "rawHtmlWidgets": "none",
+    "customCssWidgets": "none",
+    "mediaPlaceholders": "none",
+    "iconBadges": "none",
+    "structuredData": "none",
+    "seo": {
+      "pageRole": "utility-legal",
+      "commercialKeywordOptimization": "none",
+      "developmentIndexability": "noindex-until-launch-approval",
+      "futureProductionDefault": "normal-crawlable-utility-page"
+    }
+  },
+  "unresolvedBusinessLegalInputs": [
+    {
+      "field": "registeredCompanyName",
+      "status": "BUSINESS/LEGAL INPUT REQUIRED"
+    },
+    {
+      "field": "companyRegistrationNumber",
+      "status": "BUSINESS/LEGAL INPUT REQUIRED"
+    },
+    {
+      "field": "physicalAddress",
+      "status": "BUSINESS/LEGAL INPUT REQUIRED"
+    },
+    {
+      "field": "jurisdictionOrCourt",
+      "status": "BUSINESS/LEGAL INPUT REQUIRED"
+    },
+    {
+      "field": "legalRepresentative",
+      "status": "BUSINESS/LEGAL INPUT REQUIRED"
+    },
+    {
+      "field": "taxIdentity",
+      "status": "BUSINESS/LEGAL INPUT REQUIRED"
+    },
+    {
+      "field": "supportSla",
+      "status": "BUSINESS/LEGAL INPUT REQUIRED"
+    },
+    {
+      "field": "businessPhone",
+      "status": "BUSINESS/LEGAL INPUT REQUIRED"
+    }
+  ],
+  "sections": [
+    { "order": 0, "id": "review-notice", "role": "Internal design and legal review notice" },
+    { "order": 1, "id": "introduction", "role": "Hero / website terms scope and review notice" },
+    { "order": 2, "id": "website-scope", "role": "Informational purpose, non-contractual demo request, no public fixed pricing, and product descriptions subject to verification" },
+    { "order": 3, "id": "medical-and-data-boundary", "role": "No medical advice and prohibition on patient/medical data in the demo form" },
+    { "order": 4, "id": "availability-and-ip", "role": "No guarantee of uninterrupted website availability, generic intellectual property notice, and external link boundary" },
+    { "order": 5, "id": "next-step", "role": "Related routes (/demo/, /privacy/, /product-overview/, /faq/)" }
+  ],
+  "links": {
+    "primaryCta": "/demo/",
+    "secondaryCta": "/privacy/",
+    "supportingLinks": ["/product-overview/", "/faq/"]
+  }
+}

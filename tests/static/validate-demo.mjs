@@ -197,10 +197,13 @@ for (const state of ['CPMS_FORM_STATE_VALIDATION_FAILURE', 'CPMS_FORM_STATE_DELI
   assert(formPhp.includes(state), `Delivery state constant missing: ${state}`);
 }
 
-// Anti-spam decoy, data-use disclosure, and conditional non-live banner
+// Anti-spam decoy, data-use disclosure, crawlable privacy link, and conditional non-live banner
 assert(formPhp.includes('cpms_website_url'), 'First-party honeypot field required');
 assert(formPhp.includes('id="cpms-data-use-note"'), 'Minimal data-use disclosure required beside the form');
 assert(formPhp.includes('اطلاعات بیماران یا داده‌های پزشکی وارد نکنید'), 'Data-use disclosure repeats the PHI prohibition');
+assert(formPhp.includes('href="/privacy/"') && formPhp.includes('حریم خصوصی وب‌سایت'), 'Data-use disclosure beside the Demo form must include a crawlable link to /privacy/');
+assert(!/type=["']checkbox["']/i.test(formPhp), 'Demo form must not add a mandatory consent checkbox without approved legal basis');
+assert(!/موافقت با پردازش طبق قانون|رضایت قانونی صریح/u.test(formPhp), 'Demo form must not invent statutory consent wording');
 const bannerPos = formPhp.indexOf('cpms-non-live-banner');
 assert(bannerPos > deliveryGuardPos, 'Non-live banner must render only while delivery is disabled');
 assert(formPhp.includes('SAFE NON-LIVE MODE'), 'Form handler must document the safe non-live default');

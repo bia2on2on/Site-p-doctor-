@@ -95,11 +95,14 @@ A server-side heuristic (10-consecutive-digit check) is defense-in-depth only an
 
 ### Data-use disclosure (minimal, pending legal review)
 
-Beside the form, a minimal accurate disclosure states that the contact/organization
-information entered is used only to respond to the demo/consultation request (when live
-delivery is activated), and repeats the PHI prohibition. No retention period, legal basis,
-company registration identity, or privacy promise is stated: finalized Privacy/Terms text
-does not yet exist and remains a separate launch blocker.
+Beside the form (`#cpms-data-use-note`), a minimal accurate disclosure states that the
+contact/organization information entered is used only to respond to the demo/consultation
+request (when live delivery is activated), repeats the PHI prohibition, and provides a
+direct crawlable link to `/privacy/` (`حریم خصوصی وب‌سایت`). No mandatory consent checkbox
+or statutory consent wording is invented, and no retention period, legal basis, or company
+registration identity is stated: `/privacy/` and `/terms/` carry
+`LEGAL REVIEW REQUIRED BEFORE PUBLIC LAUNCH` and track unprovided corporate/legal facts as
+`BUSINESS/LEGAL INPUT REQUIRED`.
 
 ---
 

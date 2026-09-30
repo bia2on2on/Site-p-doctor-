@@ -11,9 +11,10 @@ global FAQ / buyer-objection page) into one coherent site:
 - a real WordPress **primary menu** (`menu.mjs` → WP-CLI `wp menu` commands in
   `tests/browser/site-shell.mjs`) assigned to the Koorosh `primary` location;
 - a compact truthful **footer menu** assigned to the `footer` location. The FAQ
-  (`/faq/`) is discovered from the footer only, as the trust route beside the
-  conversion route (`SITE-ARCHITECTURE §6.4`); it is deliberately **not** a
-  top-level header item;
+  (`/faq/`), Security & Data Access (`/security-data-access/`), Privacy
+  (`/privacy/`), and Website Terms (`/terms/`) pages are discovered from the
+  footer menu alongside the primary conversion routes (`SITE-ARCHITECTURE §6.4`);
+  they are deliberately **not** top-level header items;
 - a Koorosh fallback **header** (identity + primary nav + persistent
   `/demo/` CTA) with an accessible, progressively-enhanced mobile toggle and a
   compact accessible workflows submenu (`themes/koorosh/header.php`,
@@ -50,5 +51,5 @@ location assignments remain valid reusable data for any later header.
 - Live lead delivery remains **NOT CONFIGURED / NOT AUTHORIZED**; navigation
   to `/demo/` never implies a request reaches Sales, and the demo page keeps
   its non-live disclosure.
-- No contact data, address, legal/privacy destinations, social links, logo
+- No contact data, address, company registration numbers, social links, logo
   artwork, or phone numbers are invented anywhere in this slice.
