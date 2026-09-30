@@ -3,6 +3,7 @@ name: WordPress + Elementor smoke + reference-host compatibility
 # Free-Elementor CI plus a bounded REFERENCE-HOST COMPATIBILITY CI phase.
 # This is a HOST-PARITY SIMULATION, never real-host acceptance: no host access,
 # LiteSpeed, Elementor Pro, real email, or clean Pro kit import is performed.
+# A separate job builds the Koorosh TEST-HOST TRANSFER PACKAGE (test build, never a release).
 # WordPress/Elementor pins and owner-reported evidence are tracked in
 # reconstruction/manifest.json and its reference_host_compatibility_ci block.
 # PHP is family-only; exact MariaDB and LiteSpeed parity are not tested.
@@ -141,6 +142,89 @@ jobs:
           name: page-evidence-${{ github.event.pull_request.head.sha || github.sha }}
           path: tests/browser/artifacts/
           if-no-files-found: warn
+          retention-days: 14
+
+      - name: Collect container logs on failure
+        if: failure()
+        run: |
+          docker ps -a
+          for c in $(docker ps -aq); do
+            echo "=== logs: $c ==="
+            docker logs --tail 60 "$c" 2>&1 || true
+          done
+
+  koorosh-transfer-package:
+    name: Koorosh TEST-HOST TRANSFER PACKAGE (build, validate, install ZIP into clean WordPress)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    # Test build only: NOT a production release, NOT publication authorization, NOT Elementor Pro /
+    # LiteSpeed / real-host acceptance. No GitHub Release or tag is created; the artifact is a
+    # bounded-retention workflow artifact bound to the exact source SHA.
+    steps:
+      - name: Check out the exact source SHA (not the PR merge ref)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Package self-tests (determinism, inventory, checksums, negative fixtures)
+        run: python3 tests/package/test_package.py
+
+      - name: Build Koorosh transfer package (ZIP + manifest + SHA256SUMS)
+        env:
+          KOOROSH_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 scripts/package-koorosh-theme.py --require-clean --out-dir dist/transfer
+          # Independent second build must be byte-identical (deterministic ZIP).
+          python3 scripts/package-koorosh-theme.py --require-clean --out-dir dist/transfer-verify
+          cmp dist/transfer/koorosh-*-test-build-*.zip dist/transfer-verify/koorosh-*-test-build-*.zip
+          rm -rf dist/transfer-verify
+          (cd dist/transfer && sha256sum -c SHA256SUMS)
+
+      - name: Validate package (layout, identity, inventory, forbidden files, manifest flags)
+        run: python3 tests/package/validate_package.py dist/transfer --expect-sha "${{ github.event.pull_request.head.sha || github.sha }}"
+
+      - name: Install locked wp-env tooling
+        run: |
+          if ! npm ci --prefix tests/browser --no-fund --no-audit > /tmp/wp-env-install.log 2>&1; then
+            tail -20 /tmp/wp-env-install.log
+            detail=$(tail -12 /tmp/wp-env-install.log | tr '\n' ' ')
+            echo "::error title=wp-env package bootstrap::$detail"
+            exit 1
+          fi
+          echo "$GITHUB_WORKSPACE/tests/browser/node_modules/.bin" >> "$GITHUB_PATH"
+
+      - name: Start CLEAN WordPress + pinned free Elementor (no theme mapped from source)
+        run: |
+          mkdir -p tests/package/pkg
+          cp dist/transfer/* tests/package/pkg/
+          cd tests/package
+          if ! wp-env start > /tmp/wp-env-pkg-start.log 2>&1; then
+            tail -25 /tmp/wp-env-pkg-start.log
+            detail=$(tail -15 /tmp/wp-env-pkg-start.log | tr '\n' ' ')
+            echo "::error title=wp-env start failed (package job)::$detail"
+            exit 1
+          fi
+          tail -5 /tmp/wp-env-pkg-start.log
+
+      - name: Install the ZIP into clean WordPress, activate, and verify
+        run: bash tests/package/install-check.sh
+
+      - name: Record package identity (annotation + job summary)
+        run: |
+          node -e '
+          const m = JSON.parse(require("fs").readFileSync("dist/transfer/koorosh-transfer-manifest.json", "utf8"));
+          const line = `${m.zip_file} sha256=${m.zip_sha256} source=${m.source_commit_sha} theme=${m.theme_slug}@${m.theme_version} elementor_pro_included=${m.elementor_pro_included} production_release=${m.production_release} publication_authorized=${m.publication_authorized}`;
+          console.log(`::notice title=TEST-HOST TRANSFER PACKAGE::${line}`);
+          require("fs").appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### TEST-HOST TRANSFER PACKAGE (test build, not a release)\n\n- ZIP: \`${m.zip_file}\`\n- SHA-256: \`${m.zip_sha256}\`\n- Source commit: \`${m.source_commit_sha}\`\n- Theme: \`${m.theme_slug}\` ${m.theme_version}\n- Elementor Pro included: ${m.elementor_pro_included}; production release: ${m.production_release}; publication authorized: ${m.publication_authorized}\n- Host / Pro / LiteSpeed acceptance: NOT RUN\n`);
+          '
+
+      - name: Upload TEST-HOST TRANSFER PACKAGE artifact (only after validation and ZIP-install proof)
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: koorosh-test-host-transfer-${{ github.event.pull_request.head.sha || github.sha }}
+          path: dist/transfer/
+          if-no-files-found: error
           retention-days: 14
 
       - name: Collect container logs on failure

@@ -19,6 +19,8 @@
 #   5. design-system tokens + manifest integrity (tests/static/validate-tokens.mjs:
 #      schema shape, WCAG contrast math, font budget/files, breakpoint contract,
 #      Elementor mapping coverage, manifest honesty sentinels and checksums).
+#   6+. Koorosh TEST-HOST TRANSFER PACKAGE self-tests (tests/package/test_package.py):
+#      no WordPress needed; the ZIP-install proof runs in the separate CI job.
 
 set -u -o pipefail
 
@@ -323,6 +325,18 @@ if node --check "$root/tests/wp-env/reference-host-compatibility.mjs"; then
 	ok "reference-host-compatibility.mjs module syntax (node --check)"
 else
 	ko "reference-host-compatibility.mjs syntax check failed"
+fi
+
+if PYTHONDONTWRITEBYTECODE=1 python3 "$root/tests/package/test_package.py"; then
+	ok "Koorosh transfer package: deterministic ZIP, inventory, checksums, manifest flags, forbidden-file rejection, workflow policy (tests/package/test_package.py)"
+else
+	ko "Koorosh transfer package self-tests failed (tests/package/test_package.py)"
+fi
+
+if bash -n "$root/tests/package/install-check.sh"; then
+	ok "install-check.sh shell syntax (bash -n)"
+else
+	ko "install-check.sh syntax check failed"
 fi
 
 printf '== Static validation result: %s passed, %s failed ==\n' "$pass" "$fail"

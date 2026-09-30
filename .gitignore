@@ -20,3 +20,10 @@ test-results/
 # Reproducible browser tooling and ephemeral evidence
 node_modules/
 tests/browser/artifacts/
+
+# Generated TEST-HOST TRANSFER PACKAGE output (built in CI from the exact SHA; never committed)
+dist/
+tests/package/pkg/
+
+# Python bytecode
+__pycache__/
