@@ -112,6 +112,9 @@ jobs:
       - name: Reconstruct native Free Website Terms utility page and capture browser evidence
         run: node tests/browser/terms.mjs
 
+      - name: Reconstruct native Free Contact utility page and capture browser evidence
+        run: node tests/browser/contact.mjs
+
       - name: Reconstruct WordPress navigation menus and capture site-shell evidence
         run: node tests/browser/site-shell.mjs
 
@@ -135,7 +138,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Upload homepage, Product Overview, Demo, lead-delivery, workflow, FAQ, Security & Data Access page and site-shell evidence (also on failure; includes the patient-record/continuity, doctor-workspace, patient-portal and prescriptions-documents pages)
+      - name: Upload homepage, Product Overview, Demo, lead-delivery, workflow, FAQ, Security & Data Access, Contact page and site-shell evidence (also on failure; includes the patient-record/continuity, doctor-workspace, patient-portal, prescriptions-documents, Privacy and Terms pages)
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:

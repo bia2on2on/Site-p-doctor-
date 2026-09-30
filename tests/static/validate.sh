@@ -236,6 +236,12 @@ else
 	ko "Website Terms utility page guardrails failed"
 fi
 
+if node "$root/tests/static/validate-contact.mjs"; then
+	ok "Contact utility page native authoring, settings-driven contact rendering and honesty guardrails"
+else
+	ko "Contact utility page guardrails failed"
+fi
+
 if node "$root/tests/static/validate-site-shell.mjs"; then
 	ok "Site-shell navigation, menu-structure and honesty guardrails"
 else
@@ -307,6 +313,12 @@ if node --check "$root/tests/browser/privacy.mjs"; then
 	ok "privacy.mjs module syntax (node --check)"
 else
 	ko "privacy.mjs syntax check failed"
+fi
+
+if node --check "$root/tests/browser/contact.mjs"; then
+	ok "contact.mjs module syntax (node --check)"
+else
+	ko "contact.mjs syntax check failed"
 fi
 
 if node --check "$root/tests/browser/terms.mjs"; then

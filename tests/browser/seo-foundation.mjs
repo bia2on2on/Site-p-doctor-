@@ -2,7 +2,7 @@
  * Runtime technical-SEO / launch-hardening evidence (ephemeral wp-env only).
  *
  * Run LAST in the CI sequence: it authors nothing, it only observes the site
- * the earlier runners reconstructed (ten real pages + the WordPress menus).
+ * the earlier runners reconstructed (thirteen real pages + the WordPress menus).
  *
  * The runner deliberately separates two expectation sets and never mixes them:
  *
@@ -58,6 +58,7 @@ import { pageIdentity as faq } from '../../reconstruction/faq/recipe.mjs';
 import { pageIdentity as security } from '../../reconstruction/security-data-access/recipe.mjs';
 import { pageIdentity as privacy } from '../../reconstruction/privacy/recipe.mjs';
 import { pageIdentity as terms } from '../../reconstruction/terms/recipe.mjs';
+import { pageIdentity as contact } from '../../reconstruction/contact/recipe.mjs';
 
 const root = resolve(import.meta.dirname, '../..');
 const out = resolve(import.meta.dirname, 'artifacts/seo-foundation');
@@ -84,7 +85,7 @@ assert.equal(wp('option', 'get', 'home'), base, 'Only the disposable default wp-
 assert.equal(wp('theme', 'list', '--status=active', '--field=name'), 'koorosh');
 assert.equal(wp('option', 'get', 'permalink_structure'), '/%postname%/', 'Stable post-name permalinks');
 
-const identities = [homepage, productOverview, demo, appointment, patientRecord, doctorWorkspace, patientPortal, prescriptions, faq, security, privacy, terms];
+const identities = [homepage, productOverview, demo, appointment, patientRecord, doctorWorkspace, patientPortal, prescriptions, faq, security, privacy, terms, contact];
 const frontId = wp('post', 'list', '--post_type=page', '--name=cpms-home', '--field=ID');
 assert.match(frontId, /^\d+$/);
 assert.equal(wp('option', 'get', 'page_on_front'), frontId, 'The reconstructed Homepage is the front page');

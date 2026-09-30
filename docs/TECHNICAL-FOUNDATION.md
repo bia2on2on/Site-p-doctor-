@@ -52,7 +52,7 @@ A small WordPress-native admin area (`themes/koorosh/inc/theme-settings.php`, me
 
 | Key | Default | Bound / validation |
 | --- | --- | --- |
-| `contact_email`, `contact_phone`, `contact_address` | empty | one plain address ≤100; digits/space/`+-()` ≤30; plain text ≤200. **Never rendered anywhere and never injected into legal copy** (a deliberate, reviewed integration would be required). |
+| `contact_email`, `contact_phone`, `contact_address` | empty | one plain address ≤100; digits/space/`+-()` ≤30; plain text ≤200. **Rendered ONLY by the deliberate, reviewed Contact-page integration** (`/contact/` → the narrowly scoped `[cpms_contact_details]` renderer in `themes/koorosh/contact-details.php`, which reads the settings at render time): `contact_email` resolves to the authorized public default `biatoweb@gmail.com` (Product Owner decision 2026-09-30; separate role from `lead_recipient`) and renders as a `mailto:` link; phone/address render only when configured (`tel:` safely normalized) and never as empty rows. Still **never injected into legal copy**, and no page content freezes the values. |
 | `lead_recipient` | authorized default `biatoweb@gmail.com` (single source: `cpms_lead_delivery_default_recipient()`) | one plain address; empty restores the default; invalid keeps the previous value. Project configuration evidence, **not** a company identity. The public Privacy page names this address — re-review it if the recipient changes. |
 | `lead_site_enabled` | **OFF** | boolean. |
 | `header_show_site_title`, `header_show_cta` | ON (current shell) | booleans; affect only the Koorosh fallback header. |

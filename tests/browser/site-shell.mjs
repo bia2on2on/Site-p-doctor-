@@ -106,12 +106,13 @@ assert.deepEqual(footerStructure.map(i => i.title), footerMenu.items.map(i => i.
 writeFileSync(resolve(out, 'menu-structure.json'), JSON.stringify({ primary: menuStructure, footer: footerStructure }, null, 2));
 
 const workflowRoutes = primaryMenu.items.find(i => i.title === 'جریان‌های کاری').children.map(c => `/${c.slug}/`);
-// Footer destinations: the product page, the FAQ/objection trust route, the security trust route and the conversion route.
+// Footer destinations: the product page, the FAQ/objection trust route, the security trust route, the conversion route, the public contact route and the legal routes.
 const faqRoute = '/faq/';
 const securityRoute = '/security-data-access/';
+const contactRoute = '/contact/';
 const privacyRoute = '/privacy/';
 const termsRoute = '/terms/';
-const footerRoutes = ['/product-overview/', faqRoute, securityRoute, '/demo/', privacyRoute, termsRoute];
+const footerRoutes = ['/product-overview/', faqRoute, securityRoute, '/demo/', contactRoute, privacyRoute, termsRoute];
 const allRoutes = ['/', ...footerRoutes, ...workflowRoutes];
 
 // ---- Browser proof ----------------------------------------------------------
@@ -184,6 +185,9 @@ try {
     assert.equal(await footerNav.locator('a').count(), footerMenu.items.length, `${name}: footer stays compact (${footerMenu.items.length} truthful links)`);
     const footerFaq = footerNav.getByRole('link', { name: 'پرسش‌های متداول', exact: true });
     assert.equal(await footerFaq.getAttribute('href'), `${base}${faqRoute}`, `${name}: FAQ is discoverable from the footer`);
+    const footerContact = footerNav.getByRole('link', { name: 'تماس با ما', exact: true });
+    assert.equal(await footerContact.count(), 1, `${name}: footer exposes exactly one تماس با ما route`);
+    assert.equal(await footerContact.getAttribute('href'), `${base}${contactRoute}`, `${name}: footer Contact route resolves to /contact/`);
 
     const measures = await page.evaluate(() => ({
       width: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth,

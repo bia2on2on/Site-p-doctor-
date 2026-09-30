@@ -18,6 +18,7 @@ import { pageIdentity as faqIdentity } from '../../reconstruction/faq/recipe.mjs
 import { pageIdentity as securityIdentity } from '../../reconstruction/security-data-access/recipe.mjs';
 import { pageIdentity as privacyIdentity } from '../../reconstruction/privacy/recipe.mjs';
 import { pageIdentity as termsIdentity } from '../../reconstruction/terms/recipe.mjs';
+import { pageIdentity as contactIdentity } from '../../reconstruction/contact/recipe.mjs';
 
 const read = rel => readFileSync(new URL('../../' + rel, import.meta.url), 'utf8');
 
@@ -25,7 +26,7 @@ const read = rel => readFileSync(new URL('../../' + rel, import.meta.url), 'utf8
 const knownSlugs = new Set([
   homeIdentity.slug, overviewIdentity.slug, demoIdentity.slug,
   appointmentIdentity.slug, recordIdentity.slug, workspaceIdentity.slug, portalIdentity.slug,
-  faqIdentity.slug, securityIdentity.slug, privacyIdentity.slug, termsIdentity.slug,
+  faqIdentity.slug, securityIdentity.slug, privacyIdentity.slug, termsIdentity.slug, contactIdentity.slug,
 ]);
 for (const { slug } of slugReferences()) {
   assert(knownSlugs.has(slug), `Menu references a page that no recipe reconstructs: ${slug}`);
@@ -51,21 +52,23 @@ assert.deepEqual(
 assert(workflows.children.every(c => !c.children), 'Navigation depth stays at 2 (no nested submenus)');
 assert.deepEqual(
   footerMenu.items.map(i => i.slug),
-  ['cpms-home', 'product-overview', 'appointment-reception-queue', 'patient-record-continuity', 'doctor-workspace', 'patient-portal', 'faq', 'security-data-access', 'demo', 'privacy', 'terms'],
-  'Footer menu links only to real current pages including /privacy/ and /terms/',
+  ['cpms-home', 'product-overview', 'appointment-reception-queue', 'patient-record-continuity', 'doctor-workspace', 'patient-portal', 'faq', 'security-data-access', 'demo', 'contact', 'privacy', 'terms'],
+  'Footer menu links only to real current pages including /contact/, /privacy/ and /terms/',
 );
+assert.equal(footerMenu.items.find(i => i.slug === 'contact')?.title, 'تماس با ما', 'Footer menu contact label must be تماس با ما');
 assert.equal(footerMenu.items.find(i => i.slug === 'privacy')?.title, 'حریم خصوصی', 'Footer menu privacy label must be حریم خصوصی');
 assert.equal(footerMenu.items.find(i => i.slug === 'terms')?.title, 'شرایط استفاده', 'Footer menu terms label must be شرایط استفاده');
-// FAQ, Security, Privacy, and Terms are footer destinations, not top-level header items.
+// FAQ, Security, Contact, Privacy, and Terms are footer destinations, not top-level header items.
 assert(!primaryMenu.items.some(i => i.slug === faqIdentity.slug || i.title === 'پرسش‌های متداول'), 'FAQ must not become a top-level header item');
 assert(!primaryMenu.items.some(i => i.slug === securityIdentity.slug || i.title === 'امنیت و دسترسی به داده'), 'Security page must not become a top-level header item');
+assert(!primaryMenu.items.some(i => i.slug === contactIdentity.slug || i.title === 'تماس با ما'), 'Contact must not become a top-level header item (primary navigation unchanged)');
 assert(!primaryMenu.items.some(i => i.slug === privacyIdentity.slug || i.title === 'حریم خصوصی'), 'Privacy page must not become a top-level header item');
 assert(!primaryMenu.items.some(i => i.slug === termsIdentity.slug || i.title === 'شرایط استفاده'), 'Terms page must not become a top-level header item');
 const allTitles = slugReferences().map(r => r.title).concat(primaryMenu.items.map(i => i.title), [primaryMenu.name, footerMenu.name]);
 for (const title of allTitles) {
   assert(!/mailto:|tel:|https?:\/\//.test(title), `No contact/URL invention inside menu labels: ${title}`);
 }
-assert(!slugReferences().some(r => /about|contact/.test(r.slug)), 'No unbuilt about/contact destinations');
+assert(!slugReferences().some(r => /about/.test(r.slug)), 'No unbuilt about destinations (Contact is a real reconstructed page)');
 
 // ---- 2. Header shell markers ------------------------------------------------
 const header = read('themes/koorosh/header.php');

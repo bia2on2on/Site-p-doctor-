@@ -97,7 +97,10 @@ assert(copy.includes('عدم دریافت اطلاعات بیماران و پر�
 assert(copy.includes('پاسخ به سؤالات متداول پیش از ثبت درخواست'), 'Section 6 FAQ header present');
 assert(copy.includes('بررسی بیشتر پیش از تصمیم‌گیری'), 'Section 7 return path header present');
 assert(copy.includes('href="/product-overview/"'), 'Demo page keeps a real contextual route back to /product-overview/');
+assert(copy.includes('href="/contact/"'), 'Demo page keeps the small alternative-contact route to /contact/');
+assert(copy.includes('اگر مسیر فرم برای شما مناسب نیست'), 'Demo page carries the truthful alternative-contact wording (no form-path is mandatory)');
 assert(copy.includes('لطفاً از وارد کردن اطلاعات بیماران یا داده‌های پزشکی خودداری کنید'), 'Explicit PHI warning in copy');
+assert(!/تیم پشتیبانی|پاسخ\u200c?گویی ۲۴|پشتیبانی ۲۴|پاسخ\u200c?گویی فوری/u.test(copy), 'No support-channel or SLA claims on the Demo page');
 
 // 7. No fabricated image UI
 assert(!nodes.some(n => n.kind === 'image'), 'No fabricated product screenshots or decorative image widgets');

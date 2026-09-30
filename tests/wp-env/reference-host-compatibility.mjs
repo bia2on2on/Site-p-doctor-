@@ -20,7 +20,7 @@ const committedParity = JSON.parse(readFileSync(resolve(root, 'reconstruction/ma
 const pageSlugs = [
   'cpms-home', 'product-overview', 'demo', 'appointment-reception-queue',
   'patient-record-continuity', 'doctor-workspace', 'patient-portal',
-  'prescriptions-documents', 'faq', 'security-data-access', 'privacy', 'terms',
+  'prescriptions-documents', 'faq', 'security-data-access', 'privacy', 'terms', 'contact',
 ];
 mkdirSync(outputDir, { recursive: true });
 

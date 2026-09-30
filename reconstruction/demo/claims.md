@@ -136,3 +136,11 @@ Phrasing follows `docs/PRODUCT-TRUTH.md` and `docs/ROADMAP.md`:
 - Submission/delivery logic stays theme-owned; Elementor keeps page composition. No backend delivery logic lives in Elementor.
 - CI proves the two-mode behavior with `wp_mail` interception (`pre_wp_mail`) in the ephemeral wp-env container: disabled mode sends zero mail; the activated simulation targets exactly the authorized recipient; `wp_mail` failure surfaces as `handoff_failed`; no database persistence occurs. CI never performs real delivery.
 - When Elementor Pro Forms is authorized on the production host, the form container can be adapted to the authorized delivery destination.
+
+### Alternative contact route
+
+The qualification form carries one small truthful alternative line beneath it:
+«اگر مسیر فرم برای شما مناسب نیست، از صفحهٔ تماس با ما استفاده کنید.» linking to `/contact/`
+(general communication only — that page is not a support channel and holds no form). This is
+page-structure copy only: the Demo lead-delivery logic, gates, states and recipient resolution
+are unchanged by the Contact slice.

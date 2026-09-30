@@ -219,3 +219,8 @@ require_once get_template_directory() . '/inc/theme-settings.php';
 
 // Demo / consultation qualification form handler (safe non-live test mode).
 require_once get_template_directory() . '/demo-form.php';
+
+// Public contact details renderer for «تماس با ما» (/contact/): one narrowly
+// scoped shortcode that reads the Koorosh contact settings at render time.
+// Independent of the lead-recipient role in demo-form.php (see its header).
+require_once get_template_directory() . '/contact-details.php';
