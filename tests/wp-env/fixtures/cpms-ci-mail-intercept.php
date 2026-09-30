@@ -4,9 +4,13 @@
  *
  * Copied into the mapped wp-content/mu-plugins directory of the ephemeral
  * wp-env container by tests/browser/demo-delivery.mjs so automated tests can
- * observe every wp_mail() call WITHOUT any real network delivery: the
- * `pre_wp_mail` filter returns non-null, so WordPress never reaches a mail
- * transport at all.
+ * observe every wp_mail() call WITHOUT any real network delivery.
+ *
+ * WordPress (the pinned CI core 7.1.2) applies the `pre_wp_mail` filter as
+ * `apply_filters( 'pre_wp_mail', null, $atts )`, where $atts is the array of
+ * wp_mail() arguments (to, subject, message, headers, attachments, embeds —
+ * see wp-includes/pluggable.php). Returning a non-null value short-circuits
+ * wp_mail(), so no mail transport is ever reached in CI.
  *
  * Behavior:
  *  - Each call is appended as one JSON line to
@@ -27,13 +31,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 add_filter(
 	'pre_wp_mail',
-	function ( $preempt, $to, $subject, $message, $headers, $attachments ) {
+	function ( $preempt, $atts = array() ) {
+		$atts  = is_array( $atts ) ? $atts : array();
 		$entry = array(
-			'to'          => $to,
-			'subject'     => $subject,
-			'message'     => $message,
-			'headers'     => $headers,
-			'attachments' => $attachments,
+			'to'          => isset( $atts['to'] ) ? $atts['to'] : null,
+			'subject'     => isset( $atts['subject'] ) ? $atts['subject'] : null,
+			'message'     => isset( $atts['message'] ) ? $atts['message'] : null,
+			'headers'     => isset( $atts['headers'] ) ? $atts['headers'] : null,
+			'attachments' => isset( $atts['attachments'] ) ? $atts['attachments'] : null,
 			'time'        => microtime( true ),
 		);
 
@@ -45,5 +50,5 @@ add_filter(
 		return $force_fail ? false : true;
 	},
 	10,
-	6
+	2
 );
