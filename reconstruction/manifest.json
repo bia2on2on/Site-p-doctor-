@@ -247,7 +247,7 @@
         "reference_value": "ACTIVE on reported test host",
         "ci_value": "WP_DEBUG enabled; WP_DEBUG_DISPLAY/WP_DEBUG_LOG runtime values recorded; selected response flows checked",
         "evidence_method": "Rendered-response marker checks and scoped debug.log scan when enabled/readable",
-        "limitation": "Only the tested flows are observable; an unreadable log is reported NOT_TESTED. This does not prove absence of all runtime issues or define public-launch debug policy."
+        "limitation": "Only the tested flows are observable; a disabled or unreadable debug log is reported NOT_TESTED. This does not prove absence of all runtime issues or define public-launch debug policy."
       },
       "host_network_and_email": {
         "status": "NOT_TESTED",

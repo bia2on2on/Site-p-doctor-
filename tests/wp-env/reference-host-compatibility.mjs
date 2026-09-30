@@ -332,7 +332,7 @@ echo wp_json_encode( array( 'enabled' => (bool) $enabled, 'readable' => (bool) $
 `));
   report.runtime_observations.debug_log_scan = logDelta.readable === true
     ? { status: 'SIMULATED', koorosh_php_diagnostic_count: logDelta.koorosh_php_diagnostic_count }
-    : { status: 'NOT_TESTED', reason: logDelta.enabled ? 'debug.log was not readable in this runtime' : 'WP_DEBUG_LOG is disabled in wp-env defaults' };
+    : { status: 'NOT_TESTED', reason: logDelta.enabled ? 'debug.log was not readable in this runtime' : 'WP_DEBUG_LOG is disabled in this runtime' };
   if (logDelta.readable === true) {
     check('WP_DEBUG_LOG exposes no Koorosh-attributed PHP warning/notice/deprecation/fatal in this selected flow', logDelta.koorosh_php_diagnostic_count === 0, JSON.stringify(logDelta));
   } else {
@@ -378,7 +378,7 @@ echo wp_json_encode( array( 'enabled' => (bool) $enabled, 'readable' => (bool) $
     theme_settings: { status: 'SIMULATED', reference_value: 'Safe settings model and Persian RTL admin', ci_value: themeSettings.result, limitation: 'Synthetic CI state only; no host database/settings are read.' },
     elementor_pages: { status: 'SIMULATED', reference_value: 'Owner-host-authored content/runtime', ci_value: `${Object.values(pageEvidence).filter(page => page.elementor_authored).length}/${pageSlugs.length} CI pages built with Elementor Free`, limitation: 'Reconstructed native Free pages and editor save/reload suites; not the owner host DB, Pro pages, or kit import.' },
     elementor_library: { status: 'NOT_TESTED', reference_value: 'Connected (owner-reported)', ci_value: 'No authenticated Library connection in public CI', limitation: 'No credential or account connection is attempted.' },
-    debug_mode: { status: 'SIMULATED', reference_value: 'ACTIVE (owner-reported test host)', ci_value: `WP_DEBUG=${initial.wp_debug}; WP_DEBUG_DISPLAY=${initial.wp_debug_display}; WP_DEBUG_LOG=${initial.wp_debug_log}; log scan=${report.runtime_observations.debug_log_scan.status}`, limitation: 'Only selected flows are checked for visible/theme-attributed diagnostics; an unavailable log scan remains NOT_TESTED; not proof of no runtime issues.' },
+    debug_mode: { status: 'SIMULATED', reference_value: 'ACTIVE (owner-reported test host)', ci_value: `WP_DEBUG=${initial.wp_debug}; WP_DEBUG_DISPLAY=${initial.wp_debug_display}; WP_DEBUG_LOG=${initial.wp_debug_log}; log scan=${report.runtime_observations.debug_log_scan.status}`, limitation: 'Only selected flows are checked for visible/theme-attributed diagnostics; a disabled or unreadable log scan remains NOT_TESTED; not proof of no runtime issues.' },
     host_network_smtp: { status: 'NOT_TESTED', reference_value: 'Owner host/network and SMTP', ci_value: 'No host requests; synthetic intercepted lead tests only', limitation: 'No real email, inbox delivery, DNS, firewall, LiteSpeed, host cache, or network parity.' },
     clean_elementor_pro_kit_import: { status: 'NOT_TESTED', reference_value: 'Clean Pro kit import; historical ZipArchive failure', ci_value: 'No kit fixture imported', limitation: 'Requires authorized private Pro environment; synthetic ZIP smoke is not import proof.' },
   };

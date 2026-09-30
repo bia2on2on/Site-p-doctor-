@@ -19,6 +19,9 @@ assert.equal(config.core, 'WordPress/WordPress#7.1.2');
 assert.equal(config.phpVersion, '8.1');
 assert.equal(config.multisite, false);
 assert.equal(config.config.WP_MEMORY_LIMIT, '40M');
+assert.equal(config.config.WP_DEBUG, true, 'WP_DEBUG remains active for the diagnostic simulation');
+assert.equal(Object.hasOwn(config.config, 'WP_DEBUG_DISPLAY'), false, 'do not force response display behavior for diagnostics');
+assert.equal(Object.hasOwn(config.config, 'WP_DEBUG_LOG'), false, 'do not force debug.log behavior for diagnostics');
 assert.equal(Object.hasOwn(config.config, 'WP_MAX_MEMORY_LIMIT'), false, 'do not fake GitHub host memory with 4048M');
 assert.deepEqual(config.plugins, ['https://downloads.wordpress.org/plugin/elementor.4.3.2.zip']);
 assert.deepEqual(config.themes, ['./themes/koorosh'], 'Koorosh is the only mapped theme; Hello is historical evidence only');
@@ -48,6 +51,8 @@ for (const marker of [
 assert(!/wp_mail\s*\(|\bmail\s*\(/.test(runtime), 'compatibility phase never sends mail');
 assert(!/elementor\.pro\.[\w.-]+\.zip|downloads\.wordpress\.org\/plugin\/elementor-pro/i.test(runtime), 'compatibility phase never fetches Elementor Pro');
 assert(runtime.includes('not an Elementor kit import') && runtime.includes('historical Elementor ZipArchive import error'), 'synthetic ZIP smoke must remain explicitly distinct from Elementor import proof');
+assert(runtime.includes("reason: logDelta.enabled ? 'debug.log was not readable in this runtime' : 'WP_DEBUG_LOG is disabled in this runtime'"), 'debug-log gaps must distinguish disabled logging from an unreadable log');
+assert(runtime.includes('log scan=${report.runtime_observations.debug_log_scan.status}'), 'runtime parity report must preserve NOT_TESTED log-scan status');
 
 assert(theme.includes("'elementor/theme/register_locations'"));
 assert(theme.includes("method_exists( $elementor_theme_manager, 'register_location' )"));

@@ -243,6 +243,15 @@ if (dimensions.database?.exact_reference_version_status === "NOT_TESTED" &&
 } else {
   ko("reference-host record must explicitly preserve PHP/DB/Pro/LiteSpeed gaps");
 }
+const debugMode = dimensions.debug_mode ?? {};
+if (debugMode.status === "SIMULATED" &&
+    debugMode.ci_value.includes("WP_DEBUG_DISPLAY/WP_DEBUG_LOG runtime values recorded") &&
+    debugMode.evidence_method.includes("when enabled/readable") &&
+    debugMode.limitation.includes("disabled or unreadable") && debugMode.limitation.includes("NOT_TESTED")) {
+  ok("debug-log settings are observed without forcing behavior; disabled/unreadable scans stay NOT_TESTED");
+} else {
+  ko("debug-mode parity must record actual log/display settings and preserve disabled/unreadable NOT_TESTED semantics");
+}
 const featureFlags = Array.isArray(hostParity.elementor_feature_flags) ? hostParity.elementor_feature_flags : [];
 const requiredFlagNames = ["Containers", "Atomic widgets", "Editor V4", "additional custom breakpoints", "optimized markup", "Theme Builder", "nested elements", "custom import/export", "Atomic Form", "Loop", "Menu"];
 if (requiredFlagNames.every(name => featureFlags.some(item => item.name === name && allowedParityStatuses.has(item.status) && typeof item.relevance === "string"))) {
