@@ -5,7 +5,7 @@
 // and no third-party dependencies required.
 //
 // Meaningful checks (not prose greps):
-//   1. manifest has an exact, closed top-level schema (schema_revision 3);
+//   1. manifest has an exact, closed top-level schema (schema_revision 4);
 //      unknown/missing top-level sections are rejected.
 //   2. host_environment records the exact owner-reported host versions with
 //      source / evidence_date / verification_status that distinguishes
@@ -55,20 +55,20 @@ if (!manifest || !wpEnv) process.exit(1);
 const requiredTop = [
   "schema_revision", "status", "verified_at_utc", "version_source",
   "host_environment", "elementor_feature_state", "historical_log_evidence",
-  "ci_alignment", "versions", "kit_export", "design_system", "artifacts",
+  "ci_alignment", "reference_host_compatibility_ci", "versions", "kit_export", "design_system", "artifacts",
   "expected_inventory", "clean_import_pilot", "authorized_pro_host_acceptance",
   "theme_layer",
 ];
 const topKeys = Object.keys(manifest).sort();
 if (JSON.stringify(topKeys) === JSON.stringify([...requiredTop].sort())) {
-  ok("manifest has the exact expected top-level sections (schema_revision 3 shape)");
+  ok("manifest has the exact expected top-level sections (schema_revision 4 shape)");
 } else {
   ko(`manifest top-level keys differ: ${topKeys.join(", ")}`);
 }
-if (manifest.schema_revision === 3 && typeof manifest.status === "string" && manifest.status.startsWith("TEMPLATE")) {
-  ok("manifest identity: schema_revision 3 with TEMPLATE status");
+if (manifest.schema_revision === 4 && typeof manifest.status === "string" && manifest.status.startsWith("TEMPLATE")) {
+  ok("manifest identity: schema_revision 4 with TEMPLATE status");
 } else {
-  ko("manifest identity malformed (schema_revision must be 3, status must stay TEMPLATE)");
+  ko("manifest identity malformed (schema_revision must be 4, status must stay TEMPLATE)");
 }
 
 // ---- 2. owner-reported host evidence ---------------------------------------
@@ -97,6 +97,8 @@ for (const [k, want] of Object.entries(hostExpected)) {
 }
 
 const site = he.site ?? {};
+if (site.operating_system === "Linux") ok("owner-reported host operating system recorded: Linux");
+else ko(`host operating system expected Linux, got ${site.operating_system}`);
 if (site.locale === "fa_IR") ok("host locale recorded: fa_IR");
 else ko(`host locale expected fa_IR, got ${site.locale}`);
 if (typeof site.installation === "string" && site.installation.includes("single-site")) ok("host installation recorded as single-site");
@@ -107,6 +109,16 @@ if (site.debug_mode === "ACTIVE") ok("host Debug Mode recorded: ACTIVE");
 else ko(`host debug_mode expected ACTIVE, got ${site.debug_mode}`);
 if (typeof site.child_theme === "string" && site.child_theme.startsWith("NONE")) ok("host child theme recorded: NONE active at report time");
 else ko("host child_theme must record NONE active at report time (pre-deployment state)");
+const hostRuntime = site.runtime_configuration ?? {};
+if (hostRuntime.timezone === "UTC+03:30 / Tehran-equivalent behavior as actually configured" &&
+    hostRuntime.permalink_structure === "/index.php/%year%/%monthnum%/%day%/%postname%/" &&
+    hostRuntime.wp_memory_limit === "40M" && hostRuntime.wp_max_memory_limit === "4048M" &&
+    hostRuntime.php_extensions?.gd === "available" && hostRuntime.php_extensions?.zip === "available" &&
+    hostRuntime.elementor_library === "connected") {
+  ok("additional owner-reported timezone/permalink/memory/GD/ZIP/Library facts recorded without agent-verification claims");
+} else {
+  ko("host runtime configuration evidence is incomplete or differs from the owner report");
+}
 
 // ---- 3. agent-verification and pilot sentinels stay intact -----------------
 const canonVersions = manifest.versions ?? {};
@@ -157,7 +169,7 @@ for (const [k, holds] of Object.entries(parity)) {
   else ko(`CI parity broken: ${k} pin (${k === "wordpress" ? coreRef : k === "elementor_free" ? pluginUrl : phpPin}) does not match owner-reported host value`);
 }
 if (phpPin.split(".").length === 2) {
-  ok(`PHP pin is major.minor only (${phpPin}) — patch-level parity is not even representable`);
+  ok(`PHP image pin selects the 8.1 family (${phpPin}) — exact patch parity is not supported by this selected image path`);
 } else {
   ko(`PHP pin must be major.minor (wp-env format), got ${phpPin}`);
 }
@@ -191,6 +203,67 @@ if (typeof ca.basis === "string" && ca.basis.includes("host_environment")) {
   ok("ci_alignment.basis points at the owner-reported host evidence");
 } else {
   ko("ci_alignment.basis must reference the owner-reported host evidence (host_environment)");
+}
+
+// ---- 5b. machine-readable reference-host compatibility record ---------------
+const hostParity = manifest.reference_host_compatibility_ci ?? {};
+const allowedParityStatuses = new Set(["EXACT", "FAMILY_ONLY", "SIMULATED", "NOT_TESTED", "NOT_APPLICABLE"]);
+const dimensions = hostParity.dimensions ?? {};
+const expectedDimensionStatus = {
+  operating_system: "SIMULATED", wordpress: "EXACT", elementor_free: "EXACT", php: "FAMILY_ONLY", database: "SIMULATED",
+  web_server: "NOT_TESTED", elementor_pro: "NOT_TESTED", single_site: "EXACT",
+  locale_and_rtl: "EXACT", timezone: "SIMULATED", permalink: "SIMULATED",
+  wordpress_memory_limit: "SIMULATED", host_max_memory: "NOT_TESTED",
+  zip_extension: "SIMULATED", gd_extension: "SIMULATED", koorosh_theme: "SIMULATED",
+  theme_settings: "SIMULATED", elementor_pages_and_persistence: "SIMULATED",
+  elementor_library: "NOT_TESTED", debug_mode: "SIMULATED", host_network_and_email: "NOT_TESTED",
+  clean_elementor_pro_kit_import: "NOT_TESTED",
+};
+if (hostParity.schema_version === 1 && hostParity.name === "REFERENCE-HOST COMPATIBILITY CI / HOST-PARITY SIMULATION" &&
+    hostParity.reference_evidence_status === "OWNER-REPORTED — NOT INDEPENDENTLY VERIFIED BY AGENT" &&
+    JSON.stringify(hostParity.status_vocabulary) === JSON.stringify(["EXACT", "FAMILY_ONLY", "SIMULATED", "NOT_TESTED", "NOT_APPLICABLE"])) {
+  ok("reference-host CI record has the expected version, label, owner-evidence boundary, and status vocabulary");
+} else {
+  ko("reference-host CI record identity, evidence boundary, or status vocabulary is malformed");
+}
+for (const [name, expectedStatus] of Object.entries(expectedDimensionStatus)) {
+  const item = dimensions[name];
+  if (item && allowedParityStatuses.has(item.status) && item.status === expectedStatus &&
+      typeof item.reference_value === "string" && typeof item.ci_value === "string" && typeof item.evidence_method === "string" && typeof item.limitation === "string") {
+    ok(`reference-host parity dimension is honest and complete: ${name} = ${expectedStatus}`);
+  } else {
+    ko(`reference-host parity dimension ${name} must be ${expectedStatus} with reference/CI values, method, and limitation`);
+  }
+}
+if (dimensions.database?.exact_reference_version_status === "NOT_TESTED" &&
+    dimensions.php?.reference_value === "8.1.34" && dimensions.php?.status === "FAMILY_ONLY" &&
+    dimensions.web_server?.reference_value === "LiteSpeed" && dimensions.elementor_pro?.status === "NOT_TESTED" &&
+    (hostParity.explicit_non_claims || []).some(value => value.includes("Not Elementor Pro acceptance or LiteSpeed verification"))) {
+  ok("exact PHP/DB gaps and Pro/LiteSpeed exclusions remain explicit");
+} else {
+  ko("reference-host record must explicitly preserve PHP/DB/Pro/LiteSpeed gaps");
+}
+const debugMode = dimensions.debug_mode ?? {};
+if (debugMode.status === "SIMULATED" &&
+    debugMode.ci_value.includes("WP_DEBUG_DISPLAY/WP_DEBUG_LOG runtime values recorded") &&
+    debugMode.evidence_method.includes("when enabled/readable") &&
+    debugMode.limitation.includes("disabled or unreadable") && debugMode.limitation.includes("NOT_TESTED")) {
+  ok("debug-log settings are observed without forcing behavior; disabled/unreadable scans stay NOT_TESTED");
+} else {
+  ko("debug-mode parity must record actual log/display settings and preserve disabled/unreadable NOT_TESTED semantics");
+}
+const featureFlags = Array.isArray(hostParity.elementor_feature_flags) ? hostParity.elementor_feature_flags : [];
+const requiredFlagNames = ["Containers", "Atomic widgets", "Editor V4", "additional custom breakpoints", "optimized markup", "Theme Builder", "nested elements", "custom import/export", "Atomic Form", "Loop", "Menu"];
+if (requiredFlagNames.every(name => featureFlags.some(item => item.name === name && allowedParityStatuses.has(item.status) && typeof item.relevance === "string"))) {
+  ok("all owner-reported Elementor feature flags have a relevance/status assessment");
+} else {
+  ko("reference-host feature inventory must assess every reported feature flag");
+}
+if (featureFlags.some(item => item.name === "Theme Builder" && item.status === "NOT_TESTED") &&
+    featureFlags.some(item => item.name === "custom import/export" && item.status === "NOT_TESTED")) {
+  ok("Pro-dependent Theme Builder and clean import/export are not smuggled in as CI acceptance");
+} else {
+  ko("Pro-dependent Theme Builder and custom import/export must remain untested");
 }
 
 // ---- 6. historical ZIP import risk stays a NOT RUN retest item -------------

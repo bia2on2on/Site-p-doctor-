@@ -96,6 +96,7 @@ try {
   check('precondition: active theme is koorosh', wp('theme', 'list', '--status=active', '--field=name') === 'koorosh');
   check('precondition: no PHP fixtures left from earlier runners (environment authorization OFF)', wpEval("echo defined( 'CPMS_LEAD_DELIVERY_ENABLED' ) ? 'defined' : 'undefined';") === 'undefined');
   resetSettings();
+  wp('user', 'meta', 'update', adminUser, 'locale', 'fa_IR');
   wp('user', 'update', adminUser, `--user_pass=${adminPass}`);
 
   // ---- Layer 1: runtime assertions -------------------------------------------
@@ -146,8 +147,12 @@ try {
 
   await page.goto(settingsUrl('general'), { waitUntil: 'domcontentloaded' });
   check('settings page heading is «تنظیمات کوروش»', (await page.locator('#koorosh-settings h1').innerText()).trim() === 'تنظیمات کوروش');
+  const adminDocument = await page.locator('html').evaluate(el => ({ lang: el.lang, dir: el.dir }));
+  check('Persian admin locale renders RTL document semantics (fa-IR, dir=rtl)', adminDocument.lang.toLowerCase() === 'fa-ir' && adminDocument.dir === 'rtl', JSON.stringify(adminDocument));
   const tabTexts = (await page.locator('#koorosh-settings .nav-tab').allTextContents()).map(t => t.trim());
-  check('exactly the six planned sections are present, in order', JSON.stringify(tabTexts) === JSON.stringify(expectedTabs), JSON.stringify(tabTexts));
+  check('Persian labels render for all six planned sections, in order', JSON.stringify(tabTexts) === JSON.stringify(expectedTabs), JSON.stringify(tabTexts));
+  const initialSettingsHtml = await page.content();
+  check('debug diagnostic: settings page HTML contains no visible PHP warning/notice/deprecation/fatal marker', !/\b(?:PHP )?(?:Warning|Notice|Deprecated|Fatal error|Parse error)\s*:/i.test(initialSettingsHtml));
   check('general tab links to WordPress-native identity controls (no duplicate options)',
     (await page.locator('#koorosh-settings a[href*="options-general.php"]').count()) >= 1 && (await page.locator('#koorosh-settings a[href*="customize.php"]').count()) >= 1 && (await page.locator('#koorosh-settings form').count()) === 0);
 

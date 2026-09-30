@@ -1,15 +1,12 @@
-name: WordPress + Elementor smoke
+name: WordPress + Elementor smoke + reference-host compatibility
 
-# Free-Elementor CI foundation only. This workflow is NOT Elementor Pro
-# acceptance: no Pro package, license, or secrets are used or fetched here.
-# CI pins in .wp-env.json are aligned to owner-reported test-host versions
-# (source: owner-reported Elementor/host system information, evidence date
-# 2026-09-28, verification status OWNER_REPORTED — see
-# reconstruction/manifest.json host_environment / ci_alignment): exact for
-# WordPress and free Elementor; Hello Elementor is host evidence only, not a CI theme pin; PHP is family-only (CI 8.1)
-# vs host 8.1.34 — no patch-level parity claim); database and web server are
-# unpinned (no parity claim). Green CI is CI evidence bound to an exact SHA;
-# it is NOT host acceptance. authorized_pro_host_acceptance remains NOT RUN.
+# Free-Elementor CI plus a bounded REFERENCE-HOST COMPATIBILITY CI phase.
+# This is a HOST-PARITY SIMULATION, never real-host acceptance: no host access,
+# LiteSpeed, Elementor Pro, real email, or clean Pro kit import is performed.
+# WordPress/Elementor pins and owner-reported evidence are tracked in
+# reconstruction/manifest.json and its reference_host_compatibility_ci block.
+# PHP is family-only; exact MariaDB and LiteSpeed parity are not tested.
+# Green CI is evidence bound to this commit only; it is NOT host acceptance.
 
 on:
   pull_request:
@@ -36,7 +33,7 @@ jobs:
         run: bash tests/static/validate.sh
 
   wp-elementor-smoke:
-    name: Clean WordPress + free Elementor smoke (wp-env)
+    name: Clean WordPress + Free Elementor + reference-host compatibility (wp-env)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -122,6 +119,20 @@ jobs:
 
       - name: Prove Koorosh Theme Settings (admin screen, sanitization, capabilities, dual-gate status, read-only site status)
         run: node tests/browser/theme-settings.mjs
+
+      - name: REFERENCE-HOST COMPATIBILITY CI (host-parity simulation; no Pro/LiteSpeed/real mail)
+        env:
+          REFERENCE_REPORT_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node tests/wp-env/reference-host-compatibility.mjs
+
+      - name: Upload reference-host compatibility report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: reference-host-compatibility-${{ github.event.pull_request.head.sha || github.sha }}
+          path: tests/browser/artifacts/reference-host-compatibility/
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Upload homepage, Product Overview, Demo, lead-delivery, workflow, FAQ, Security & Data Access page and site-shell evidence (also on failure; includes the patient-record/continuity, doctor-workspace, patient-portal and prescriptions-documents pages)
         if: always()

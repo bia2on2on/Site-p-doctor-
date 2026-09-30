@@ -1,5 +1,5 @@
 {
-  "schema_revision": 3,
+  "schema_revision": 4,
   "status": "TEMPLATE — NO EXPORT OR REBUILD VALIDATED",
   "verified_at_utc": "NOT YET VERIFIED",
   "version_source": "NOT YET VERIFIED",
@@ -17,11 +17,23 @@
       "elementor_pro": "4.3.0"
     },
     "site": {
+      "operating_system": "Linux",
       "locale": "fa_IR",
       "installation": "single-site (not multisite)",
       "web_server": "LiteSpeed",
       "debug_mode": "ACTIVE",
-      "child_theme": "NONE active at report time"
+      "child_theme": "NONE active at report time",
+      "runtime_configuration": {
+        "timezone": "UTC+03:30 / Tehran-equivalent behavior as actually configured",
+        "permalink_structure": "/index.php/%year%/%monthnum%/%day%/%postname%/",
+        "wp_memory_limit": "40M",
+        "wp_max_memory_limit": "4048M",
+        "php_extensions": {
+          "gd": "available",
+          "zip": "available"
+        },
+        "elementor_library": "connected"
+      }
     },
     "notes": [
       "CPMS 1.0.0 plugin presence on this host is recorded as an environment fact only; it is not a marketing claim and not product-truth evidence.",
@@ -71,10 +83,207 @@
     "wordpress": "EXACT — owner-reported 7.1.2 equals CI core pin",
     "elementor_free": "EXACT — owner-reported 4.3.2 equals CI plugin pin",
     "hello_elementor": "HOST EVIDENCE ONLY — owner-reported 3.5.1 describes the host at evidence collection time; Koorosh is the intended project theme and has no Hello parent; Hello is not installed in public CI",
-    "php": "FAMILY ONLY — host exact 8.1.34 (owner-reported); CI pin 8.1 (wp-env phpVersion format is major.minor only); NO patch-level parity claim",
+    "php": "FAMILY ONLY — host exact 8.1.34 (owner-reported); CI pin 8.1. The chosen wp-env/official WordPress Docker path selects the PHP family image, not an exact 8.1.34 patch runtime; NO patch-level parity claim",
     "elementor_pro": "EXCLUDED FROM PUBLIC CI — no Pro package, URL, credential, or activator in this repository; Pro acceptance tracked only by authorized_pro_host_acceptance (NOT RUN)",
     "database": "NO PARITY CLAIM — host MariaDB 11.4.13-MariaDB-cll-lve-log (owner-reported); CI uses wp-env default floating mariadb:lts image, unpinned",
     "web_server": "NO PARITY CLAIM — host LiteSpeed (owner-reported); CI uses Apache from the WordPress Docker image"
+  },
+  "reference_host_compatibility_ci": {
+    "schema_version": 1,
+    "name": "REFERENCE-HOST COMPATIBILITY CI / HOST-PARITY SIMULATION",
+    "reference_evidence_status": "OWNER-REPORTED — NOT INDEPENDENTLY VERIFIED BY AGENT",
+    "status_vocabulary": ["EXACT", "FAMILY_ONLY", "SIMULATED", "NOT_TESTED", "NOT_APPLICABLE"],
+    "workflow": ".github/workflows/wordpress-elementor-smoke.yml (bounded compatibility phase in the existing wp-env job)",
+    "runtime_report_artifact": "reference-host-compatibility-<exact-head-sha>/report.json and README.md",
+    "official_sources_checked_utc": "2026-09-30",
+    "official_sources": {
+      "wp_env_docs": "https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/",
+      "wp_env_11_16_source": "https://github.com/WordPress/gutenberg/tree/56d8058eda6e30c4cc8bfc37818fa6ed972f7dc2/packages/env",
+      "mariadb_official_tags": "https://hub.docker.com/_/mariadb/tags?name=11.4.13",
+      "wordpress_official_tags": "https://hub.docker.com/_/wordpress/tags",
+      "wordpress_requirements": "https://wordpress.org/about/requirements/",
+      "elementor_requirements": "https://elementor.com/help/requirements/",
+      "elementor_theme_locations": "https://developers.elementor.com/docs/themes/registering-locations/"
+    },
+    "dimensions": {
+      "operating_system": {
+        "status": "SIMULATED",
+        "reference_value": "Linux",
+        "ci_value": "GitHub-hosted ubuntu-latest runner (Linux); distribution/runtime details recorded by Actions",
+        "evidence_method": "GitHub runner label and Node process.platform",
+        "limitation": "Linux family only; not the owner host's distribution, kernel, filesystem, or service stack."
+      },
+      "wordpress": {
+        "status": "EXACT",
+        "reference_value": "7.1.2",
+        "ci_value": "WordPress/WordPress#7.1.2; WP-CLI and runtime version asserted",
+        "evidence_method": "Existing wp-env smoke plus compatibility runtime query",
+        "limitation": "CI core parity only; owner host remains owner-reported."
+      },
+      "elementor_free": {
+        "status": "EXACT",
+        "reference_value": "4.3.2",
+        "ci_value": "Pinned WordPress.org Elementor ZIP 4.3.2; active/runtime asserted",
+        "evidence_method": "Existing runtime smoke and Elementor-authored page editor save/reload browser suites",
+        "limitation": "Free plugin only. This is not Elementor Pro acceptance."
+      },
+      "php": {
+        "status": "FAMILY_ONLY",
+        "reference_value": "8.1.34",
+        "ci_value": "wp-env phpVersion 8.1; actual PHP_VERSION recorded at runtime",
+        "evidence_method": "Official wp-env 11.16.0 configuration/source and runtime PHP_VERSION query",
+        "limitation": "The selected official WordPress Docker image path selects PHP family/minor, not the host's exact 8.1.34 patch. No exact patch parity is claimed."
+      },
+      "database": {
+        "status": "SIMULATED",
+        "exact_reference_version_status": "NOT_TESTED",
+        "reference_value": "MariaDB 11.4.13-MariaDB-cll-lve-log",
+        "ci_value": "wp-env 11.16.0 default mariadb:lts; exact runtime SELECT VERSION() recorded",
+        "evidence_method": "Official @wordpress/env 11.16.0 source/default and runtime database version query",
+        "limitation": "NO EXACT DB PARITY. The official MariaDB 11.4.13 tag exists, but wp-env has no database-image/version configuration field; no custom Compose overlay is introduced."
+      },
+      "web_server": {
+        "status": "NOT_TESTED",
+        "reference_value": "LiteSpeed",
+        "ci_value": "WordPress official Docker development image (Apache-based)",
+        "evidence_method": "wp-env runtime stack; web-server-neutral WordPress URL checks",
+        "limitation": "LITESPEED PARITY = NOT TESTED. No substitute server is presented as LiteSpeed."
+      },
+      "elementor_pro": {
+        "status": "NOT_TESTED",
+        "reference_value": "4.3.0",
+        "ci_value": "Not installed in public CI",
+        "evidence_method": "Public workflow/package and secret boundary inspection",
+        "limitation": "ELEMENTOR PRO RUNTIME PARITY = NOT TESTED IN PUBLIC CI. No Pro ZIP, license, credential, private package, or unofficial source is used."
+      },
+      "single_site": {
+        "status": "EXACT",
+        "reference_value": "single-site",
+        "ci_value": "wp-env multisite=false; is_multisite() asserted false",
+        "evidence_method": "Committed wp-env config and WordPress runtime",
+        "limitation": "Ephemeral CI site only."
+      },
+      "locale_and_rtl": {
+        "status": "EXACT",
+        "reference_value": "fa_IR",
+        "ci_value": "fa_IR language pack activated; locale, is_rtl(), frontend lang/dir, and Persian admin labels asserted",
+        "evidence_method": "wp-env runtime smoke and Theme Settings browser test",
+        "limitation": "Language-pack availability and RTL behavior on the owner host are not agent-verified."
+      },
+      "timezone": {
+        "status": "SIMULATED",
+        "reference_value": "UTC+03:30 / Tehran-equivalent behavior as actually configured",
+        "ci_value": "Asia/Tehran; observed +03:30 offset asserted",
+        "evidence_method": "WordPress timezone option and wp_date() runtime",
+        "limitation": "Matches reported offset behavior for this test date; does not establish the host's actual timezone setting or future timezone rules."
+      },
+      "permalink": {
+        "status": "SIMULATED",
+        "configuration_status": "EXACT",
+        "reference_value": "/index.php/%year%/%monthnum%/%day%/%postname%/",
+        "ci_value": "Exact option configured; synthetic dated post route requested; canonical page slugs also requested",
+        "evidence_method": "wp-env WordPress rewrite setting plus HTTP checks",
+        "limitation": "Routing is exercised under wp-env/Apache, not LiteSpeed. Sales-page slugs remain root-relative."
+      },
+      "wordpress_memory_limit": {
+        "status": "SIMULATED",
+        "reference_value": "WP_MEMORY_LIMIT 40M",
+        "ci_value": "WP_MEMORY_LIMIT=40M; PHP ini memory_limit recorded",
+        "evidence_method": "wp-env wp-config constants and runtime query",
+        "application_requirement": "Elementor currently documents a 256 MB WordPress memory limit (512 MB recommended); owner-reported 40M is below that stated requirement.",
+        "limitation": "CI sets the WordPress constant only and does not reproduce or cap the effective hosting/container PHP memory ceiling; compatibility under a true 40 MB limit is NOT TESTED."
+      },
+      "host_max_memory": {
+        "status": "NOT_TESTED",
+        "reference_value": "4048M",
+        "ci_value": "Not forced; actual WP_MAX_MEMORY_LIMIT and PHP ini values recorded only",
+        "evidence_method": "WordPress/PHP runtime query",
+        "limitation": "No artificial 4048M setting or GitHub-host memory-equivalence claim."
+      },
+      "zip_extension": {
+        "status": "SIMULATED",
+        "reference_value": "ZIP / ZipArchive available",
+        "ci_value": "Extension/class/version recorded; synthetic ZIP create/open/extract smoke",
+        "evidence_method": "PHP extension query and ZIP RUNTIME SMOKE",
+        "limitation": "Not an Elementor kit import and not proof that the historical Elementor import error is fixed."
+      },
+      "gd_extension": {
+        "status": "SIMULATED",
+        "reference_value": "GD available",
+        "ci_value": "GD extension/version recorded; synthetic PNG create/read smoke",
+        "evidence_method": "PHP extension query and image behavior",
+        "limitation": "Does not compare host image-processing configuration."
+      },
+      "koorosh_theme": {
+        "status": "SIMULATED",
+        "reference_value": "Standalone Koorosh theme, no Hello parent",
+        "ci_value": "Installed and active; metadata, no parent, local font assets, fallback shell and menu locations asserted",
+        "evidence_method": "Existing runtime smoke plus compatibility HTTP/runtime checks",
+        "limitation": "CI runtime only; Elementor Pro locations are not rendered."
+      },
+      "theme_settings": {
+        "status": "SIMULATED",
+        "reference_value": "Safe settings model, environment gate, Persian/RTL admin",
+        "ci_value": "Existing runtime/browser assertions: option model, OFF default, recipient validation/fallback, dual gate, no-secret schema, admin RTL",
+        "evidence_method": "tests/wp-env/assertions/theme-settings.php and tests/browser/theme-settings.mjs",
+        "limitation": "Synthetic ephemeral database; no host settings are read or written."
+      },
+      "elementor_pages_and_persistence": {
+        "status": "SIMULATED",
+        "reference_value": "Owner-host Elementor-authored pages",
+        "ci_value": "Twelve native Elementor Free pages rebuilt; editor save/reload checks run; persisted pages queried under reference permalink setting",
+        "evidence_method": "Existing Playwright reconstruction suite plus compatibility runtime/page-route queries",
+        "limitation": "Not the owner host database, Elementor Pro pages, or a clean exported-kit import."
+      },
+      "elementor_library": {
+        "status": "NOT_TESTED",
+        "reference_value": "Connected (owner-reported)",
+        "ci_value": "No authenticated Library connection in public CI",
+        "evidence_method": "No account connection or credential used",
+        "limitation": "Network/account connection status cannot be inferred from local Elementor Free."
+      },
+      "debug_mode": {
+        "status": "SIMULATED",
+        "reference_value": "ACTIVE on reported test host",
+        "ci_value": "WP_DEBUG enabled; WP_DEBUG_DISPLAY/WP_DEBUG_LOG runtime values recorded; selected response flows checked",
+        "evidence_method": "Rendered-response marker checks and scoped debug.log scan when enabled/readable",
+        "limitation": "Only the tested flows are observable; a disabled or unreadable debug log is reported NOT_TESTED. This does not prove absence of all runtime issues or define public-launch debug policy."
+      },
+      "host_network_and_email": {
+        "status": "NOT_TESTED",
+        "reference_value": "Actual host/network, SMTP and inbox delivery",
+        "ci_value": "No host access; existing lead tests use synthetic wp_mail interception only",
+        "evidence_method": "Workflow/test boundary inspection",
+        "limitation": "No actual host/network, DNS, firewall, SMTP handoff, or inbox delivery is tested; CI sends no real email."
+      },
+      "clean_elementor_pro_kit_import": {
+        "status": "NOT_TESTED",
+        "reference_value": "Clean Pro kit import; historical ZipArchive error",
+        "ci_value": "No kit imported",
+        "evidence_method": "No proprietary fixture; ZIP runtime smoke only",
+        "limitation": "Requires an authorized private environment and remains a separate host/private acceptance gate."
+      }
+    },
+    "elementor_feature_flags": [
+      {"name": "Containers", "status": "SIMULATED", "relevance": "Directly relevant; recipes use native Elementor containers and browser editor save/reload exercises them."},
+      {"name": "Atomic widgets", "status": "NOT_APPLICABLE", "relevance": "Not used by current recipes; no experimental/version-sensitive Atomic widget is a hard dependency."},
+      {"name": "Editor V4", "status": "NOT_APPLICABLE", "relevance": "Current authoring recipes use documented native Elementor Free controls; Editor V4 state is not required or asserted."},
+      {"name": "additional custom breakpoints", "status": "NOT_APPLICABLE", "relevance": "No custom breakpoint dependency; responsive behavior is tested at standard viewport sizes."},
+      {"name": "optimized markup", "status": "SIMULATED", "relevance": "Rendered markup is browser-tested; no feature-flag setting is pinned as an architectural requirement."},
+      {"name": "Theme Builder", "status": "NOT_TESTED", "relevance": "Pro-dependent acceptance is excluded; Koorosh uses the documented public location hook guarded for Pro absence, while fallback shell is tested."},
+      {"name": "nested elements", "status": "SIMULATED", "relevance": "Nested native containers are created and persisted by the Free editor suites; no separate experimental flag is forced."},
+      {"name": "custom import/export", "status": "NOT_TESTED", "relevance": "No kit import/export is run; custom import/export feature state is version-sensitive and not a CI prerequisite."},
+      {"name": "Atomic Form", "status": "NOT_APPLICABLE", "relevance": "Current Demo uses the theme-owned shortcode/form flow, not Elementor Atomic Form."},
+      {"name": "Loop", "status": "NOT_APPLICABLE", "relevance": "No Loop Builder archive/loop template is required by current reconstructed pages."},
+      {"name": "Menu", "status": "NOT_APPLICABLE", "relevance": "Navigation uses WordPress native menu locations, which are tested; Elementor Menu feature is not required."}
+    ],
+    "explicit_non_claims": [
+      "Not real host acceptance or production verification.",
+      "Not Elementor Pro acceptance or LiteSpeed verification.",
+      "Not proof of exact PHP patch or exact MariaDB version parity.",
+      "Not proof of actual host/network behavior, SMTP/inbox delivery, Library connectivity, or a clean Pro kit import.",
+      "ZIP RUNTIME SMOKE is not Elementor kit import proof."
+    ]
   },
   "versions": {
     "wordpress": "NOT YET VERIFIED",
