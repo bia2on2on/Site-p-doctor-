@@ -179,7 +179,7 @@ svg { display: block; width: 1.25rem; height: 1.25rem; fill: none; stroke: curre
 .nav-dropdown {
   position: absolute;
   z-index: 80;
-  inset-block-start: calc(100% + 7px);
+  inset-block-start: 100%;
   inset-inline-start: 0;
   display: grid;
   width: 252px;
