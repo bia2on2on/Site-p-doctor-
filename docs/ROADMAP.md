@@ -362,6 +362,8 @@ CTAها باید با مرحله Journey متناسب باشند؛ تکرار ب
 - Nonce؛
 - Spam Protection متناسب با Privacy؛
 - Rate Limit؛
+
+> نکتهٔ وضعیت (2026-09-30): Rate Limit مقاوم نیازمند زیرساخت/ذخیره‌سازی وضعیت است که در این مخزن وجود ندارد؛ بنابراین به‌عنوان ملاحظهٔ عملیاتی launch/operations مستند شده و در این slice ساخته نشده است. تنها محافظت ضد-spam پیاده‌شده، honeypot مخفی سبک first-party است (بدون CAPTCHA/سرویس خارجی — تصمیم جداگانهٔ privacy/performance لازم دارد).
 - عدم جمع‌آوری اطلاعات حساس بیش از نیاز؛
 - Label و Error Message قابل دسترس؛
 - تجربه RTL و Mobile-first؛

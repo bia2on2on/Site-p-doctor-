@@ -7,5 +7,8 @@
 	],
 	"themes": [
 		"./themes/koorosh"
-	]
+	],
+	"mappings": {
+		"wp-content/mu-plugins": "./tests/wp-env/mu-plugins"
+	}
 }

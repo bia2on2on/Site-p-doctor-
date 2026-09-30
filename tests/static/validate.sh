@@ -52,10 +52,15 @@ if (!/^\d+\.\d+$/.test(c.phpVersion || "")) err("phpVersion pin must be major.mi
 if (!Array.isArray(c.plugins) || c.plugins.length !== 1) err("plugins must be the single Elementor ZIP pin");
 else if (!/^https:\/\/downloads\.wordpress\.org\/plugin\/elementor\.\d+(\.\d+)+\.zip$/.test(c.plugins[0])) err("plugins[0] must be a pinned elementor ZIP URL: " + c.plugins[0]);
 if (!Array.isArray(c.themes) || c.themes.length !== 1 || c.themes[0] !== "./themes/koorosh") err("themes must map only the standalone Koorosh theme");
-if (JSON.stringify(Object.keys(c).sort()) !== JSON.stringify(["$schema", "core", "phpVersion", "plugins", "themes"].sort())) err("unexpected/missing top-level keys: " + Object.keys(c).join(","));
+const m = c.mappings || {};
+const mKeys = Object.keys(m);
+if (mKeys.length !== 1 || mKeys[0] !== "wp-content/mu-plugins" || m[mKeys[0]] !== "./tests/wp-env/mu-plugins") {
+  err("mappings must be exactly the CI mu-plugins bind mount (wp-content/mu-plugins -> ./tests/wp-env/mu-plugins): " + JSON.stringify(m));
+}
+if (JSON.stringify(Object.keys(c).sort()) !== JSON.stringify(["$schema", "core", "phpVersion", "plugins", "themes", "mappings"].sort())) err("unexpected/missing top-level keys: " + Object.keys(c).join(","));
 process.exit(bad);
 ' "$root/.wp-env.json" \
-	&& ok ".wp-env.json pins are well-formed (core ref, phpVersion, single Elementor ZIP, Koorosh theme)" \
+	&& ok ".wp-env.json pins are well-formed (core ref, phpVersion, single Elementor ZIP, Koorosh theme, mu-plugins mount)" \
 	|| ko ".wp-env.json pins are malformed"
 
 node -e '
@@ -204,10 +209,53 @@ else
 	ko "Technical-SEO foundation guardrails failed"
 fi
 
+node -e '
+const fs = require("fs");
+const path = require("path");
+const root = process.argv[1];
+let bad = 0;
+const err = (m) => { console.error(m); bad = 1; };
+// The mapped mu-plugins directory must stay PHP-free in Git so every CI run
+// starts with lead delivery in its safe default (disabled) mode.
+const muDir = path.join(root, "tests/wp-env/mu-plugins");
+if (!fs.existsSync(path.join(muDir, "README.md"))) err("tests/wp-env/mu-plugins/README.md missing (mapped bind-mount directory must exist in Git)");
+const phpInMu = fs.existsSync(muDir) ? fs.readdirSync(muDir).filter((f) => f.toLowerCase().endsWith(".php")) : [];
+if (phpInMu.length > 0) err("no .php file may be committed in tests/wp-env/mu-plugins (CI default must be delivery-OFF): " + phpInMu.join(", "));
+// CI delivery fixtures must exist exactly once each and carry no credentials/recipient.
+const fixtures = path.join(root, "tests/wp-env/fixtures");
+for (const f of ["cpms-ci-mail-intercept.php", "cpms-ci-enable-delivery.php", "README.md"]) {
+  if (!fs.existsSync(path.join(fixtures, f))) err("missing CI fixture: tests/wp-env/fixtures/" + f);
+}
+const intercept = fs.readFileSync(path.join(fixtures, "cpms-ci-mail-intercept.php"), "utf8");
+if (!intercept.includes("pre_wp_mail")) err("interception fixture must hook pre_wp_mail");
+if (intercept.includes("CPMS_LEAD_DELIVERY_ENABLED")) err("interception fixture must not activate delivery");
+const enable = fs.readFileSync(path.join(fixtures, "cpms-ci-enable-delivery.php"), "utf8");
+if (!enable.includes("define( \x27CPMS_LEAD_DELIVERY_ENABLED\x27, true )")) err("activation fixture must define the activation constant only");
+if (/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(enable)) err("activation fixture must contain no email address");
+for (const f of [intercept, enable]) {
+  if (/(passw|secret|token|api.?key|licen[cs]e)/i.test(f)) err("CI fixtures must not contain credential-like content");
+}
+process.exit(bad);
+' "$root" \
+	&& ok "CI lead-delivery fixtures bounded (mu-plugins PHP-free in Git, interception/activation separated, no credentials)" \
+	|| ko "CI lead-delivery fixture guardrails failed"
+
 if node --check "$root/themes/koorosh/nav.js"; then
 	ok "nav.js classic-script syntax (node --check)"
 else
 	ko "nav.js syntax check failed"
+fi
+
+if node --check "$root/themes/koorosh/demo-form.js"; then
+	ok "demo-form.js classic-script syntax (node --check)"
+else
+	ko "demo-form.js syntax check failed"
+fi
+
+if node --check "$root/tests/browser/demo-delivery.mjs"; then
+	ok "demo-delivery.mjs module syntax (node --check)"
+else
+	ko "demo-delivery.mjs syntax check failed"
 fi
 
 printf '== Static validation result: %s passed, %s failed ==\n' "$pass" "$fail"

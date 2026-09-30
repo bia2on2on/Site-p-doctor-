@@ -84,6 +84,9 @@ jobs:
       - name: Reconstruct native Free Demo conversion page and capture browser evidence
         run: node tests/browser/demo.mjs
 
+      - name: Prove Demo lead-delivery states (default OFF, intercepted live-mode simulation, honest failure)
+        run: node tests/browser/demo-delivery.mjs
+
       - name: Reconstruct native Free appointment/reception/queue workflow page and capture browser evidence
         run: node tests/browser/appointment-reception-queue.mjs
 
@@ -111,7 +114,7 @@ jobs:
       - name: Capture technical-SEO / indexability evidence (development expectation + simulated launch switch)
         run: node tests/browser/seo-foundation.mjs
 
-      - name: Upload homepage, Product Overview, Demo, workflow, FAQ, Security & Data Access page and site-shell evidence (also on failure; includes the patient-record/continuity, doctor-workspace, patient-portal and prescriptions-documents pages)
+      - name: Upload homepage, Product Overview, Demo, lead-delivery, workflow, FAQ, Security & Data Access page and site-shell evidence (also on failure; includes the patient-record/continuity, doctor-workspace, patient-portal and prescriptions-documents pages)
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:

@@ -6,28 +6,61 @@
 
 ---
 
-## 1. Commercial Boundary & Launch Blocker
+## 1. Commercial Boundary & Lead-Delivery Status
 
-The Product Owner has **NOT yet authorized**:
-- a production recipient email address;
+**LEAD DELIVERY = AUTHORIZED RECIPIENT RECORDED · DEFAULT OFF · LIVE HOST ACTIVATION NOT DONE**
+
+The Product Owner has authorized (commercial decision recorded 2026-09-30) exactly one lead
+recipient: **biatoweb@gmail.com** (business-contact evidence; no credential of any kind is
+stored in this repository).
+
+Still NOT authorized / NOT configured:
+
 - a CRM system;
 - a webhook destination;
 - third-party form SaaS;
 - analytics or tracking scripts;
 - advertising pixels;
 - a WhatsApp or phone delivery destination;
-- production SMTP / form-delivery architecture.
+- production SMTP / form-delivery architecture (environment-owned, outside Git).
 
-**LIVE LEAD DELIVERY = NOT CONFIGURED / NOT AUTHORIZED**
-This is a **launch blocker** for the conversion path.
+### Two explicit delivery modes
 
-### Safe Non-Live Mode Policy
-The page implements an explicit **SAFE NON-LIVE MODE**:
-- The visitor/evaluator is clearly informed in Persian that live submission delivery is not yet active in this technical preview.
+**A. DEVELOPMENT / CI (default in every context):** delivery is disabled, `wp_mail()` is
+never called, nothing is persisted or logged, and valid submissions receive the honest
+non-live notice. Deploying or updating the code can never enable delivery by itself.
+
+**B. AUTHORIZED LIVE ENVIRONMENT:** delivery can be activated only by the environment owner
+defining `CPMS_LEAD_DELIVERY_ENABLED` as (boolean) `true` in wp-config.php (or an equivalent
+environment-owned bootstrap). The theme only reads the constant and never defines it. When
+activated, delivery uses the WordPress-native mail layer (`wp_mail()`) with the single
+code-bounded authorized recipient; SMTP/transport/deliverability configuration remains
+environment-owned and outside Git. **Live host activation has NOT been done.**
+
+### Delivery states (single vocabulary)
+
+| State | Meaning | User-facing treatment |
+|---|---|---|
+| `validation_failure` | Server-side validation (nonce, allowlist, fields, honeypot) failed | Accessible field errors, `role=alert` |
+| `delivery_disabled` | Valid submission in the default non-live mode | Honest notice: nothing sent or stored |
+| `handoff_accepted` | The configured WordPress mail layer accepted the handoff | Truthful notice; explicitly no receipt/read/response-time promise |
+| `handoff_failed` | The mail layer reported failure | Error notice (`role=alert`), HTTP 500 for AJAX; never shown as success |
+
+`wp_mail()` returning true proves **mail-layer acceptance only** — inbox delivery, reading,
+or any response-time promise is NOT claimed and NOT verified.
+
+### Safe Non-Live Mode Policy (default)
+
+The page keeps an explicit **SAFE NON-LIVE MODE**:
+
+- While delivery is not activated, the visitor is clearly informed in Persian that live
+  submission delivery is not active in this technical preview.
 - Submissions are validated server-side and client-side using synthetic test data.
 - No payload leaves the test environment.
 - No payload is persisted in the WordPress database or logged to disk.
 - No submission data is stored in Git.
+- The technical non-live banner renders only while delivery is disabled; it disappears
+  only in an explicitly activated environment.
 
 ---
 
@@ -41,6 +74,10 @@ The qualification form collects the minimum sensible set of fields required to e
 5. `cpms_doctor_count`: Approximate number of cooperating doctors (1–2, 3–5, 6–10, 11+).
 6. `cpms_discussion_topic`: Optional short note on current clinic workflow or focus areas.
 
+No additional fields are collected. Requests carrying fields outside the strict server-side
+allowlist are rejected outright (HTTP 400), which is also what makes the recipient
+structurally non-overridable by request parameters.
+
 ### Strict Data Privacy Prohibition (No PHI)
 Prominent Persian guidance is embedded:
 > «لطفاً از وارد کردن اطلاعات بیماران یا داده‌های پزشکی خودداری کنید.»
@@ -52,6 +89,17 @@ The form strictly forbids collecting:
 - insurance policy or claim details;
 - clinical documents or prescription scans;
 - passwords or account credentials.
+
+A server-side heuristic (10-consecutive-digit check) is defense-in-depth only and carries
+**no guarantee** of PHI prevention.
+
+### Data-use disclosure (minimal, pending legal review)
+
+Beside the form, a minimal accurate disclosure states that the contact/organization
+information entered is used only to respond to the demo/consultation request (when live
+delivery is activated), and repeats the PHI prohibition. No retention period, legal basis,
+company registration identity, or privacy promise is stated: finalized Privacy/Terms text
+does not yet exist and remains a separate launch blocker.
 
 ---
 
@@ -78,5 +126,7 @@ Phrasing follows `docs/PRODUCT-TRUTH.md` and `docs/ROADMAP.md`:
 
 - Composed entirely of native Elementor Free elements (`container`, `heading`, `text-editor`, `button`).
 - Headings follow strict sequential hierarchy (single H1 followed by H2 and H3).
-- The qualification form is integrated via the Koorosh theme shortcode `[cpms_demo_form]`, ensuring robust server-side validation, CSRF nonce protection, accessibility attributes (`label[for]`, `aria-required`, `aria-describedby`, `aria-invalid`, `role="alert"`, `role="status"`), and progressive enhancement without brittle Elementor content coupling.
+- The qualification form is integrated via the Koorosh theme shortcode `[cpms_demo_form]`, ensuring robust server-side validation, CSRF nonce protection, a strict POST-field allowlist, a first-party hidden honeypot, accessibility attributes (`label[for]`, `aria-required`, `aria-describedby`, `aria-invalid`, `role="alert"`, `role="status"`), and progressive enhancement without brittle Elementor content coupling.
+- Submission/delivery logic stays theme-owned; Elementor keeps page composition. No backend delivery logic lives in Elementor.
+- CI proves the two-mode behavior with `wp_mail` interception (`pre_wp_mail`) in the ephemeral wp-env container: disabled mode sends zero mail; the activated simulation targets exactly the authorized recipient; `wp_mail` failure surfaces as `handoff_failed`; no database persistence occurs. CI never performs real delivery.
 - When Elementor Pro Forms is authorized on the production host, the form container can be adapted to the authorized delivery destination.

@@ -519,6 +519,8 @@ Core = کمیتۀ صفحاتی که بدون آن‌ها یک سایت فروش�
 
 validation (server-side + پیام‌های دسترس‌پذیر)، spam protection (متناسب با privacy؛ انتخاب ابزار = فاز محیط)، privacy disclosure + رضایت (LEGAL REVIEW REQUIRED؛ Consent مبنای صریح می‌خواهد)، success state، failure state + مسیر جایگزین، مقصد Lead/مالک پیگیری/retention (BUSINESS INPUT REQUIRED). الزامات فنی فرم ROADMAP §8 بدون تغییر حاکم است.
 
+**به‌روزرسانی وضعیت (2026-09-30):** validation سمت سرور با پیام‌های دسترس‌پذیر، honeypot سبک first-party (بدون CAPTCHA/سرویس خارجی)، privacy disclosure حداقلی کنار فرم، حالات صادقانهٔ موفقیت/خطا (شامل تفکیک «پذیرش در لایهٔ ارسال ایمیل» از «تحویل تضمین‌شده») و مقصد Lead اکنون در theme پیاده‌سازی شده‌اند: دریافت‌کنندهٔ مجاز `biatoweb@gmail.com` (تصمیم تجاری مالک)، تحویل پیش‌فرض خاموش، فعال‌سازی صرفاً environment-owned از طریق `CPMS_LEAD_DELIVERY_ENABLED` در wp-config. Rate limiting مقاوم به‌عنوان ملاحظهٔ launch/operations مستند شده (زیرساخت موجود نیست). رضایت/Consent صریح، نگهداری/حذف داده، SLA پاسخ و مسیر جایگزین تماس همچنان OPEN هستند. مرجع فنی: `docs/TECHNICAL-FOUNDATION.md` بخش ۲ و `reconstruction/demo/claims.md`.
+
 **۱۳.۵ مسیر دومِ واجدالشرایط‌سازی — نیاز هم‌زمان به وب‌سایت (مکمل، بدون مسیر خرید دوم)**
 
 جریان مجاز (§1.6):
