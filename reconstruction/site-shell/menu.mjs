@@ -44,6 +44,8 @@ export const footerMenu = {
     { title: 'پرسش‌های متداول', slug: 'faq' },
     { title: 'امنیت و دسترسی به داده', slug: 'security-data-access' },
     { title: 'درخواست دمو / مشاوره', slug: 'demo' },
+    { title: 'حریم خصوصی', slug: 'privacy' },
+    { title: 'شرایط استفاده', slug: 'terms' },
   ],
 };
 

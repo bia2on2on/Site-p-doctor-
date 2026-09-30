@@ -203,6 +203,8 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
     assert.equal(await page.locator('#cpms-privacy-banner').count(), 1, 'Privacy guidance banner present');
     assert.equal(await page.locator('#cpms-data-use-note').count(), 1, 'Minimal data-use disclosure present beside the form');
     assert((await page.locator('#cpms-data-use-note').innerText()).includes('اطلاعات بیماران یا داده‌های پزشکی وارد نکنید'), 'Data-use disclosure repeats the PHI prohibition');
+    assert.equal(await page.locator('#cpms-data-use-note a[href="/privacy/"]').count(), 1, 'Crawlable /privacy/ link present in data-use disclosure beside the form');
+    assert.equal(await page.locator('form#cpms-demo-form input[type="checkbox"]').count(), 0, 'No mandatory consent checkbox added to Demo form');
     assert.equal(await page.locator('form#cpms-demo-form').count(), 1, 'Form element present');
     const honeypot = page.locator('#cpms-website-url');
     assert.equal(await honeypot.count(), 1, 'Honeypot field present exactly once');
@@ -247,8 +249,9 @@ echo wp_json_encode(array('front' => $id, 'mode' => get_option('show_on_front'),
     assert(measures.font.includes('Vazirmatn') && measures.fontLoaded, `${name}: Vazirmatn font loaded`);
     assert.deepEqual(measures.brokenAnchors, [], `${name}: broken in-page anchors`);
     assert.deepEqual(measures.externalLinks, [], `${name}: external links`);
-    assert.deepEqual(measures.crossPageLinks, ['/product-overview/'], `${name}: Demo keeps exactly its contextual route back to Product Overview`);
+    assert.deepEqual(measures.crossPageLinks, ['/privacy/', '/product-overview/'], `${name}: Demo keeps its privacy disclosure link to /privacy/ and contextual route back to Product Overview`);
     assert.equal(await page.locator('main a[href$="/product-overview/"]').count(), 1, `${name}: return route renders as a normal crawlable link`);
+    assert.equal(await page.locator('main a[href$="/privacy/"]').count(), 1, `${name}: privacy route renders as a normal crawlable link`);
     assert(measures.inputHeights.every(h => h >= 44), `${name}: all inputs and submit button touch targets >= 44px`);
 
     await page.screenshot({ path: resolve(out, `${name}.png`), fullPage: true });

@@ -197,6 +197,18 @@ else
 	ko "Security & Data Access trust page guardrails failed"
 fi
 
+if node "$root/tests/static/validate-privacy.mjs"; then
+	ok "Privacy utility page native authoring, Demo form field disclosures and legal honesty guardrails"
+else
+	ko "Privacy utility page guardrails failed"
+fi
+
+if node "$root/tests/static/validate-terms.mjs"; then
+	ok "Website Terms utility page native authoring, conservative website boundaries and legal honesty guardrails"
+else
+	ko "Website Terms utility page guardrails failed"
+fi
+
 if node "$root/tests/static/validate-site-shell.mjs"; then
 	ok "Site-shell navigation, menu-structure and honesty guardrails"
 else
@@ -256,6 +268,18 @@ if node --check "$root/tests/browser/demo-delivery.mjs"; then
 	ok "demo-delivery.mjs module syntax (node --check)"
 else
 	ko "demo-delivery.mjs syntax check failed"
+fi
+
+if node --check "$root/tests/browser/privacy.mjs"; then
+	ok "privacy.mjs module syntax (node --check)"
+else
+	ko "privacy.mjs syntax check failed"
+fi
+
+if node --check "$root/tests/browser/terms.mjs"; then
+	ok "terms.mjs module syntax (node --check)"
+else
+	ko "terms.mjs syntax check failed"
 fi
 
 printf '== Static validation result: %s passed, %s failed ==\n' "$pass" "$fail"

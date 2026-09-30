@@ -109,7 +109,9 @@ const workflowRoutes = primaryMenu.items.find(i => i.title === 'جریان‌ه�
 // Footer destinations: the product page, the FAQ/objection trust route, the security trust route and the conversion route.
 const faqRoute = '/faq/';
 const securityRoute = '/security-data-access/';
-const footerRoutes = ['/product-overview/', faqRoute, securityRoute, '/demo/'];
+const privacyRoute = '/privacy/';
+const termsRoute = '/terms/';
+const footerRoutes = ['/product-overview/', faqRoute, securityRoute, '/demo/', privacyRoute, termsRoute];
 const allRoutes = ['/', ...footerRoutes, ...workflowRoutes];
 
 // ---- Browser proof ----------------------------------------------------------
@@ -312,6 +314,26 @@ try {
   assert.equal(await page.locator('h1').count(), 1, 'Security destination serves one H1');
   assert.match(await page.locator('h1').innerText(), /دسترسی متناسب با نقش/, 'Footer route reaches the Security & Data Access page');
   assert.equal(await page.locator('.site-navigation a[aria-current="page"]').count(), 0, 'Security page stays a footer trust route, not a primary-navigation item');
+
+  // Footer discovery of the Privacy utility page (/privacy/).
+  await page.goto(base, { waitUntil: 'networkidle' });
+  const footerPrivacy = page.locator('.footer-navigation').getByRole('link', { name: 'حریم خصوصی', exact: true });
+  assert(await footerPrivacy.isVisible(), 'Footer Privacy link visible');
+  await footerPrivacy.click();
+  await page.waitForURL(`${base}${privacyRoute}`);
+  assert.equal(await page.locator('h1').count(), 1, 'Privacy destination serves one H1');
+  assert.match(await page.locator('h1').innerText(), /حریم خصوصی/, 'Footer route reaches the Privacy page');
+  assert.equal(await page.locator('.site-navigation a[aria-current="page"]').count(), 0, 'Privacy page stays a footer utility route, not a primary-navigation item');
+
+  // Footer discovery of the Website Terms utility page (/terms/).
+  await page.goto(base, { waitUntil: 'networkidle' });
+  const footerTerms = page.locator('.footer-navigation').getByRole('link', { name: 'شرایط استفاده', exact: true });
+  assert(await footerTerms.isVisible(), 'Footer Terms link visible');
+  await footerTerms.click();
+  await page.waitForURL(`${base}${termsRoute}`);
+  assert.equal(await page.locator('h1').count(), 1, 'Terms destination serves one H1');
+  assert.match(await page.locator('h1').innerText(), /شرایط استفاده/, 'Footer route reaches the Terms page');
+  assert.equal(await page.locator('.site-navigation a[aria-current="page"]').count(), 0, 'Terms page stays a footer utility route, not a primary-navigation item');
 
   // ---- Progressive enhancement: no JavaScript at all -------------------------
   const noJs = await browser.newContext({ reducedMotion: 'reduce', javaScriptEnabled: false });
