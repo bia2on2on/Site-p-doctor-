@@ -7,6 +7,7 @@
 - **GIT:** canonical theme, design tokens, reconstruction assets.
 - **PUBLIC CI:** Koorosh + Elementor Free compatibility/reconstruction smoke.
 - **PRIVATE ACCEPTANCE:** Elementor Pro + kit export/import + authorized test host.
+- **TEST-HOST TRANSFER:** CI builds an installable Koorosh ZIP (test build, not a release) — see [docs/TEST-HOST-TRANSFER.md](docs/TEST-HOST-TRANSFER.md).
 - **REFERENCE HOST:** recorded versions are test/evidence facts, not architecture locks.
 
 
