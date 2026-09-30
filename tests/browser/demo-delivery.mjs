@@ -17,8 +17,13 @@
  *
  * Proven here (see checks[] in results.json):
  *  - default delivery OFF; disabled mode sends ZERO mail;
- *  - live-mode simulation targets EXACTLY the authorized recipient;
- *  - recipient cannot be overridden by request fields (strict allowlist);
+ *  - live-mode simulation targets EXACTLY the authorized recipient (default) or
+ *    the administrator-configured recipient from تنظیمات کوروش;
+ *  - DUAL GATE: effective delivery requires BOTH the environment authorization
+ *    (CPMS_LEAD_DELIVERY_ENABLED) AND the site-level switch (default OFF);
+ *    turning either off stops all mail;
+ *  - recipient cannot be overridden by request fields (strict allowlist), query
+ *    string or settings-shaped POST keys;
  *  - validated payload maps correctly into a plain-text message;
  *  - invalid nonce, validation errors, honeypot and malformed requests
  *    produce no mail;
@@ -106,6 +111,21 @@ function clearMailLog() {
   );
 }
 
+const settingsOption = 'koorosh_settings';
+const configuredRecipient = 'configured-leads@example.test';
+
+// Administrator-context writes through the real Settings API sanitizer (the
+// sanitize callback requires manage_options), exactly like the admin screen.
+function setSettings(arrayLiteral) {
+  return wpEval(
+    `$a = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) ); wp_set_current_user( (int) $a[0] ); update_option( '${settingsOption}', ${arrayLiteral} ); echo wp_json_encode( get_option( '${settingsOption}' ) );`
+  );
+}
+
+function deleteSettings() {
+  return wpEval(`delete_option( '${settingsOption}' ); echo 'deleted';`);
+}
+
 function phpLint(containerPath) {
   try {
     return wpEnv(['php', '-l', containerPath]);
@@ -129,12 +149,12 @@ function extractNonce(html) {
   return match ? match[1] : null;
 }
 
-async function postDemoForm(fields, { ajax = true } = {}) {
+async function postDemoForm(fields, { ajax = true, query = '' } = {}) {
   const body = new URLSearchParams(fields);
   if (ajax) body.set('cpms_ajax', '1');
   const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
   if (ajax) headers['X-Requested-With'] = 'XMLHttpRequest';
-  const res = await fetch(`${base}/demo/`, {
+  const res = await fetch(`${base}/demo/${query}`, {
     method: 'POST',
     headers,
     body,
@@ -177,6 +197,7 @@ function cleanupFixtures() {
     rmSync(resolve(muDir, fixture), { force: true });
   }
   try {
+    deleteSettings();
     clearMailLog();
   } catch {
     // Best effort: a failing wp-env here must not mask the real test result.
@@ -194,6 +215,8 @@ try {
   if (!/^\d+$/.test(demoPageId)) {
     throw new Error('Demo page missing — run tests/browser/demo.mjs before this script.');
   }
+  deleteSettings();
+  check('default: the site-level lead switch is OFF and the recipient falls back to the authorized default', wpEval(`$s = koorosh_get_settings(); echo ( false === $s['lead_site_enabled'] && '${authorizedRecipient}' === cpms_lead_delivery_recipient() ) ? 'yes' : 'no';`) === 'yes');
   const initial = await getDemoHtml();
   check('precondition: /demo/ responds 200', initial.status === 200, initial.status);
   check('default mode: technical non-live banner renders before any fixture is installed', initial.html.includes('id="cpms-non-live-banner"'));
@@ -243,6 +266,21 @@ try {
   const lintEnable = phpLint(`/var/www/html/wp-content/mu-plugins/${enableFixture}`);
   check('activation fixture passes php -l inside the container', lintEnable.includes('No syntax errors detected'), lintEnable);
 
+  // Gate A alone (environment authorizes, site switch still default OFF) must NOT send mail.
+  const envOnly = await getDemoHtml();
+  check('dual gate: environment ON + site switch OFF (default) keeps the technical non-live banner', envOnly.html.includes('id=\"cpms-non-live-banner\"'));
+  nonce = extractNonce(envOnly.html) || nonce;
+  const envOnlyResponse = await postDemoForm(validSubmission({ cpms_demo_nonce: nonce }));
+  check(
+    'dual gate: environment ON + site switch OFF returns delivery_disabled',
+    envOnlyResponse.status === 200 && envOnlyResponse.json?.data?.state === 'delivery_disabled',
+    `status=${envOnlyResponse.status} body=${envOnlyResponse.text.slice(0, 300)}`
+  );
+  check('dual gate: environment ON + site switch OFF sends ZERO mail', mailEntries().length === 0, JSON.stringify(mailEntries().length));
+  // Now the administrator turns gate B on (through the Settings API sanitizer).
+  setSettings("array( 'lead_site_enabled' => true )");
+  check('dual gate: site switch stored as boolean true after administrator update', wpEval("echo true === koorosh_get_setting( 'lead_site_enabled' ) ? 'yes' : 'no';") === 'yes');
+
   const live = await getDemoHtml();
   check('activated mode: technical non-live banner does NOT render', !live.html.includes('cpms-non-live-banner'));
   check('activated mode: privacy banner still renders', live.html.includes('id="cpms-privacy-banner"'));
@@ -268,7 +306,7 @@ try {
   check('accepted submission reaches the intercepted mail layer exactly once', entries.length === 1, JSON.stringify(entries.length));
   const entry = entries[0] || {};
   check('mail targets EXACTLY the authorized recipient', entry.to === authorizedRecipient, JSON.stringify(entry.to));
-  check('mail recipient cannot be overridden by request parameters (fixed code-bounded value)', entry.to === authorizedRecipient);
+  check('mail recipient cannot be overridden by request parameters (administrator setting / authorized default only)', entry.to === authorizedRecipient);
   check('mail subject identifies the CPMS website demo/consultation lead', entry.subject === expectedSubject, JSON.stringify(entry.subject));
   const message = typeof entry.message === 'string' ? entry.message : '';
   check(
@@ -369,6 +407,7 @@ try {
   rmSync(resolve(muDir, enableFixture), { force: true });
   rmSync(resolve(muDir, forceFailMarker), { force: true });
   clearMailLog(); // drop the activated-phase entries; assert zero NEW mail below
+  check('environment gate is independent: site switch is still stored ON while the environment authorization is removed', wpEval("echo true === koorosh_get_setting( 'lead_site_enabled' ) ? 'yes' : 'no';") === 'yes');
   const restored = await getDemoHtml();
   check('deactivation: technical non-live banner renders again', restored.html.includes('id="cpms-non-live-banner"'));
   nonce = extractNonce(restored.html) || nonce;
@@ -380,6 +419,59 @@ try {
   );
   results.mailLogFinalEntries = mailEntries().length;
   check('deactivated environment sends zero further mail', results.mailLogFinalEntries === 0, JSON.stringify(results.mailLogFinalEntries));
+
+  // ---- Phase 5: dual gate matrix + administrator-configured recipient ---------
+  copyFileSync(resolve(fixtureDir, enableFixture), resolve(muDir, enableFixture));
+  clearMailLog();
+
+  // Gate B OFF while gate A ON: no mail.
+  setSettings("array( 'lead_site_enabled' => false )");
+  let gate = await getDemoHtml();
+  nonce = extractNonce(gate.html) || nonce;
+  let gateResponse = await postDemoForm(validSubmission({ cpms_demo_nonce: nonce }));
+  check('dual gate: environment ON + site switch turned OFF again -> delivery_disabled', gateResponse.json?.data?.state === 'delivery_disabled', gateResponse.text.slice(0, 200));
+  check('dual gate: disabling the site switch stops mail (zero entries)', mailEntries().length === 0, JSON.stringify(mailEntries().length));
+
+  // Both gates ON with an administrator-configured recipient.
+  setSettings(`array( 'lead_site_enabled' => true, 'lead_recipient' => '${configuredRecipient}' )`);
+  gate = await getDemoHtml();
+  nonce = extractNonce(gate.html) || nonce;
+  gateResponse = await postDemoForm(validSubmission({ cpms_demo_nonce: nonce }));
+  check('dual gate: environment ON + site switch ON -> handoff_accepted', gateResponse.json?.data?.state === 'handoff_accepted', gateResponse.text.slice(0, 200));
+  entries = mailEntries();
+  check('mail goes to the administrator-configured recipient (not the code default)', entries.length === 1 && entries[0].to === configuredRecipient, JSON.stringify(entries.map(e => e.to)));
+
+  // Request parameters can never change the recipient or the settings.
+  const overrideFields = [
+    { cpms_recipient: 'attacker@example.test' },
+    { lead_recipient: 'attacker@example.test' },
+    { 'koorosh_settings[lead_recipient]': 'attacker@example.test', 'koorosh_settings[lead_site_enabled]': '1' },
+    { to: 'attacker@example.test' },
+  ];
+  for (const extra of overrideFields) {
+    const r = await postDemoForm(validSubmission({ cpms_demo_nonce: nonce, ...extra }));
+    check(`request field ${Object.keys(extra)[0]} cannot override the recipient (HTTP 400, no mail)`, r.status === 400 && r.json?.data?.code === 'unexpected_fields', `status=${r.status}`);
+  }
+  const queryOverride = await postDemoForm(validSubmission({ cpms_demo_nonce: nonce }), { query: '?lead_recipient=attacker@example.test&cpms_recipient=attacker@example.test&koorosh_settings[lead_recipient]=attacker@example.test' });
+  entries = mailEntries();
+  check('query-string recipient parameters are ignored: mail still goes to the configured recipient', queryOverride.json?.data?.state === 'handoff_accepted' && entries.length === 2 && entries[1].to === configuredRecipient, JSON.stringify(entries.map(e => e.to)));
+  check('front-end requests never changed the stored recipient', wpEval("echo koorosh_get_setting( 'lead_recipient' );") === configuredRecipient);
+  check('no attacker address appears anywhere in the intercepted mail', !JSON.stringify(entries).includes('attacker@example.test'));
+
+  // Clearing the stored recipient restores the authorized default (never recipient-less).
+  setSettings("array( 'lead_recipient' => '' )");
+  check('an emptied recipient falls back to the authorized default', wpEval('echo cpms_lead_delivery_recipient();') === authorizedRecipient);
+  // An invalid recipient update is refused and the previous value is kept.
+  setSettings("array( 'lead_recipient' => 'not-an-email' )");
+  check('an invalid recipient update is rejected (effective recipient unchanged)', wpEval('echo cpms_lead_delivery_recipient();') === authorizedRecipient);
+
+  deleteSettings();
+  rmSync(resolve(muDir, enableFixture), { force: true });
+  clearMailLog();
+  const afterReset = await getDemoHtml();
+  nonce = extractNonce(afterReset.html) || nonce;
+  const afterResetResponse = await postDemoForm(validSubmission({ cpms_demo_nonce: nonce }));
+  check('reset to defaults: delivery_disabled again and zero mail', afterResetResponse.json?.data?.state === 'delivery_disabled' && mailEntries().length === 0);
 
   cleanupFixtures();
   check('cleanup: no PHP fixtures remain in the mapped mu-plugins directory', phpFilesInMuDir().length === 0, phpFilesInMuDir().join(', '));
