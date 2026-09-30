@@ -92,7 +92,7 @@ try {
   await page.waitForTimeout(220);
   diagnostics.desktopMenuState = await page.locator('#desktop-workflows').evaluate((node) => {
     const panel = node.querySelector('.nav-dropdown');
-    const link = panel?.querySelector('a[href="#stage-reception"]');
+    const link = panel?.querySelector('a[href="#stage-appointment"]');
     const panelStyle = panel ? getComputedStyle(panel) : null;
     const linkStyle = link ? getComputedStyle(link) : null;
     const panelRect = panel?.getBoundingClientRect();
@@ -104,8 +104,8 @@ try {
       link: link && linkStyle ? { display: linkStyle.display, visibility: linkStyle.visibility, opacity: linkStyle.opacity, rect: [linkRect.x, linkRect.y, linkRect.width, linkRect.height], hit: hit?.tagName || null } : null,
     };
   });
-  await page.locator('#desktop-workflows .nav-dropdown a[href="#stage-reception"]').click({ timeout: 5000 });
-  assert.equal(new URL(page.url()).hash, '#stage-reception', 'desktop submenu route safely targets the workflow preview');
+  await page.locator('#desktop-workflows .nav-dropdown a[href="#stage-appointment"]').click({ timeout: 5000 });
+  assert.equal(new URL(page.url()).hash, '#stage-appointment', 'desktop submenu route safely targets the workflow preview');
   assert.equal(await page.locator('#desktop-workflows').evaluate((node) => node.open), false, 'desktop submenu closes after choosing a route');
 
   await page.locator('.hero-actions [data-demo-cta]').click();
