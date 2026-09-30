@@ -87,12 +87,16 @@ function cpms_lead_delivery_recipient() {
  * be overridden by the request" structurally true: there is no field that
  * could carry a recipient, and extra fields are refused outright.
  *
+ * `_wp_http_referer` is expected because wp_nonce_field() emits it by default
+ * in the rendered form; its value is never read or reflected.
+ *
  * @return array List of accepted POST keys.
  */
 function cpms_get_demo_form_allowed_fields() {
 	return array(
 		'cpms_demo_submit',
 		'cpms_demo_nonce',
+		'_wp_http_referer',
 		'cpms_ajax',
 		'cpms_submit_btn',
 		'cpms_contact_name',

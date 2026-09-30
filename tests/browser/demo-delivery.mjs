@@ -151,8 +151,17 @@ async function postDemoForm(fields, { ajax = true } = {}) {
 }
 
 function validSubmission(extra = {}) {
+  // Mirrors the exact field set a real browser submits from the rendered
+  // form: the wp_nonce_field() output includes BOTH cpms_demo_nonce and the
+  // default _wp_http_referer hidden field, and the submit button is a
+  // successful control in a no-JS form POST. (A regression where the strict
+  // allowlist rejected a field the rendered form actually contains is what
+  // this shape guards against.)
   return {
     cpms_demo_submit: '1',
+    cpms_demo_nonce: 'set-by-caller',
+    _wp_http_referer: '/demo/',
+    cpms_submit_btn: 'ثبت درخواست مشاوره / دمو',
     cpms_contact_name: synthetic.name,
     cpms_org_name: synthetic.org,
     cpms_contact_value: synthetic.contact,
@@ -284,7 +293,7 @@ try {
     `state=${phoneResponse.json?.data?.state} entries=${entries.length} headers=${JSON.stringify(entries[1]?.headers)}`
   );
 
-  const noJsAccepted = await postDemoForm(validSubmission({ cpms_demo_nonce: nonce, cpms_submit_btn: 'ثبت درخواست مشاوره / دمو' }), { ajax: false });
+  const noJsAccepted = await postDemoForm(validSubmission({ cpms_demo_nonce: nonce }), { ajax: false });
   check(
     'no-JS accepted flow: server renders a role=status notice with the truthful handoff wording',
     noJsAccepted.status === 200 && noJsAccepted.text.includes('id="cpms-form-success-notice"') && noJsAccepted.text.includes('role="status"') && noJsAccepted.text.includes('درخواست شما ثبت شد'),
@@ -340,7 +349,7 @@ try {
   check('failed handoff attempted exactly one further mail call (logged by interception)', entries.length === 4, JSON.stringify(entries.length));
   check('failed handoff response contains no success wording', !(failedResponse.json?.data?.message || '').includes('ثبت شد'));
 
-  const noJsFailed = await postDemoForm(validSubmission({ cpms_demo_nonce: nonce, cpms_submit_btn: 'ثبت درخواست مشاوره / دمو' }), { ajax: false });
+  const noJsFailed = await postDemoForm(validSubmission({ cpms_demo_nonce: nonce }), { ajax: false });
   check(
     'no-JS failure flow: server renders a role=alert error notice (not a success notice)',
     noJsFailed.status === 200 && noJsFailed.text.includes('id="cpms-form-error-summary"') && noJsFailed.text.includes('role="alert"') && noJsFailed.text.includes('ارسال درخواست در حال حاضر انجام نشد') && !noJsFailed.text.includes('id="cpms-form-success-notice"'),

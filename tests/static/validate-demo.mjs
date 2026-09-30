@@ -172,9 +172,9 @@ const allowlistMatch = formPhp.match(/function cpms_get_demo_form_allowed_fields
 assert(allowlistMatch, 'Allowlist must return an array');
 const allowlisted = [...allowlistMatch[1].matchAll(/'([a-z_]+)'/g)].map(m => m[1]);
 assert.deepEqual([...allowlisted].sort(), [
-  'cpms_ajax', 'cpms_contact_name', 'cpms_contact_value', 'cpms_demo_nonce', 'cpms_demo_submit',
+  '_wp_http_referer', 'cpms_ajax', 'cpms_contact_name', 'cpms_contact_value', 'cpms_demo_nonce', 'cpms_demo_submit',
   'cpms_discussion_topic', 'cpms_doctor_count', 'cpms_org_name', 'cpms_org_type', 'cpms_submit_btn', 'cpms_website_url',
-].sort(), 'Allowlist must be exactly the expected bounded field set');
+].sort(), 'Allowlist must be exactly the expected bounded field set (including the _wp_http_referer field wp_nonce_field emits)');
 
 // No persistence, no payload logging, no redirects
 assert(!formPhp.includes('wp_insert_post('), 'Form handler must NOT persist payloads to posts');
