@@ -163,13 +163,16 @@ try:
     except SystemExit as exc:
         check("packager refuses unclassified file", "unclassified" in str(exc))
 
-    # 7. Workflow / repo policy: artifact only, no release/tag/write permission, Pro never fetched
+    # 7. Workflow / repo policy: top-level read-only, job-scoped main-only pre-release after install proof, Pro never fetched
     wf = open(os.path.join(ROOT, ".github", "workflows", "wordpress-elementor-smoke.yml"), encoding="utf-8").read()
     check("workflow builds the package with --require-clean from the exact head SHA", "--require-clean" in wf and "ref: ${{ github.event.pull_request.head.sha || github.sha }}" in wf)
     check("workflow installs the ZIP via tests/package/install-check.sh", "bash tests/package/install-check.sh" in wf)
     check("workflow uploads a koorosh-test-host-transfer-<sha> artifact with bounded retention", "name: koorosh-test-host-transfer-${{ github.event.pull_request.head.sha || github.sha }}" in wf and "retention-days: 14" in wf)
-    check("workflow stays read-only (no contents: write)", "contents: write" not in wf and "contents: read" in wf)
-    check("workflow creates no release or tag", not any(t in wf for t in ("action-gh-release", "gh release", "git tag", "create-release", "actions/create-release")))
+    check("workflow default stays read-only and scopes contents: write to transfer job only", "permissions:\n  contents: read" in wf and wf.count("contents: write") == 1)
+    check("workflow publishes only a main-gated --prerelease after ZIP-install proof (never a production release)",
+          "github.ref == 'refs/heads/main'" in wf and "--prerelease" in wf and "--latest" not in wf
+          and "koorosh-test-v" in wf and "Test Host Transfer Build" in wf
+          and wf.index("bash tests/package/install-check.sh") < wf.index("gh release create"))
     check("no Elementor Pro download/URL/secret in workflow", not any(t in wf.lower() for t in ("elementor-pro.zip", "secrets.")))
     pkg_env = json.load(open(os.path.join(HERE, ".wp-env.json"), encoding="utf-8"))
     root_env = json.load(open(os.path.join(ROOT, ".wp-env.json"), encoding="utf-8"))
