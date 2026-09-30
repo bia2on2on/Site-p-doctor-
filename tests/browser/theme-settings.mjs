@@ -78,7 +78,11 @@ async function login(page, user, pass) {
 }
 
 // Saving redirects (options.php -> settings page); wait for that one navigation.
+// Native browser validation (type=email/url) would swallow invalid submissions before they
+// reach the server, so it is switched off here: the test must prove the SERVER-side sanitizer
+// is the authority, not the browser hint.
 async function submit(page) {
+  await page.evaluate(() => { document.querySelectorAll('#koorosh-settings form').forEach(f => { f.noValidate = true; }); });
   await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 60_000 }), page.click('#submit')]);
 }
 
