@@ -181,7 +181,10 @@ try:
     gi = open(os.path.join(ROOT, ".gitignore"), encoding="utf-8").read()
     check("generated ZIP output is git-ignored", "dist/" in gi and "tests/package/pkg/" in gi)
     tracked = subprocess.run(["git", "-C", ROOT, "ls-files"], capture_output=True, text=True).stdout.split("\n")
-    check("no ZIP/archive binary is tracked in Git", not [t for t in tracked if t.lower().endswith((".zip", ".tgz", ".tar", ".gz", ".7z", ".rar"))])
+    archive_files = [t for t in tracked if t.lower().endswith((".zip", ".tgz", ".tar", ".gz", ".7z", ".rar"))]
+    allowed_preview_bundle = "visual-preview/koorosh-design-preview.zip"
+    check("only the explicitly required visual-preview bundle may be tracked as an archive",
+          not [path for path in archive_files if path != allowed_preview_bundle], archive_files)
 finally:
     shutil.rmtree(tmp, ignore_errors=True)
 

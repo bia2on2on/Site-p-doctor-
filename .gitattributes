@@ -2,3 +2,5 @@
 # (SIL OFL 1.1 from github.com/rastikerdar/vazirmatn tag v33.003); do not
 # "fix" whitespace inside it — disable whitespace checks for that path only.
 themes/koorosh/fonts/OFL.txt -whitespace
+# Byte-identical license copy accompanies the standalone visual-review font bundle.
+visual-preview/assets/fonts/OFL.txt -whitespace
