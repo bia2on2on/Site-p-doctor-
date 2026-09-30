@@ -89,7 +89,22 @@ try {
   await page.locator('#desktop-workflows > summary').click();
   assert.equal(await page.locator('#desktop-workflows').evaluate((node) => node.open), true, 'desktop workflow submenu opens');
   assert.equal(await page.locator('#desktop-workflows .nav-dropdown a').count(), 4, 'desktop workflow submenu contains its four routes');
-  await page.locator('#desktop-workflows .nav-dropdown a[href="#stage-reception"]').click();
+  await page.waitForTimeout(220);
+  diagnostics.desktopMenuState = await page.locator('#desktop-workflows').evaluate((node) => {
+    const panel = node.querySelector('.nav-dropdown');
+    const link = panel?.querySelector('a[href="#stage-reception"]');
+    const panelStyle = panel ? getComputedStyle(panel) : null;
+    const linkStyle = link ? getComputedStyle(link) : null;
+    const panelRect = panel?.getBoundingClientRect();
+    const linkRect = link?.getBoundingClientRect();
+    const hit = linkRect ? document.elementFromPoint(linkRect.x + linkRect.width / 2, linkRect.y + linkRect.height / 2) : null;
+    return {
+      open: node.open,
+      panel: panel && panelStyle ? { display: panelStyle.display, visibility: panelStyle.visibility, opacity: panelStyle.opacity, pointerEvents: panelStyle.pointerEvents, rect: [panelRect.x, panelRect.y, panelRect.width, panelRect.height] } : null,
+      link: link && linkStyle ? { display: linkStyle.display, visibility: linkStyle.visibility, opacity: linkStyle.opacity, rect: [linkRect.x, linkRect.y, linkRect.width, linkRect.height], hit: hit?.tagName || null } : null,
+    };
+  });
+  await page.locator('#desktop-workflows .nav-dropdown a[href="#stage-reception"]').click({ timeout: 5000 });
   assert.equal(new URL(page.url()).hash, '#stage-reception', 'desktop submenu route safely targets the workflow preview');
   assert.equal(await page.locator('#desktop-workflows').evaluate((node) => node.open), false, 'desktop submenu closes after choosing a route');
 
@@ -197,11 +212,12 @@ try {
 
   console.log('PASS: interactive visual preview (responsive widths, mobile/desktop navigation, CTA, scroll motion, reduced motion, Settings tabs, no-JavaScript fallback, no external requests/errors)');
 } catch (error) {
-  const detail = String(error?.stack || error).replaceAll(process.cwd(), "<workspace>").slice(0, 6000);
+  const detail = String(error?.stack || error).replaceAll(process.cwd(), "<workspace>");
+  const report = `${detail}\n\nDiagnostics: ${JSON.stringify(diagnostics, null, 2)}`.slice(0, 6000);
   const artifactDir = resolve(import.meta.dirname, "artifacts/visual-preview");
   mkdirSync(artifactDir, { recursive: true });
-  writeFileSync(resolve(artifactDir, "failure.txt"), `${detail}\n\nDiagnostics: ${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
-  const annotation = detail.replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
+  writeFileSync(resolve(artifactDir, "failure.txt"), `${report}\n`, "utf8");
+  const annotation = report.replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
   console.error(`::error title=Interactive visual preview::${annotation}`);
   console.error(detail);
   process.exitCode = 1;
