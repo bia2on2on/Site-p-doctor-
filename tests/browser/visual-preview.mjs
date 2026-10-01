@@ -145,6 +145,7 @@ function visualFingerprint() {
     return { box: box(section), background: getComputedStyle(section).backgroundColor, paddingBlock: `${getComputedStyle(section).paddingBlockStart}/${getComputedStyle(section).paddingBlockEnd}`, headingTag: heading?.tagName.toLowerCase() || null };
   });
   return {
+    document: { title: document.title, url: location.href, topFrame: window.self === window.top, bodyTextLength: document.body?.innerText?.length || 0, h1Count: document.querySelectorAll('h1').length, headerCount: document.querySelectorAll('header').length, mainCount: document.querySelectorAll('main').length, sectionCount: document.querySelectorAll('section').length, iframeCount: document.querySelectorAll('iframe').length },
     viewport: { width: innerWidth, height: innerHeight, scrollWidth: document.documentElement.scrollWidth, pageHeight: document.documentElement.scrollHeight },
     page: { background: getComputedStyle(document.body).backgroundColor, font: getComputedStyle(document.body).fontFamily, fontSize: getComputedStyle(document.body).fontSize, lineHeight: getComputedStyle(document.body).lineHeight },
     header: describe(document.querySelector('header')),
@@ -170,6 +171,8 @@ function emitVisualMeasurement(label, viewport, fingerprint) {
     return { box, display: style?.display, background: style?.background, color: style?.color, font: style?.font, fontSize: style?.fontSize, lineHeight: style?.lineHeight, padding: style?.padding, gap: style?.gap, radius: style?.radius, shadow: style?.shadow, backdrop: style?.backdrop };
   };
   const measurement = {
+    document: fingerprint.document,
+    contentFrame: fingerprint.frameSummary || null,
     viewport: fingerprint.viewport,
     page: fingerprint.page,
     header: geometry(fingerprint.header),
@@ -208,9 +211,30 @@ async function captureReferenceParity(browser, screenshotDir) {
         const response = await referencePage.goto(referenceUrl, { waitUntil: 'domcontentloaded' });
         if (!response || response.status() >= 400) throw new Error(`reference returned HTTP ${response?.status() ?? 'no response'}`);
         await referencePage.waitForTimeout(650);
-        const fingerprint = await referencePage.evaluate(visualFingerprint);
+        const frames = referencePage.frames();
+        const frameSummaries = await Promise.all(frames.map(async (frame, index) => {
+          try {
+            return await frame.evaluate((frameIndex) => ({ index: frameIndex, url: location.href, title: document.title, topFrame: window.self === window.top, width: innerWidth, height: innerHeight, pageHeight: document.documentElement.scrollHeight, scrollWidth: document.documentElement.scrollWidth, bodyTextLength: document.body?.innerText?.length || 0, h1Count: document.querySelectorAll('h1').length, headerCount: document.querySelectorAll('header').length, sectionCount: document.querySelectorAll('section').length }), index);
+          } catch (error) {
+            return { index, url: frame.url(), error: String(error?.message || error).slice(0, 200) };
+          }
+        }));
+        const contentFrameSummary = frameSummaries.filter((summary) => !summary.error).sort((a, b) => b.bodyTextLength - a.bodyTextLength)[0];
+        const contentFrame = frames[contentFrameSummary?.index] || referencePage.mainFrame();
+        const fingerprint = await contentFrame.evaluate(visualFingerprint);
+        fingerprint.frameSummary = contentFrameSummary || null;
+        console.log(`[REFERENCE-FRAMES ${viewport.width}x${viewport.height}] ${JSON.stringify(frameSummaries)}`);
         console.log(`[REFERENCE-PARITY ${viewport.width}x${viewport.height}] ${JSON.stringify(fingerprint)}`);
         emitVisualMeasurement('REFERENCE', viewport, fingerprint);
+        if (contentFrame !== referencePage.mainFrame() && fingerprint.viewport.pageHeight > viewport.height) {
+          const frameElement = await contentFrame.frameElement();
+          await frameElement.evaluate((node, height) => {
+            node.style.setProperty('height', `${height}px`, 'important');
+            node.style.setProperty('min-height', `${height}px`, 'important');
+            node.style.setProperty('max-height', 'none', 'important');
+          }, fingerprint.viewport.pageHeight);
+          await referencePage.waitForTimeout(200);
+        }
         await referencePage.evaluate(async () => {
           const step = Math.max(300, Math.floor(innerHeight * 0.72));
           for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
@@ -277,7 +301,6 @@ async function captureVisualReviewScreenshots(browser) {
     assert.equal(reveals.visible, reveals.total, `all homepage sections are revealed before ${viewport.width}px screenshot (${JSON.stringify(reveals)})`);
     const fingerprint = await capturePage.evaluate(visualFingerprint);
     console.log(`[CPMS-PARITY ${viewport.width}x${viewport.height}] ${JSON.stringify(fingerprint)}`);
-    emitVisualMeasurement('CPMS', viewport, fingerprint);
     await capturePage.waitForTimeout(850);
     const path = resolve(screenshotDir, `homepage-${viewport.width}x${viewport.height}.jpg`);
     await capturePage.screenshot({ path, type: "jpeg", quality: 88, fullPage: true, animations: "disabled", caret: "hide" });
