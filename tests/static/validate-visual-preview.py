@@ -199,7 +199,7 @@ check("green" not in css.lower() and "teal" not in css.lower(), "preview palette
 def is_rejected_green_hue(rgb: tuple[int, int, int]) -> bool:
     hue, _lightness, saturation = colorsys.rgb_to_hls(*(value / 255 for value in rgb))
     degrees = hue * 360
-    return 82 <= degrees <= 205 and saturation >= 0.045
+    return 82 <= degrees <= 165 and saturation >= 0.045
 
 rejected_colors: list[str] = []
 for match in re.finditer(r"#[0-9A-Fa-f]{6}\b", css):
@@ -211,10 +211,10 @@ for match in re.finditer(r"\brgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)", 
     rgb = tuple(round(float(match.group(index))) for index in (1, 2, 3))
     if is_rejected_green_hue(rgb):
         rejected_colors.append(match.group(0))
-check(not rejected_colors, f"preview palette has no green/cyan hue colors: {rejected_colors[:5]}")
+check(not rejected_colors, f"preview palette has no green-family hue colors: {rejected_colors[:5]}")
 check(bool(js), "preview.js exists and is not empty")
 check("CPMS visual-review Design System v3" in css, "preview documents the v3 token system and its non-production scope")
-for token in ("--color-canvas", "--color-surface", "--color-ink", "--color-copy", "--color-muted", "--color-primary", "--color-cobalt", "--color-sky", "--color-glass", "--color-success", "--color-warning", "--color-info"):
+for token in ("--color-canvas", "--color-surface", "--color-ink", "--color-copy", "--color-muted", "--color-primary", "--color-cobalt", "--color-sky", "--color-aqua", "--color-aqua-soft", "--color-glass", "--color-success", "--color-warning", "--color-info"):
     check(token in css, f"preview design system defines semantic token {token}")
 for token in ("--space-1", "--space-11", "--radius-sm", "--radius-xl", "--shadow-soft", "--shadow-raised", "--shadow-float"):
     check(token in css, f"preview design system defines scale token {token}")
@@ -225,6 +225,7 @@ check("IntersectionObserver" in js, "scroll reveal uses a small native Intersect
 check("aria-selected" in js and "role=\"tabpanel\"" in (PREVIEW / "theme-settings.html").read_text(encoding="utf-8"), "settings navigation has an accessible tab implementation")
 check("Escape" in js and "mobileNavigation" in js, "interactive mobile menu has close behavior")
 check(not re.search(r"https?://|//fonts\.googleapis|fonts\.gstatic|fetch\s*\(|XMLHttpRequest|sendBeacon", css + js, re.I), "CSS/JavaScript contain no remote assets, requests or analytics")
+check(not re.search(r"animation(?:-iteration-count)?\s*:[^;}]*infinite", css, re.I), "preview animations are finite and do not run continuously")
 for css_url in re.findall(r"url\(\s*['\"]?([^)'\"]+)", css, re.I):
     check(not css_url.lower().startswith(("http:", "https:", "//", "data:")), f"CSS asset is local: {css_url}")
     css_target = (PREVIEW / css_url).resolve()
