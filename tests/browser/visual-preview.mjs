@@ -244,9 +244,9 @@ try {
     [palette['--color-copy'], '#EDF1EF', 'inactive status on soft gray'],
     [palette['--color-warning'], palette['--color-warm-soft'], 'review status on soft amber'],
     [palette['--color-info'], palette['--color-blue-soft'], 'unverified status on soft blue'],
-    ['#FFFFFF', '#0A8179', 'white CTA text on the lightest teal gradient stop'],
-    ['#FFFFFF', palette['--color-primary-hover'], 'white CTA text on deep teal'],
-    ['#FFFFFF', '#064E50', 'white CTA text on the darkest teal gradient stop'],
+    ['#FFFFFF', '#08746F', 'white CTA text on the first teal gradient stop'],
+    ['#FFFFFF', '#075F60', 'white CTA text on the deep teal gradient stop'],
+    ['#FFFFFF', '#164E62', 'white CTA text on the blue-teal gradient stop'],
     ['#F1F8F5', '#08746F', 'light CTA body text on teal'],
     ['#F1F8F5', '#075F60', 'light CTA body text on dark teal'],
     ['#F1F8F5', '#164E62', 'light CTA body text on blue-teal'],
@@ -366,6 +366,7 @@ try {
     await assertNoOverflow(page, `homepage responsive check ${viewport.width}×${viewport.height}`);
   }
 
+  await page.setViewportSize({ width: 390, height: 844 });
   response = await page.goto(pageUrl('theme-settings.html'), { waitUntil: 'networkidle' });
   assert.equal(response.status(), 200, 'Theme Settings preview returns HTTP 200');
   assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'), 'noindex,nofollow');
