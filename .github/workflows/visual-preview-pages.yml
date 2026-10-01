@@ -137,6 +137,7 @@ jobs:
       - name: Test the published Pages site and capture responsive review evidence
         env:
           VISUAL_PREVIEW_BASE_URL: ${{ needs.deploy.outputs.page_url }}
+          VISUAL_REFERENCE_URL: https://01a0f849-cd20-76e1-a6de-cd79f231f369.arena.site/
           VISUAL_REVIEW_SCREENSHOTS: '1'
         run: node tests/browser/visual-preview.mjs
 

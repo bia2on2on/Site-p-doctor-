@@ -91,6 +91,123 @@ async function assertNoOverflow(page, label) {
   assert(metrics.body <= metrics.viewport + 1, `${label}: body overflows horizontally (${JSON.stringify(metrics)})`);
 }
 
+function visualFingerprint() {
+  const round = (value) => Math.round(value * 10) / 10;
+  const box = (element) => {
+    if (!element) return null;
+    const rect = element.getBoundingClientRect();
+    return { x: round(rect.x + scrollX), y: round(rect.y + scrollY), width: round(rect.width), height: round(rect.height) };
+  };
+  const visualStyle = (element) => {
+    if (!element) return null;
+    const style = getComputedStyle(element);
+    return {
+      display: style.display,
+      position: style.position,
+      background: style.backgroundColor,
+      color: style.color,
+      font: style.fontFamily,
+      fontSize: style.fontSize,
+      fontWeight: style.fontWeight,
+      lineHeight: style.lineHeight,
+      padding: style.padding,
+      gap: style.gap,
+      radius: style.borderRadius,
+      border: `${style.borderWidth} ${style.borderStyle} ${style.borderColor}`,
+      shadow: style.boxShadow,
+      backdrop: style.backdropFilter,
+      transition: style.transitionDuration,
+      animation: style.animationDuration,
+    };
+  };
+  const describe = (element) => ({ tag: element.tagName.toLowerCase(), className: typeof element.className === 'string' ? element.className.slice(0, 90) : element.getAttribute('class')?.slice(0, 90) || '', box: box(element), style: visualStyle(element) });
+  const main = document.querySelector('main');
+  const sections = [...(main || document).querySelectorAll('section')].filter((element) => !element.parentElement?.closest('section'));
+  const h1 = document.querySelector('h1');
+  const hero = h1?.closest('section') || h1?.parentElement;
+  let heroGrid = null;
+  for (let node = h1?.parentElement; node && node !== hero; node = node.parentElement) {
+    const display = getComputedStyle(node).display;
+    if (node.children.length >= 2 && [...node.children].some((child) => !child.contains(h1)) && (display === 'grid' || display === 'flex')) {
+      heroGrid = node;
+      break;
+    }
+  }
+  const copyColumn = heroGrid ? [...heroGrid.children].find((child) => child.contains(h1)) : h1?.parentElement;
+  const mediaColumn = heroGrid ? [...heroGrid.children].filter((child) => child !== copyColumn).sort((a, b) => (b.getBoundingClientRect().width * b.getBoundingClientRect().height) - (a.getBoundingClientRect().width * a.getBoundingClientRect().height))[0] : null;
+  const heroCta = hero ? [...hero.querySelectorAll('a,button')].find((element) => /demo|دمو|درخواست|مشاوره/i.test(element.innerText || element.getAttribute('aria-label') || '')) || hero.querySelector('a,button') : null;
+  const cardCandidates = [...document.querySelectorAll('article,figure,[class*="card"],[class*="feature"],[class*="stat"],[class*="panel"]')].filter((element) => {
+    const rect = element.getBoundingClientRect();
+    return rect.width > 90 && rect.height > 42;
+  }).slice(0, 8);
+  const topSections = sections.map((section) => {
+    const heading = section.querySelector('h2,h3');
+    return { box: box(section), background: getComputedStyle(section).backgroundColor, paddingBlock: `${getComputedStyle(section).paddingBlockStart}/${getComputedStyle(section).paddingBlockEnd}`, headingTag: heading?.tagName.toLowerCase() || null };
+  });
+  return {
+    viewport: { width: innerWidth, height: innerHeight, scrollWidth: document.documentElement.scrollWidth, pageHeight: document.documentElement.scrollHeight },
+    page: { background: getComputedStyle(document.body).backgroundColor, font: getComputedStyle(document.body).fontFamily, fontSize: getComputedStyle(document.body).fontSize, lineHeight: getComputedStyle(document.body).lineHeight },
+    header: describe(document.querySelector('header')),
+    nav: describe(document.querySelector('header nav')),
+    hero: describe(hero),
+    heroGrid: describe(heroGrid),
+    heroCopy: describe(copyColumn),
+    heroMedia: describe(mediaColumn),
+    h1: describe(h1),
+    heroCta: describe(heroCta),
+    sectionCount: sections.length,
+    sections: topSections,
+    cards: cardCandidates.map(describe),
+    footer: describe(document.querySelector('footer')),
+    interaction: { details: document.querySelectorAll('details').length, navDetails: document.querySelectorAll('header details').length, buttons: document.querySelectorAll('button').length, reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches },
+  };
+}
+
+async function captureReferenceParity(browser, screenshotDir) {
+  const referenceUrl = process.env.VISUAL_REFERENCE_URL;
+  if (!referenceUrl) return;
+  const viewports = [
+    { width: 390, height: 844 },
+    { width: 430, height: 932 },
+    { width: 768, height: 1024 },
+    { width: 1024, height: 768 },
+    { width: 1366, height: 768 },
+    { width: 1440, height: 900 },
+    { width: 1920, height: 1080 },
+  ];
+  const referencePage = await browser.newPage({ reducedMotion: 'reduce' });
+  referencePage.setDefaultNavigationTimeout(30000);
+  try {
+    for (const viewport of viewports) {
+      await referencePage.setViewportSize(viewport);
+      try {
+        const response = await referencePage.goto(referenceUrl, { waitUntil: 'domcontentloaded' });
+        if (!response || response.status() >= 400) throw new Error(`reference returned HTTP ${response?.status() ?? 'no response'}`);
+        await referencePage.waitForTimeout(650);
+        const fingerprint = await referencePage.evaluate(visualFingerprint);
+        console.log(`[REFERENCE-PARITY ${viewport.width}x${viewport.height}] ${JSON.stringify(fingerprint)}`);
+        await referencePage.evaluate(async () => {
+          const step = Math.max(300, Math.floor(innerHeight * 0.72));
+          for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
+            scrollTo(0, y);
+            await new Promise((resolveFrame) => requestAnimationFrame(resolveFrame));
+          }
+          scrollTo(0, 0);
+          await new Promise((resolveFrame) => requestAnimationFrame(resolveFrame));
+        });
+        const path = resolve(screenshotDir, `reference-${viewport.width}x${viewport.height}.jpg`);
+        await referencePage.screenshot({ path, type: 'jpeg', quality: 88, fullPage: true, animations: 'disabled', caret: 'hide' });
+        console.log(`[REFERENCE-SCREENSHOT] ${viewport.width}×${viewport.height}: ${path}`);
+      } catch (error) {
+        console.warn(`[REFERENCE-INSPECTION-UNAVAILABLE ${viewport.width}x${viewport.height}] ${String(error?.message || error).slice(0, 350)}`);
+        break;
+      }
+    }
+  } finally {
+    await referencePage.close();
+  }
+}
+
 async function captureVisualReviewScreenshots(browser) {
   const screenshotDir = resolve(import.meta.dirname, "artifacts/visual-preview/screenshots");
   mkdirSync(screenshotDir, { recursive: true });
@@ -130,6 +247,7 @@ async function captureVisualReviewScreenshots(browser) {
     await exposeReveals();
     const reveals = await capturePage.evaluate(() => ({ total: document.querySelectorAll("[data-reveal]").length, visible: document.querySelectorAll("[data-reveal].is-visible").length }));
     assert.equal(reveals.visible, reveals.total, `all homepage sections are revealed before ${viewport.width}px screenshot (${JSON.stringify(reveals)})`);
+    console.log(`[CPMS-PARITY ${viewport.width}x${viewport.height}] ${JSON.stringify(await capturePage.evaluate(visualFingerprint))}`);
     await capturePage.waitForTimeout(850);
     const path = resolve(screenshotDir, `homepage-${viewport.width}x${viewport.height}.jpg`);
     await capturePage.screenshot({ path, type: "jpeg", quality: 88, fullPage: true, animations: "disabled", caret: "hide" });
@@ -166,6 +284,7 @@ async function captureVisualReviewScreenshots(browser) {
   await capturePage.screenshot({ path: menuPath, type: "jpeg", quality: 88, fullPage: false, animations: "disabled", caret: "hide" });
   console.log(`[SCREENSHOT] mobile menu 390×844: ${menuPath}`);
   await capturePage.close();
+  await captureReferenceParity(browser, screenshotDir);
 }
 
 async function assertFontSize(page, selector, minimum, label) {
