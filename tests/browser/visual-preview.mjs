@@ -120,7 +120,7 @@ function visualFingerprint() {
       animation: style.animationDuration,
     };
   };
-  const describe = (element) => ({ tag: element.tagName.toLowerCase(), className: typeof element.className === 'string' ? element.className.slice(0, 90) : element.getAttribute('class')?.slice(0, 90) || '', box: box(element), style: visualStyle(element) });
+  const describe = (element) => !element ? null : ({ tag: element.tagName.toLowerCase(), className: typeof element.className === 'string' ? element.className.slice(0, 90) : element.getAttribute('class')?.slice(0, 90) || '', box: box(element), style: visualStyle(element) });
   const main = document.querySelector('main');
   const sections = [...(main || document).querySelectorAll('section')].filter((element) => !element.parentElement?.closest('section'));
   const h1 = document.querySelector('h1');
@@ -164,7 +164,11 @@ function visualFingerprint() {
 }
 
 function emitVisualMeasurement(label, viewport, fingerprint) {
-  const geometry = ({ box, style }) => ({ box, display: style?.display, background: style?.background, color: style?.color, font: style?.font, fontSize: style?.fontSize, lineHeight: style?.lineHeight, padding: style?.padding, gap: style?.gap, radius: style?.radius, shadow: style?.shadow, backdrop: style?.backdrop });
+  const geometry = (element) => {
+    if (!element) return null;
+    const { box, style } = element;
+    return { box, display: style?.display, background: style?.background, color: style?.color, font: style?.font, fontSize: style?.fontSize, lineHeight: style?.lineHeight, padding: style?.padding, gap: style?.gap, radius: style?.radius, shadow: style?.shadow, backdrop: style?.backdrop };
+  };
   const measurement = {
     viewport: fingerprint.viewport,
     page: fingerprint.page,
