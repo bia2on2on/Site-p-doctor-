@@ -68,9 +68,9 @@ jobs:
                   r"""<a\b(?=[^>]*\bhref=["'][^"']*\.zip(?:[?#][^"']*)?["'])[^>]*>.*?</a>""",
                   re.IGNORECASE | re.DOTALL,
               )
-              text, removed = zip_link.subn("", text, count=1)
-              if removed != 1:
-                  raise SystemExit(f"{name} should have exactly one offline package link removed")
+              text, removed = zip_link.subn("", text)
+              if removed > 1:
+                  raise SystemExit(f"{name} contains unexpected multiple ZIP download links")
               if zip_link.search(text):
                   raise SystemExit(f"{name} still contains a ZIP download link")
               if "koorosh-design-preview.zip" in text.lower():

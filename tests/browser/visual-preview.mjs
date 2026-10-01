@@ -91,6 +91,27 @@ async function assertNoOverflow(page, label) {
   assert(metrics.body <= metrics.viewport + 1, `${label}: body overflows horizontally (${JSON.stringify(metrics)})`);
 }
 
+async function assertFontSize(page, selector, minimum, label) {
+  const sizes = await page.locator(selector).evaluateAll((nodes) => nodes.map((node) => Number.parseFloat(getComputedStyle(node).fontSize)));
+  assert(sizes.length > 0, `${label}: selector matched at least one element (${selector})`);
+  for (const size of sizes) assert(size >= minimum, `${label}: ${selector} is at least ${minimum}px (got ${size}px)`);
+}
+
+function luminance(hex) {
+  const match = /^#([\da-f]{6})$/i.exec(hex.trim());
+  assert(match, `expected a six-digit hex color, got ${hex}`);
+  const channels = [0, 2, 4].map((offset) => Number.parseInt(match[1].slice(offset, offset + 2), 16) / 255);
+  const linear = channels.map((value) => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
+  return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+}
+
+function assertContrast(foreground, background, label) {
+  const first = luminance(foreground);
+  const second = luminance(background);
+  const ratio = (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05);
+  assert(ratio >= 4.5, `${label}: WCAG AA normal-text contrast is ${ratio.toFixed(2)}:1`);
+}
+
 try {
   browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 1366, height: 900 } });
@@ -99,6 +120,8 @@ try {
   assert.equal(response.status(), 200, 'homepage preview returns HTTP 200');
   if (requestedBase) {
     assert.equal(await page.locator('a[href$=".zip"]').count(), 0, 'published homepage has no offline package link');
+  } else {
+    assert.equal(await page.locator('a[href$=".zip"]').count(), 1, 'downloadable source exposes exactly one homepage bundle link');
   }
   const requiredAssets = ['preview.css', 'preview.js', 'assets/fonts/Vazirmatn-Regular.woff2', 'assets/fonts/Vazirmatn-Bold.woff2', 'assets/fonts/OFL.txt'];
   if (!requestedBase) requiredAssets.push('koorosh-design-preview.zip');
@@ -116,15 +139,51 @@ try {
   assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'), 'noindex,nofollow');
   assert.match(await page.locator('#preview-notice').innerText(), /پیش‌نمایش طراحی — نسخه نهایی سایت نیست/);
   assert.equal(await page.locator('h1').count(), 1, 'homepage has one H1');
-  assert.match(await page.locator('h1').innerText(), /مدیریت کلینیک/);
+  assert.match(await page.locator('h1').innerText(), /مدیریت یکپارچهٔ کلینیک/);
   assert.equal(await page.locator('form').count(), 0, 'homepage has no real form');
-  assert.equal(await page.locator('.media-frame').isVisible(), true, 'reserved product-media frame is visible');
-  assert.match(await page.locator('.media-frame').innerText(), /این تصویرسازی، نمای محصول نیست/);
+  assert.equal(await page.locator('.reserved-media').count(), 2, 'hero and proof each reserve product media');
+  assert.equal(await page.locator('.reserved-media').first().isVisible(), true, 'hero reserved-media surface is visible');
+  assert.equal(await page.locator('.media-disclosure').count(), 1, 'a single concise disclosure covers all reserved media');
+  assert.match(await page.locator('#media-disclosure').innerText(), /جایگاه رسانه‌اند و رابط واقعی نرم‌افزار را نشان نمی‌دهند/);
+  assert.match(await page.locator('.role-fit-note').innerText(), /کلینیک‌های چندپزشکی و مراکز درمانی/);
+  assert.match(await page.locator('.role-fit-note').innerText(), /مطب مستقل یا مجموعهٔ کوچک‌تر/);
+  assert.equal(await page.locator('.reserved-media button, .reserved-media input, .reserved-media select, .reserved-media textarea, .reserved-media table, .reserved-media canvas, .reserved-media iframe').count(), 0, 'reserved product media contains no fabricated interface');
   assert.equal(await page.evaluate(() => document.fonts.check('16px Vazirmatn')), true, 'local Vazirmatn font loads');
+
+  const palette = await page.evaluate(() => {
+    const styles = getComputedStyle(document.documentElement);
+    return Object.fromEntries(['--color-ink', '--color-copy', '--color-muted', '--color-canvas', '--color-surface', '--color-primary', '--color-primary-hover', '--color-teal-soft', '--color-success', '--color-warning', '--color-info', '--color-warm-soft', '--color-blue-soft', '--color-night'].map((name) => [name, styles.getPropertyValue(name).trim()]));
+  });
+  for (const [foreground, background, label] of [
+    [palette['--color-ink'], palette['--color-canvas'], 'body text on warm canvas'],
+    [palette['--color-copy'], palette['--color-canvas'], 'supporting copy on warm canvas'],
+    [palette['--color-muted'], palette['--color-surface'], 'muted text on white surface'],
+    [palette['--color-primary'], palette['--color-canvas'], 'teal link on warm canvas'],
+    [palette['--color-primary-hover'], palette['--color-teal-soft'], 'active tab on soft teal'],
+    [palette['--color-success'], '#E7F1EA', 'active status on soft green'],
+    [palette['--color-copy'], '#EDF0EE', 'inactive status on soft gray'],
+    [palette['--color-warning'], palette['--color-warm-soft'], 'review status on soft amber'],
+    [palette['--color-info'], palette['--color-blue-soft'], 'unverified status on soft blue'],
+    ['#FFFFFF', palette['--color-primary'], 'white CTA text on deep teal'],
+    ['#FFFFFF', palette['--color-primary-hover'], 'white CTA text on dark teal'],
+    ['#FFFFFF', '#154D61', 'white CTA text on blue-teal gradient end'],
+    ['#F0F6F3', palette['--color-primary'], 'soft-white CTA body text on the lightest gradient stop'],
+    ['#F0F6F3', '#075851', 'soft-white CTA body text on the deep teal gradient stop'],
+    ['#F0F6F3', '#154D61', 'soft-white CTA body text on the blue-teal gradient stop'],
+    ['#C4E3DE', palette['--color-night'], 'light product-proof eyebrow on navy'],
+    ['#9BD1C7', palette['--color-night'], 'light product-proof heading on navy'],
+    ['#D4E0E1', palette['--color-night'], 'footer copy on navy'],
+  ]) assertContrast(foreground, background, label);
 
   await page.locator('#desktop-workflows > summary').click();
   assert.equal(await page.locator('#desktop-workflows').evaluate((node) => node.open), true, 'desktop workflow submenu opens');
-  assert.equal(await page.locator('#desktop-workflows .nav-dropdown a').count(), 4, 'desktop workflow submenu contains its four routes');
+  assert.equal(await page.locator('#desktop-workflows .nav-dropdown a').count(), 3, 'desktop workflow submenu only lists the three previewed stages');
+  for (const [target, label] of [['#stage-appointment', 'نوبت'], ['#stage-reception', 'پذیرش و صف'], ['#stage-visit', 'فضای کاری پزشک']]) {
+    const link = page.locator(`#desktop-workflows .nav-dropdown a[href="${target}"]`);
+    assert((await link.innerText()).includes(label), `workflow navigation label matches ${target}`);
+    assert.equal(await page.locator(target).count(), 1, `workflow destination exists: ${target}`);
+  }
+  assert.equal(await page.locator('.desktop-nav a').filter({ hasText: 'پورتال بیمار' }).count(), 0, 'preview nav omits the mismatched patient-portal destination');
   await page.waitForTimeout(220);
   diagnostics.desktopMenuState = await page.locator('#desktop-workflows').evaluate((node) => {
     const panel = node.querySelector('.nav-dropdown');
@@ -151,17 +210,57 @@ try {
   await page.locator('#workflow').scrollIntoViewIfNeeded();
   await page.locator('.workflow-track').waitFor({ state: 'visible' });
   await page.waitForFunction(() => document.querySelector('#workflow .section-heading')?.classList.contains('is-visible'));
+  await page.waitForFunction(() => document.querySelector('.workflow-track')?.classList.contains('is-active'));
   await page.locator('.question-item').nth(1).locator('summary').click();
   assert.equal(await page.locator('.question-item').nth(1).evaluate((node) => node.open), true, 'objection details disclosure opens');
 
-  for (const width of [320, 390, 768, 1366, 1920]) {
-    await page.setViewportSize({ width, height: 900 });
-    await assertNoOverflow(page, `homepage ${width}px`);
+  const viewportMatrix = [
+    { width: 320, height: 720 },
+    { width: 390, height: 844 },
+    { width: 768, height: 1024 },
+    { width: 1366, height: 768 },
+    { width: 1440, height: 900 },
+    { width: 1920, height: 1080 },
+  ];
+  for (const viewport of viewportMatrix) {
+    await page.setViewportSize(viewport);
+    await assertNoOverflow(page, `homepage ${viewport.width}×${viewport.height}`);
+    if (viewport.width === 768) {
+      const headerHeight = await page.locator('#site-header').evaluate((node) => node.getBoundingClientRect().height);
+      assert(headerHeight >= 60 && headerHeight <= 64, `tablet compact header is 60–64px tall (got ${headerHeight}px)`);
+      const columns = await page.locator('.hero-grid').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
+      assert.equal(columns, 1, 'tablet hero uses a single-column composition');
+      const workflowColumns = await page.locator('.workflow-track').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
+      assert.equal(workflowColumns, 1, 'tablet workflow becomes a vertical sequence');
+    }
+    if (viewport.width === 1366 || viewport.width === 1440) {
+      const headerHeight = await page.locator('#site-header').evaluate((node) => node.getBoundingClientRect().height);
+      assert(headerHeight >= 68 && headerHeight <= 72, `desktop header is 68–72px tall (got ${headerHeight}px)`);
+    }
+    if (viewport.width === 1440) {
+      const columns = await page.locator('.hero-grid').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
+      assert.equal(columns, 2, 'desktop hero uses the intended balanced two-column composition');
+    }
   }
 
   await page.setViewportSize({ width: 390, height: 844 });
   response = await page.goto(pageUrl(''), { waitUntil: 'networkidle' });
   assert.equal(response.status(), 200);
+  const mobileHeaderHeight = await page.locator('#site-header').evaluate((node) => node.getBoundingClientRect().height);
+  assert(mobileHeaderHeight >= 60 && mobileHeaderHeight <= 64, `mobile header is 60–64px tall (got ${mobileHeaderHeight}px)`);
+  assert.equal(await page.locator('.header-cta').isVisible(), true, 'mobile header retains the Demo CTA');
+  assert.equal(await page.locator('.mobile-navigation').isVisible(), true, 'mobile header exposes its disclosure menu');
+  const mobileHeroOrder = await page.evaluate(() => {
+    const box = (selector) => {
+      const rect = document.querySelector(selector).getBoundingClientRect();
+      return { top: rect.top, bottom: rect.bottom };
+    };
+    return { actions: box('.hero-actions'), media: box('.reserved-media--hero'), disclosure: box('#media-disclosure') };
+  });
+  assert(mobileHeroOrder.media.top >= mobileHeroOrder.actions.bottom, 'mobile hero places media after its CTA and secondary link');
+  assert(mobileHeroOrder.disclosure.top >= mobileHeroOrder.media.bottom, 'the single visible media disclosure follows the reserved frame');
+  for (const selector of ['.hero-lede', '.section-heading > p', '.workflow-step p', '.product-copy__lede', '.product-points p', '.role-item__body p', '.role-fit-note p', '.questions-intro > p:not(.eyebrow)', '.question-item p', '.demo-panel__copy > p:last-child', '.footer-brand > p']) await assertFontSize(page, selector, 16, 'mobile body copy');
+  await assertFontSize(page, '.media-disclosure', 13, 'Persian product-media disclosure');
   await page.locator('#mobile-navigation > summary').click();
   assert.equal(await page.locator('#mobile-navigation').evaluate((node) => node.open), true, 'mobile navigation opens');
   await page.locator('#mobile-workflows > summary').click();
@@ -177,9 +276,9 @@ try {
   await page.keyboard.press('Escape');
   assert.equal(await page.locator('#mobile-navigation').evaluate((node) => node.open), false, 'Escape closes the mobile menu');
 
-  for (const width of [320, 390, 768, 1366, 1920]) {
-    await page.setViewportSize({ width, height: 900 });
-    await assertNoOverflow(page, `homepage responsive check ${width}px`);
+  for (const viewport of viewportMatrix) {
+    await page.setViewportSize(viewport);
+    await assertNoOverflow(page, `homepage responsive check ${viewport.width}×${viewport.height}`);
   }
 
   response = await page.goto(pageUrl('theme-settings.html'), { waitUntil: 'networkidle' });
@@ -188,9 +287,7 @@ try {
   assert.equal(await page.locator('html').getAttribute('lang'), 'fa');
   assert.equal(await page.locator('html').getAttribute('dir'), 'rtl');
   assert.match(await page.locator('.admin-review-banner').innerText(), /پیش‌نمایش طراحی — نسخه نهایی سایت نیست/);
-  if (requestedBase) {
-    assert.equal(await page.locator('a[href$=".zip"]').count(), 0, 'published Theme Settings page has no offline package link');
-  }
+  assert.equal(await page.locator('a[href$=".zip"]').count(), 0, 'Theme Settings page has no offline package link');
   assert.equal(await page.locator('h1').count(), 1, 'Theme Settings preview has one H1');
   assert.equal(await page.locator('[role="tab"]').count(), 6, 'Theme Settings preview has six sections');
   assert.equal(await page.locator('#panel-general').isVisible(), true, 'general panel starts selected');
@@ -199,10 +296,16 @@ try {
   assert.equal(await page.locator('#tab-contact').getAttribute('aria-selected'), 'true', 'contact tab becomes selected');
   assert.equal(await page.locator('#panel-contact').isVisible(), true, 'contact panel becomes visible');
   assert.equal(await page.locator('#panel-general').isVisible(), false, 'previous panel is hidden');
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.locator('#tab-contact').focus();
+  await page.keyboard.press('ArrowLeft');
+  assert.equal(await page.locator('#tab-sales').getAttribute('aria-selected'), 'true', 'RTL horizontal tab rail responds to ArrowLeft on mobile');
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.locator('#tab-sales').focus();
   await page.keyboard.press('ArrowDown');
-  assert.equal(await page.locator('#tab-sales').getAttribute('aria-selected'), 'true', 'tab arrow-key navigation changes the selected panel');
-  assert.equal(await page.locator('#panel-sales').isVisible(), true);
+  assert.equal(await page.locator('#tab-shell').getAttribute('aria-selected'), 'true', 'vertical settings sidebar responds to ArrowDown on desktop');
+  assert.equal(await page.locator('#panel-shell').isVisible(), true);
+  await page.locator('#tab-sales').click();
   assert.match(await page.locator('#panel-sales').innerText(), /غیرفعال/);
   assert.match(await page.locator('#panel-sales').innerText(), /نیازمند بررسی/);
   assert.match(await page.locator('#panel-sales').innerText(), /هیچ درخواستی دریافت یا ارسال نمی‌شود/);
@@ -218,9 +321,13 @@ try {
   assert.match(statusText, /تأیید نشده/);
   assert.equal(await page.locator('.settings-save-bar button').isDisabled(), true, 'prototype cannot save settings');
   assert.equal(await page.locator('form').count(), 0, 'Theme Settings preview has no form or real write endpoint');
-  for (const width of [320, 390, 768, 1366, 1920]) {
-    await page.setViewportSize({ width, height: 900 });
-    await assertNoOverflow(page, `Theme Settings ${width}px`);
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const selector of ['.settings-page-heading > div > p:last-child', '.settings-panel__heading p']) await assertFontSize(page, selector, 16, 'Settings explanatory copy');
+  for (const selector of ['.admin-review-banner strong', '.settings-sidebar__note p', '.settings-callout p', '.preview-field small', '.status-summary-card small']) await assertFontSize(page, selector, 13, 'Settings notice/help/disclosure text');
+  await assertFontSize(page, '.settings-tab', 12, 'Settings control labels');
+  for (const viewport of viewportMatrix) {
+    await page.setViewportSize(viewport);
+    await assertNoOverflow(page, `Theme Settings ${viewport.width}×${viewport.height}`);
   }
 
   const reducedContext = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });

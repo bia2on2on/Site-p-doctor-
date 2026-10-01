@@ -29,10 +29,10 @@
 
   <main class="settings-main" id="settings-main">
     <div class="container settings-container">
-      <div class="admin-review-banner">
-        <span class="admin-review-banner__mark" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 2.8 16 5v4.2c0 3.6-2.4 6.2-6 8-3.6-1.8-6-4.4-6-8V5l6-2.2Z" /><path d="M10 7v3.4M10 13.2h.01" /></svg></span>
-        <div><strong>پیش‌نمایش طراحی — نسخه نهایی سایت نیست</strong><p>این نمونه فقط برای بازبینی تجربهٔ کاربری پنل است؛ گزینه‌ها ذخیره نمی‌شوند و به سایت یا سرویس واقعی وصل نیستند.</p></div>
-        <a href="koorosh-design-preview.zip" download>دریافت نسخهٔ آفلاین</a>
+      <div class="admin-review-banner" id="preview-notice" role="note">
+        <span class="admin-review-banner__mark" aria-hidden="true"></span>
+        <strong>پیش‌نمایش طراحی — نسخه نهایی سایت نیست</strong>
+        <a href="index.html">بازگشت به صفحهٔ اصلی</a>
       </div>
 
       <div class="settings-page-heading">
@@ -53,11 +53,11 @@
           <p class="settings-sidebar__caption">بخش‌ها</p>
           <nav class="settings-tabs" role="tablist" aria-label="بخش‌های تنظیمات" aria-orientation="vertical">
             <a class="settings-tab is-active" id="tab-general" href="#panel-general" role="tab" aria-controls="panel-general" aria-selected="true" tabindex="0"><span class="settings-tab__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M3 4.5h14v11H3zM6 8h8M6 11h5" /></svg></span><span>عمومی</span></a>
-            <a class="settings-tab" id="tab-contact" href="#panel-contact" role="tab" aria-controls="panel-contact" aria-selected="false" tabindex="-1"><span class="settings-tab__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><rect x="3" y="4.5" width="14" height="11" rx="1.5" /><path d="m4 6 6 4.5L16 6" /></svg></span><span>اطلاعات تماس</span></a>
-            <a class="settings-tab" id="tab-sales" href="#panel-sales" role="tab" aria-controls="panel-sales" aria-selected="false" tabindex="-1"><span class="settings-tab__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M4 5h12v10H4zM7 8h6M7 11h4" /><path d="M6 3v2M14 3v2" /></svg></span><span>فروش و درخواست دمو</span></a>
-            <a class="settings-tab" id="tab-shell" href="#panel-shell" role="tab" aria-controls="panel-shell" aria-selected="false" tabindex="-1"><span class="settings-tab__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M3 5h14M3 10h14M3 15h14" /><circle cx="6" cy="5" r="1" /><circle cx="13" cy="10" r="1" /><circle cx="9" cy="15" r="1" /></svg></span><span>هدر و فوتر</span></a>
-            <a class="settings-tab" id="tab-social" href="#panel-social" role="tab" aria-controls="panel-social" aria-selected="false" tabindex="-1"><span class="settings-tab__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" /><path d="M7 10h6M10 7v6" /></svg></span><span>شبکه‌های اجتماعی</span></a>
-            <a class="settings-tab" id="tab-status" href="#panel-status" role="tab" aria-controls="panel-status" aria-selected="false" tabindex="-1"><span class="settings-tab__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 2.8 16 5v4.2c0 3.6-2.4 6.2-6 8-3.6-1.8-6-4.4-6-8V5l6-2.2Z" /><path d="M10 7v3.4M10 13.2h.01" /></svg></span><span>وضعیت سایت</span></a>
+            <a class="settings-tab" id="tab-contact" href="#panel-contact" role="tab" aria-controls="panel-contact" aria-selected="false" tabindex="0"><span class="settings-tab__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><rect x="3" y="4.5" width="14" height="11" rx="1.5" /><path d="m4 6 6 4.5L16 6" /></svg></span><span>اطلاعات تماس</span></a>
+            <a class="settings-tab" id="tab-sales" href="#panel-sales" role="tab" aria-controls="panel-sales" aria-selected="false" tabindex="0"><span class="settings-tab__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M4 5h12v10H4zM7 8h6M7 11h4" /><path d="M6 3v2M14 3v2" /></svg></span><span>فروش و درخواست دمو</span></a>
+            <a class="settings-tab" id="tab-shell" href="#panel-shell" role="tab" aria-controls="panel-shell" aria-selected="false" tabindex="0"><span class="settings-tab__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M3 5h14M3 10h14M3 15h14" /><circle cx="6" cy="5" r="1" /><circle cx="13" cy="10" r="1" /><circle cx="9" cy="15" r="1" /></svg></span><span>هدر و فوتر</span></a>
+            <a class="settings-tab" id="tab-social" href="#panel-social" role="tab" aria-controls="panel-social" aria-selected="false" tabindex="0"><span class="settings-tab__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" /><path d="M7 10h6M10 7v6" /></svg></span><span>شبکه‌های اجتماعی</span></a>
+            <a class="settings-tab" id="tab-status" href="#panel-status" role="tab" aria-controls="panel-status" aria-selected="false" tabindex="0"><span class="settings-tab__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 2.8 16 5v4.2c0 3.6-2.4 6.2-6 8-3.6-1.8-6-4.4-6-8V5l6-2.2Z" /><path d="M10 7v3.4M10 13.2h.01" /></svg></span><span>وضعیت سایت</span></a>
           </nav>
           <div class="settings-sidebar__note"><span aria-hidden="true">i</span><p>این پنل نمونه است؛ هیچ تغییری ثبت یا ارسال نمی‌شود.</p></div>
         </aside>

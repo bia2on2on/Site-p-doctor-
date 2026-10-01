@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Structural and boundary checks for the isolated, downloadable HTML review preview."""
+"""Structural and boundary checks for the isolated visual review preview."""
 from __future__ import annotations
 
 import hashlib
@@ -37,6 +37,8 @@ class MarkupAudit(HTMLParser):
         self.stack: list[str] = []
         self.ids: set[str] = set()
         self.anchors: list[str] = []
+        self.idrefs: list[str] = []
+        self.zip_links: list[str] = []
         self.references: list[str] = []
         self.scripts: list[dict[str, str | None]] = []
         self.stylesheets: list[str] = []
@@ -67,8 +69,13 @@ class MarkupAudit(HTMLParser):
             if identifier in self.ids:
                 failures.append(f"{self.filename}: duplicate id #{identifier}")
             self.ids.add(identifier)
+        for attribute in ("aria-labelledby", "aria-describedby", "aria-controls"):
+            if values.get(attribute):
+                self.idrefs.extend(str(values[attribute]).split())
         if tag == "a" and values.get("href"):
             href = str(values["href"])
+            if re.search(r"\.zip(?:[?#]|$)", href, re.I):
+                self.zip_links.append(href)
             if href.startswith("#"):
                 self.anchors.append(href[1:])
             elif not href.startswith(("mailto:", "tel:")):
@@ -131,11 +138,19 @@ for page_name in PAGES:
     check("پیش‌نمایش طراحی — نسخه نهایی سایت نیست" in source, f"{page_name}: visible design-preview / not-final notice")
     check(audit.h1_count == 1, f"{page_name}: exactly one H1")
     check(audit.forms == 0, f"{page_name}: no real form or submission endpoint")
+    if page_name == "index.html":
+        check(len(audit.zip_links) == 1, "index.html: exactly one offline bundle link exists in the downloadable source")
+        check(source.count('class="media-disclosure"') == 1, "index.html: exactly one Persian product-media disclosure is visible")
+        check("کلینیک‌های چندپزشکی و مراکز درمانی" in source and "مطب مستقل یا مجموعهٔ کوچک‌تر" in source, "index.html: existing clinic-fit positioning remains bounded")
+    else:
+        check(len(audit.zip_links) == 0, "theme-settings.html: no offline bundle link is exposed")
     check(not re.search(r"https?://|//fonts\.googleapis|fonts\.gstatic", source, re.I), f"{page_name}: no external URL or remote font reference")
     check(not any(term in source.lower() for term in FORBIDDEN_FILLER), f"{page_name}: no English filler or fake success status")
 
     for anchor in audit.anchors:
         check(anchor in audit.ids, f"{page_name}: local anchor target #{anchor} exists")
+    for identifier in audit.idrefs:
+        check(identifier in audit.ids, f"{page_name}: ARIA ID reference #{identifier} exists")
     for reference in audit.references:
         ref_path = reference.split("?", 1)[0].split("#", 1)[0]
         target = (PREVIEW / ref_path).resolve()
