@@ -110,16 +110,20 @@ async function captureVisualReviewScreenshots(browser) {
     const response = await capturePage.goto(pageUrl(""), { waitUntil: "networkidle" });
     assert.equal(response?.status(), 200, `screenshot source returns HTTP 200 at ${viewport.width}px`);
     await capturePage.evaluate(() => document.fonts.ready);
+    const scrollBehaviorOverride = await capturePage.addStyleTag({ content: "html, body { scroll-behavior: auto !important; }" });
     await capturePage.evaluate(async () => {
       const step = Math.max(240, Math.floor(window.innerHeight * 0.72));
       const bottom = document.documentElement.scrollHeight;
       for (let y = 0; y < bottom; y += step) {
-        window.scrollTo(0, y);
+        window.scrollTo({ top: y, behavior: "instant" });
         await new Promise((resolveFrame) => requestAnimationFrame(() => requestAnimationFrame(resolveFrame)));
       }
-      window.scrollTo(0, 0);
+      window.scrollTo({ top: 0, behavior: "instant" });
       await new Promise((resolveFrame) => requestAnimationFrame(() => requestAnimationFrame(resolveFrame)));
     });
+    const reveals = await capturePage.evaluate(() => ({ total: document.querySelectorAll("[data-reveal]").length, visible: document.querySelectorAll("[data-reveal].is-visible").length }));
+    assert.equal(reveals.visible, reveals.total, `all homepage sections are revealed before ${viewport.width}px screenshot (${JSON.stringify(reveals)})`);
+    await scrollBehaviorOverride.evaluate((style) => style.remove());
     await capturePage.waitForTimeout(650);
     const path = resolve(screenshotDir, `homepage-${viewport.width}x${viewport.height}.jpg`);
     await capturePage.screenshot({ path, type: "jpeg", quality: 90, fullPage: true, animations: "disabled" });
