@@ -168,11 +168,12 @@ function emitVisualMeasurement(label, viewport, fingerprint) {
   const geometry = (element) => {
     if (!element) return null;
     const { box, style } = element;
-    return { box, display: style?.display, background: style?.background, color: style?.color, font: style?.font, fontSize: style?.fontSize, lineHeight: style?.lineHeight, padding: style?.padding, gap: style?.gap, radius: style?.radius, shadow: style?.shadow, backdrop: style?.backdrop };
+    return { box, display: style?.display, background: style?.background, color: style?.color, fontSize: style?.fontSize, lineHeight: style?.lineHeight, padding: style?.padding, gap: style?.gap, radius: style?.radius, shadow: style?.shadow, backdrop: style?.backdrop };
   };
+  const documentSummary = (value) => value && ({ title: value.title, url: value.url, topFrame: value.topFrame, textLength: value.bodyTextLength, h1: value.h1Count, headers: value.headerCount, sections: value.sectionCount, iframes: value.iframeCount, width: value.width, height: value.height, pageHeight: value.pageHeight, scrollWidth: value.scrollWidth });
   const measurement = {
-    document: fingerprint.document,
-    contentFrame: fingerprint.frameSummary || null,
+    document: documentSummary(fingerprint.document),
+    contentFrame: documentSummary(fingerprint.frameSummary),
     viewport: fingerprint.viewport,
     page: fingerprint.page,
     header: geometry(fingerprint.header),
@@ -183,8 +184,8 @@ function emitVisualMeasurement(label, viewport, fingerprint) {
     heroMedia: geometry(fingerprint.heroMedia),
     h1: geometry(fingerprint.h1),
     cta: geometry(fingerprint.heroCta),
-    sections: fingerprint.sections,
-    cards: fingerprint.cards.slice(0, 4).map(geometry),
+    sections: fingerprint.sections.slice(0, 10).map(({ box, background, paddingBlock }) => ({ box, background, paddingBlock })),
+    cards: fingerprint.cards.slice(0, 1).map((card) => ({ box: card.box, background: card.style?.background, radius: card.style?.radius, shadow: card.style?.shadow, backdrop: card.style?.backdrop })),
   };
   const safeMessage = JSON.stringify(measurement).replaceAll('%', '%25').replaceAll('\r', '%0D').replaceAll('\n', '%0A');
   console.log(`::notice title=${label}-${viewport.width}x${viewport.height}::${safeMessage}`);
