@@ -99,18 +99,16 @@ async function captureVisualReviewScreenshots(browser) {
 
   const viewports = [
     { width: 390, height: 844 },
+    { width: 430, height: 932 },
     { width: 768, height: 1024 },
     { width: 1024, height: 768 },
     { width: 1366, height: 768 },
     { width: 1440, height: 900 },
+    { width: 1920, height: 1080 },
   ];
 
-  for (const viewport of viewports) {
-    await capturePage.setViewportSize(viewport);
-    const response = await capturePage.goto(pageUrl(""), { waitUntil: "networkidle" });
-    assert.equal(response?.status(), 200, `screenshot source returns HTTP 200 at ${viewport.width}px`);
-    await capturePage.evaluate(() => document.fonts.ready);
-    const scrollBehaviorOverride = await capturePage.addStyleTag({ content: "html, body { scroll-behavior: auto !important; }" });
+  const exposeReveals = async () => {
+    const override = await capturePage.addStyleTag({ content: "html, body { scroll-behavior: auto !important; }" });
     await capturePage.evaluate(async () => {
       const step = Math.max(240, Math.floor(window.innerHeight * 0.72));
       const bottom = document.documentElement.scrollHeight;
@@ -121,13 +119,41 @@ async function captureVisualReviewScreenshots(browser) {
       window.scrollTo({ top: 0, behavior: "instant" });
       await new Promise((resolveFrame) => requestAnimationFrame(() => requestAnimationFrame(resolveFrame)));
     });
+    await override.evaluate((style) => style.remove());
+  };
+
+  for (const viewport of viewports) {
+    await capturePage.setViewportSize(viewport);
+    const response = await capturePage.goto(pageUrl(""), { waitUntil: "networkidle" });
+    assert.equal(response?.status(), 200, `homepage screenshot source returns HTTP 200 at ${viewport.width}px`);
+    await capturePage.evaluate(() => document.fonts.ready);
+    await exposeReveals();
     const reveals = await capturePage.evaluate(() => ({ total: document.querySelectorAll("[data-reveal]").length, visible: document.querySelectorAll("[data-reveal].is-visible").length }));
     assert.equal(reveals.visible, reveals.total, `all homepage sections are revealed before ${viewport.width}px screenshot (${JSON.stringify(reveals)})`);
-    await scrollBehaviorOverride.evaluate((style) => style.remove());
-    await capturePage.waitForTimeout(650);
+    await capturePage.waitForTimeout(850);
     const path = resolve(screenshotDir, `homepage-${viewport.width}x${viewport.height}.jpg`);
-    await capturePage.screenshot({ path, type: "jpeg", quality: 90, fullPage: true, animations: "disabled" });
-    console.log(`[SCREENSHOT] ${viewport.width}×${viewport.height}: ${path}`);
+    await capturePage.screenshot({ path, type: "jpeg", quality: 88, fullPage: true, animations: "disabled", caret: "hide" });
+    console.log(`[SCREENSHOT] homepage ${viewport.width}×${viewport.height}: ${path}`);
+  }
+
+  for (const viewport of viewports) {
+    await capturePage.setViewportSize(viewport);
+    const response = await capturePage.goto(pageUrl("theme-settings.html"), { waitUntil: "networkidle" });
+    assert.equal(response?.status(), 200, `Theme Settings screenshot source returns HTTP 200 at ${viewport.width}px`);
+    await capturePage.evaluate(() => document.fonts.ready);
+    const path = resolve(screenshotDir, `theme-settings-${viewport.width}x${viewport.height}.jpg`);
+    await capturePage.screenshot({ path, type: "jpeg", quality: 88, fullPage: true, animations: "disabled", caret: "hide" });
+    console.log(`[SCREENSHOT] Theme Settings ${viewport.width}×${viewport.height}: ${path}`);
+  }
+
+  for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
+    await capturePage.setViewportSize(viewport);
+    await capturePage.goto(pageUrl("theme-settings.html"), { waitUntil: "networkidle" });
+    await capturePage.locator("#tab-status").click();
+    assert.equal(await capturePage.locator("#panel-status").isVisible(), true, "status overview opens for screenshot evidence");
+    const path = resolve(screenshotDir, `theme-settings-status-${viewport.width}x${viewport.height}.jpg`);
+    await capturePage.screenshot({ path, type: "jpeg", quality: 88, fullPage: true, animations: "disabled", caret: "hide" });
+    console.log(`[SCREENSHOT] Theme Settings status ${viewport.width}×${viewport.height}: ${path}`);
   }
 
   await capturePage.setViewportSize({ width: 390, height: 844 });
@@ -137,8 +163,8 @@ async function captureVisualReviewScreenshots(browser) {
   await capturePage.locator("#mobile-workflows > summary").click();
   assert.equal(await capturePage.locator(".mobile-workflows__links a").count(), 5, "mobile screenshot evidence includes all five workflow destinations");
   const menuPath = resolve(screenshotDir, "homepage-390x844-menu-open.jpg");
-  await capturePage.screenshot({ path: menuPath, type: "jpeg", quality: 90, fullPage: false, animations: "disabled" });
-  console.log(`[SCREENSHOT] 390×844 mobile menu: ${menuPath}`);
+  await capturePage.screenshot({ path: menuPath, type: "jpeg", quality: 88, fullPage: false, animations: "disabled", caret: "hide" });
+  console.log(`[SCREENSHOT] mobile menu 390×844: ${menuPath}`);
   await capturePage.close();
 }
 
@@ -192,40 +218,43 @@ try {
   assert.equal(await page.locator('h1').count(), 1, 'homepage has one H1');
   assert.match(await page.locator('h1').innerText(), /مدیریت یکپارچهٔ کلینیک/);
   assert.equal(await page.locator('form').count(), 0, 'homepage has no real form');
-  assert.equal(await page.locator('.brand-visual').count(), 2, 'the hero and product section each use a brand illustration');
-  assert.equal(await page.locator('.brand-visual--hero').isVisible(), true, 'the hero illustration is visible');
-  assert.equal(await page.locator('.brand-visual--hero').getAttribute('aria-label'), 'ترکیب انتزاعی مسیر مراجعه در CPMS');
-  assert.doesNotMatch(await page.locator('body').innerText(), /جایگاه رسانه|قاب رزروشده|تصویر واقعی محصول|رابط واقعی نرم‌افزار/, 'visible copy contains no media placeholders');
+  assert.equal(await page.locator('.media-reservation').count(), 2, 'hero and product proof each reserve a large replaceable media frame');
+  assert.equal(await page.locator('.media-reservation--hero').isVisible(), true, 'the hero media frame is visible');
+  assert.deepEqual(await page.locator('.media-disclosure').allInnerTexts(), ['تصویر واقعی محصول در این جایگاه قرار می‌گیرد.', 'تصویر واقعی محصول در این جایگاه قرار می‌گیرد.'], 'each reserved composition has exactly one concise Persian disclosure');
+  assert.match(await page.locator('.media-reservation--hero').getAttribute('aria-labelledby'), /hero-media-disclosure/);
+  assert.match(await page.locator('.media-reservation--proof').getAttribute('aria-labelledby'), /proof-media-disclosure/);
   assert.match(await page.locator('.role-fit-note').innerText(), /کلینیک‌های چندپزشکی و مراکز درمانی/);
   assert.match(await page.locator('.role-fit-note').innerText(), /مطب مستقل یا مجموعهٔ کوچک‌تر/);
-  assert.equal(await page.locator('.brand-visual button, .brand-visual input, .brand-visual select, .brand-visual textarea, .brand-visual table, .brand-visual canvas, .brand-visual iframe').count(), 0, 'brand illustrations contain no fabricated software controls');
+  assert.equal(await page.locator('.media-reservation button, .media-reservation input, .media-reservation select, .media-reservation textarea, .media-reservation table, .media-reservation canvas, .media-reservation iframe, .media-reservation img').count(), 0, 'reserved media uses abstract geometry only, with no fabricated product UI or photography');
   const workflowLabels = await page.locator('.workflow-step h3').allInnerTexts();
   assert.deepEqual(workflowLabels, ['نوبت', 'پذیرش', 'صف', 'ویزیت', 'پرونده'], 'the clinic journey is shown as five distinct evaluation steps');
   assert.equal(await page.evaluate(() => document.fonts.check('16px Vazirmatn')), true, 'local Vazirmatn font loads');
 
   const palette = await page.evaluate(() => {
     const styles = getComputedStyle(document.documentElement);
-    return Object.fromEntries(['--color-ink', '--color-copy', '--color-muted', '--color-canvas', '--color-surface', '--color-primary', '--color-primary-hover', '--color-teal-soft', '--color-success', '--color-warning', '--color-info', '--color-warm-soft', '--color-blue-soft', '--color-night'].map((name) => [name, styles.getPropertyValue(name).trim()]));
+    return Object.fromEntries(['--color-ink', '--color-copy', '--color-muted', '--color-canvas', '--color-surface', '--color-primary', '--color-primary-hover', '--color-teal-soft', '--color-success', '--color-success-soft', '--color-warning', '--color-info', '--color-warm-soft', '--color-blue-soft', '--color-night'].map((name) => [name, styles.getPropertyValue(name).trim()]));
   });
   for (const [foreground, background, label] of [
     [palette['--color-ink'], palette['--color-canvas'], 'body text on warm canvas'],
     [palette['--color-copy'], palette['--color-canvas'], 'supporting copy on warm canvas'],
     [palette['--color-muted'], palette['--color-surface'], 'muted text on white surface'],
-    [palette['--color-primary'], palette['--color-canvas'], 'teal link on warm canvas'],
+    [palette['--color-primary-hover'], palette['--color-canvas'], 'teal links on warm canvas'],
     [palette['--color-primary-hover'], palette['--color-teal-soft'], 'active tab on soft teal'],
-    [palette['--color-success'], '#E7F1EA', 'active status on soft green'],
-    [palette['--color-copy'], '#EDF0EE', 'inactive status on soft gray'],
+    [palette['--color-success'], palette['--color-success-soft'], 'active status on soft green'],
+    [palette['--color-copy'], '#EDF1EF', 'inactive status on soft gray'],
     [palette['--color-warning'], palette['--color-warm-soft'], 'review status on soft amber'],
     [palette['--color-info'], palette['--color-blue-soft'], 'unverified status on soft blue'],
-    ['#FFFFFF', palette['--color-primary'], 'white CTA text on deep teal'],
-    ['#FFFFFF', palette['--color-primary-hover'], 'white CTA text on dark teal'],
-    ['#FFFFFF', '#154D61', 'white CTA text on blue-teal gradient end'],
-    ['#F0F6F3', palette['--color-primary'], 'soft-white CTA body text on the lightest gradient stop'],
-    ['#F0F6F3', '#075851', 'soft-white CTA body text on the deep teal gradient stop'],
-    ['#F0F6F3', '#154D61', 'soft-white CTA body text on the blue-teal gradient stop'],
-    ['#C4E3DE', palette['--color-night'], 'light product-proof eyebrow on navy'],
-    ['#9BD1C7', palette['--color-night'], 'light product-proof heading on navy'],
-    ['#D4E0E1', palette['--color-night'], 'footer copy on navy'],
+    ['#FFFFFF', '#0A8179', 'white CTA text on the lightest teal gradient stop'],
+    ['#FFFFFF', palette['--color-primary-hover'], 'white CTA text on deep teal'],
+    ['#FFFFFF', '#064E50', 'white CTA text on the darkest teal gradient stop'],
+    ['#F1F8F5', '#08746F', 'light CTA body text on teal'],
+    ['#F1F8F5', '#075F60', 'light CTA body text on dark teal'],
+    ['#F1F8F5', '#164E62', 'light CTA body text on blue-teal'],
+    ['#E4F4F0', '#08746F', 'light CTA eyebrow on teal'],
+    ['#E4F4F0', '#075F60', 'light CTA eyebrow on dark teal'],
+    ['#E4F4F0', '#164E62', 'light CTA eyebrow on blue-teal'],
+    ['#D5E2E1', palette['--color-night'], 'footer copy on navy'],
+    ['#BDE1D9', palette['--color-night'], 'footer link on navy'],
   ]) assertContrast(foreground, background, label);
 
   if (process.env.VISUAL_REVIEW_SCREENSHOTS === "1") await captureVisualReviewScreenshots(browser);
@@ -272,6 +301,7 @@ try {
   const viewportMatrix = [
     { width: 320, height: 720 },
     { width: 390, height: 844 },
+    { width: 430, height: 932 },
     { width: 768, height: 1024 },
     { width: 1024, height: 768 },
     { width: 1366, height: 768 },
@@ -281,25 +311,21 @@ try {
   for (const viewport of viewportMatrix) {
     await page.setViewportSize(viewport);
     await assertNoOverflow(page, `homepage ${viewport.width}×${viewport.height}`);
-    if (viewport.width === 768) {
+    if (viewport.width === 768 || viewport.width === 1024) {
       const headerHeight = await page.locator('#site-header').evaluate((node) => node.getBoundingClientRect().height);
       assert(headerHeight >= 60 && headerHeight <= 64, `tablet compact header is 60–64px tall (got ${headerHeight}px)`);
-      const columns = await page.locator('.hero-grid').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
-      assert.equal(columns, 1, 'tablet hero uses a single-column composition');
+      const heroColumns = await page.locator('.hero-grid').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
+      assert.equal(heroColumns, 1, 'tablet hero uses its own single-column composition');
       const workflowColumns = await page.locator('.workflow-track').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
-      assert.equal(workflowColumns, 1, 'tablet workflow becomes a vertical sequence');
+      assert.equal(workflowColumns, 1, 'tablet workflow uses open editorial timeline rows');
     }
-    if (viewport.width === 1366 || viewport.width === 1440) {
+    if (viewport.width === 1366 || viewport.width === 1440 || viewport.width === 1920) {
       const headerHeight = await page.locator('#site-header').evaluate((node) => node.getBoundingClientRect().height);
       assert(headerHeight >= 68 && headerHeight <= 72, `desktop header is 68–72px tall (got ${headerHeight}px)`);
-    }
-    if (viewport.width === 1024 || viewport.width === 1366 || viewport.width === 1440 || viewport.width === 1920) {
       const workflowColumns = await page.locator('.workflow-track').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
-      assert.equal(workflowColumns, 5, 'wide workflow uses five connected columns');
-    }
-    if (viewport.width === 1440) {
-      const columns = await page.locator('.hero-grid').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
-      assert.equal(columns, 2, 'desktop hero uses the intended balanced two-column composition');
+      assert.equal(workflowColumns, 5, 'desktop workflow uses five connected stages');
+      const heroColumns = await page.locator('.hero-grid').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
+      assert.equal(heroColumns, 2, 'desktop hero uses a balanced two-column composition');
     }
   }
 
@@ -315,7 +341,7 @@ try {
       const rect = document.querySelector(selector).getBoundingClientRect();
       return { top: rect.top, bottom: rect.bottom };
     };
-    return { actions: box('.hero-actions'), visual: box('.brand-visual--hero') };
+    return { actions: box('.hero-actions'), visual: box('.media-reservation--hero') };
   });
   assert(mobileHeroOrder.visual.top >= mobileHeroOrder.actions.bottom, 'mobile hero places its visual after the CTA and secondary link');
   for (const selector of ['.hero-lede', '.section-heading > p', '.workflow-step p', '.product-copy__lede', '.product-points p', '.role-item__body p', '.role-fit-note p', '.questions-intro > p:not(.eyebrow)', '.question-item p', '.demo-panel__copy > p:last-child', '.footer-brand > p']) await assertFontSize(page, selector, 16, 'mobile body copy');
@@ -349,6 +375,7 @@ try {
   assert.equal(await page.locator('a[href$=".zip"]').count(), 0, 'Theme Settings page has no offline package link');
   assert.equal(await page.locator('h1').count(), 1, 'Theme Settings preview has one H1');
   assert.equal(await page.locator('[role="tab"]').count(), 6, 'Theme Settings preview has six sections');
+  assert.equal(await page.locator('[role="tablist"]').getAttribute('aria-orientation'), 'horizontal', 'mobile Settings navigation uses a horizontal scroll rail');
   assert.equal(await page.locator('#panel-general').isVisible(), true, 'general panel starts selected');
   assert.equal(await page.locator('#panel-contact').isVisible(), false, 'inactive tab panel is hidden after enhancement');
   await page.locator('#tab-contact').click();
@@ -359,7 +386,10 @@ try {
   await page.locator('#tab-contact').focus();
   await page.keyboard.press('ArrowLeft');
   assert.equal(await page.locator('#tab-sales').getAttribute('aria-selected'), 'true', 'RTL horizontal tab rail responds to ArrowLeft on mobile');
+  await page.setViewportSize({ width: 1024, height: 768 });
+  assert.equal(await page.locator('[role="tablist"]').getAttribute('aria-orientation'), 'horizontal', 'tablet Settings navigation remains horizontally scrollable');
   await page.setViewportSize({ width: 1440, height: 900 });
+  assert.equal(await page.locator('[role="tablist"]').getAttribute('aria-orientation'), 'vertical', 'desktop Settings navigation uses a vertical sidebar');
   await page.locator('#tab-sales').focus();
   await page.keyboard.press('ArrowDown');
   assert.equal(await page.locator('#tab-shell').getAttribute('aria-selected'), 'true', 'vertical settings sidebar responds to ArrowDown on desktop');

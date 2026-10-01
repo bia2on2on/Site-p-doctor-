@@ -140,15 +140,21 @@ for page_name in PAGES:
     check(audit.forms == 0, f"{page_name}: no real form or submission endpoint")
     if page_name == "index.html":
         check(len(audit.zip_links) == 1, "index.html: exactly one offline bundle link exists in the downloadable source")
-        check(source.count('class="brand-visual') == 2, "index.html: hero and product section use two abstract brand compositions")
-        check('aria-label="ترکیب انتزاعی مسیر مراجعه در CPMS"' in source and 'aria-label="ترکیب انتزاعی هویت بصری CPMS"' in source, "index.html: both illustrations are accurately identified as abstract brand art")
+        check(source.count('class="media-reservation ') == 2, "index.html: hero and product proof reserve two large replaceable media compositions")
+        media_figures = re.findall(r'<figure\b[^>]*class="media-reservation [^"]*"[^>]*>.*?</figure>', source, re.DOTALL)
+        check(len(media_figures) == 2, "index.html: both reserved media figures are well-formed")
+        check(all(figure.count('class="media-disclosure"') == 1 for figure in media_figures), "index.html: each reserved composition has one concise Persian disclosure")
+        check(all("تصویر واقعی محصول در این جایگاه قرار می‌گیرد." in figure for figure in media_figures), "index.html: media disclosures say real product imagery is not present yet")
+        check(all(not re.search(r"<(?:img|button|input|select|textarea|table|canvas|iframe)\b", figure, re.I) for figure in media_figures), "index.html: reserved compositions contain no fabricated product UI, screenshots or photography")
         check(source.count('class="workflow-step"') == 5, "index.html: clinic journey contains five separate review stages")
         for stage in ("نوبت", "پذیرش", "صف", "ویزیت", "پرونده"):
             check(f"<h3>{stage}</h3>" in source, f"index.html: journey contains the separate {stage} stage")
-        check(not any(term in source for term in ("جایگاه رسانه", "قاب رزروشده", "تصویر واقعی محصول", "رابط واقعی نرم‌افزار")), "index.html: no reserved-media placeholder copy is shown")
+        check(source.index('id="product-proof"') < source.index('id="workflow"'), "index.html: product proof appears before the integrated workflow")
         check("کلینیک‌های چندپزشکی و مراکز درمانی" in source and "مطب مستقل یا مجموعهٔ کوچک‌تر" in source, "index.html: existing clinic-fit positioning remains bounded")
     else:
         check(len(audit.zip_links) == 0, "theme-settings.html: no offline bundle link is exposed")
+        check(source.count('class="settings-panel"') == 6, "theme-settings.html: exactly six settings sections remain")
+        check(source.count('role="tab"') == 6, "theme-settings.html: exactly six navigation tabs remain")
     check(not re.search(r"https?://|//fonts\.googleapis|fonts\.gstatic", source, re.I), f"{page_name}: no external URL or remote font reference")
     check(not any(term in source.lower() for term in FORBIDDEN_FILLER), f"{page_name}: no English filler or fake success status")
 
@@ -187,6 +193,13 @@ css = css_path.read_text(encoding="utf-8") if css_path.exists() else ""
 js = js_path.read_text(encoding="utf-8") if js_path.exists() else ""
 check(bool(css), "preview.css exists and is not empty")
 check(bool(js), "preview.js exists and is not empty")
+check("CPMS visual-review Design System v3" in css, "preview documents the v3 token system and its non-production scope")
+for token in ("--color-canvas", "--color-surface", "--color-ink", "--color-copy", "--color-muted", "--color-primary", "--color-cobalt", "--color-sky", "--color-glass", "--color-success", "--color-warning", "--color-info"):
+    check(token in css, f"preview design system defines semantic token {token}")
+for token in ("--space-1", "--space-11", "--radius-sm", "--radius-xl", "--shadow-soft", "--shadow-raised", "--shadow-float"):
+    check(token in css, f"preview design system defines scale token {token}")
+readme = (PREVIEW / "README.md").read_text(encoding="utf-8") if (PREVIEW / "README.md").is_file() else ""
+check("REAL CPMS MEDIA = NOT AVAILABLE" in readme, "preview records the verified real-media gate outcome")
 check("prefers-reduced-motion: reduce" in css and "prefers-reduced-motion: reduce" in js, "reduced-motion CSS and JavaScript behavior exist")
 check("IntersectionObserver" in js, "scroll reveal uses a small native IntersectionObserver helper")
 check("aria-selected" in js and "role=\"tabpanel\"" in (PREVIEW / "theme-settings.html").read_text(encoding="utf-8"), "settings navigation has an accessible tab implementation")

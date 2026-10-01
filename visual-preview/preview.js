@@ -84,7 +84,7 @@
     const tablist = settingsLayout.querySelector('[role="tablist"]');
     const tabs = [...settingsLayout.querySelectorAll('[role="tab"]')];
     const panels = [...settingsLayout.querySelectorAll('[role="tabpanel"]')];
-    const desktopTabs = window.matchMedia("(min-width: 961px)");
+    const desktopTabs = window.matchMedia("(min-width: 1121px)");
 
     if (tablist && tabs.length === 6 && panels.length === tabs.length) {
       const panelFor = (tab) => settingsLayout.querySelector(`#${CSS.escape(tab.getAttribute("aria-controls"))}`);

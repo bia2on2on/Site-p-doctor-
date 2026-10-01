@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <meta name="description" content="پیش‌نمایش طراحی فارسی CPMS؛ مرور مسیر نوبت، پذیرش و ویزیت برای ارزیابی تناسب با کلینیک.">
-  <meta name="theme-color" content="#F5F4EF">
+  <meta name="description" content="پیش‌نمایش طراحی فارسی CPMS؛ مرور مسیر نوبت، پذیرش، صف، ویزیت و پرونده برای ارزیابی تناسب با کلینیک.">
+  <meta name="theme-color" content="#F7F8F6">
   <title>پیش‌نمایش طراحی CPMS | مدیریت کلینیک</title>
   <link rel="preload" href="assets/fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/Vazirmatn-Bold.woff2" as="font" type="font/woff2" crossorigin>
@@ -33,8 +33,8 @@
       </a>
 
       <nav class="desktop-nav" aria-label="ناوبری اصلی">
-        <a class="nav-link" href="#workflow">مسیر مراجعه</a>
         <a class="nav-link" href="#product-proof">مرور محصول</a>
+        <a class="nav-link" href="#workflow">مسیر مراجعه</a>
         <a class="nav-link" href="#roles">نقش‌های کلینیک</a>
         <a class="nav-link" href="#questions">پیش از تصمیم</a>
         <details class="nav-disclosure" id="desktop-workflows">
@@ -52,7 +52,7 @@
         </details>
       </nav>
 
-      <a class="button button--primary header-cta" href="#demo" data-demo-cta aria-label="درخواست دمو">
+      <a class="button button--primary header-cta" href="#demo" data-demo-cta aria-label="رفتن به درخواست دمو">
         <span>درخواست دمو</span>
         <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5 6 10l6.5 5.5M6.5 10h10" /></svg>
       </a>
@@ -63,8 +63,8 @@
         </summary>
         <div class="mobile-navigation__panel">
           <nav class="mobile-nav-links" aria-label="ناوبری موبایل">
-            <a href="#workflow">مسیر مراجعه</a>
             <a href="#product-proof">مرور محصول</a>
+            <a href="#workflow">مسیر مراجعه</a>
             <a href="#roles">نقش‌های کلینیک</a>
             <a href="#questions">پیش از تصمیم</a>
             <details class="mobile-workflows" id="mobile-workflows">
@@ -89,7 +89,7 @@
         <div class="hero-copy">
           <p class="eyebrow hero-eyebrow"><span class="eyebrow__spark" aria-hidden="true"></span>مدیریت حرفه‌ای کلینیک</p>
           <h1 id="hero-title"><span>مدیریت یکپارچهٔ کلینیک،</span><span>از نوبت تا ویزیت</span></h1>
-          <p class="hero-lede"><bdi>CPMS</bdi> برای ارتباط نوبت، پذیرش و ویزیت طراحی شده است. تناسب این مسیر را با شیوهٔ کار مرکز خود بررسی کنید.</p>
+          <p class="hero-lede">در یک دمو، ارتباط نوبت، پذیرش، صف، ویزیت و پروندهٔ بیمار را با شیوهٔ کار مرکز خود بسنجید.</p>
           <div class="hero-actions">
             <a class="button button--primary button--large" href="#demo" data-demo-cta>
               <span>درخواست دمو</span>
@@ -97,36 +97,72 @@
             </a>
             <a class="text-action" href="#workflow">مشاهدهٔ مسیر کار <span aria-hidden="true">↙</span></a>
           </div>
-          <p class="hero-context"><span class="hero-context__rule" aria-hidden="true"></span>از یک مراجعهٔ واقعی شروع کنید؛ نه از فهرست قابلیت‌ها.</p>
         </div>
 
         <div class="hero-media">
-          <figure class="brand-visual brand-visual--hero" role="img" aria-label="ترکیب انتزاعی مسیر مراجعه در CPMS" data-reveal>
-            <div class="hero-art" aria-hidden="true">
-              <span class="hero-art__glow hero-art__glow--teal"></span>
-              <span class="hero-art__glow hero-art__glow--blue"></span>
-              <span class="hero-art__orbit hero-art__orbit--outer"></span>
-              <span class="hero-art__orbit hero-art__orbit--inner"></span>
-              <span class="hero-art__core"></span>
-              <span class="hero-art__arc hero-art__arc--one"></span>
-              <span class="hero-art__arc hero-art__arc--two"></span>
-              <span class="hero-art__wordmark"><bdi>CPMS</bdi></span>
-              <span class="hero-art__route"><b>نوبت</b><i></i><b>پذیرش</b><i></i><b>صف</b><i></i><b>ویزیت</b><i></i><b>پرونده</b></span>
-              <span class="hero-art__spark hero-art__spark--one"></span>
-              <span class="hero-art__spark hero-art__spark--two"></span>
-              <span class="hero-art__spark hero-art__spark--three"></span>
+          <figure class="media-reservation media-reservation--hero" aria-labelledby="hero-media-disclosure" data-reveal>
+            <span class="media-reservation__halo" aria-hidden="true"></span>
+            <span class="media-reservation__context" data-authorized-photo-slot aria-hidden="true"></span>
+            <div class="media-window" aria-hidden="true">
+              <div class="media-window__chrome"><span></span><span></span><span></span><i></i></div>
+              <div class="media-window__canvas">
+                <span class="media-canvas__wash media-canvas__wash--one"></span>
+                <span class="media-canvas__wash media-canvas__wash--two"></span>
+                <span class="media-canvas__plane media-canvas__plane--back"></span>
+                <span class="media-canvas__plane media-canvas__plane--front"></span>
+                <span class="media-canvas__arc media-canvas__arc--one"></span>
+                <span class="media-canvas__arc media-canvas__arc--two"></span>
+                <span class="media-canvas__core"></span>
+              </div>
             </div>
+            <span class="media-glass-accent media-glass-accent--hero" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="media-glass-orb" aria-hidden="true"></span>
+            <figcaption class="media-disclosure" id="hero-media-disclosure">تصویر واقعی محصول در این جایگاه قرار می‌گیرد.</figcaption>
           </figure>
         </div>
       </div>
-      <span class="hero-wash" aria-hidden="true"></span>
+      <span class="hero-orb hero-orb--one" aria-hidden="true"></span>
+      <span class="hero-orb hero-orb--two" aria-hidden="true"></span>
     </section>
 
-    <section class="value-strip" aria-label="جهت ارزیابی محصول">
+    <section class="value-strip" aria-label="محورهای ارزیابی CPMS">
       <div class="container value-strip__grid">
-        <div class="value-item"><span class="value-item__index">۰۱</span><p><strong>مسیر مراجعه</strong><span>از نوبت تا ویزیت</span></p></div>
-        <div class="value-item"><span class="value-item__index">۰۲</span><p><strong>نقش‌های تیم</strong><span>پذیرش، پزشک و مدیریت کلینیک</span></p></div>
+        <div class="value-item"><span class="value-item__index">۰۱</span><p><strong>مسیر مراجعه</strong><span>از نوبت تا پرونده</span></p></div>
+        <div class="value-item"><span class="value-item__index">۰۲</span><p><strong>نقش‌های تیم</strong><span>پذیرش، پزشک و مدیریت</span></p></div>
         <div class="value-item"><span class="value-item__index">۰۳</span><p><strong>ارزیابی روشن</strong><span>در محدودهٔ نسخهٔ ارائه‌شده</span></p></div>
+      </div>
+    </section>
+
+    <section class="product-proof section-pad" id="product-proof" aria-labelledby="product-title">
+      <div class="container product-layout">
+        <div class="product-copy" data-reveal>
+          <p class="eyebrow"><span class="eyebrow__spark" aria-hidden="true"></span>مرور محصول در متن مسیر</p>
+          <h2 id="product-title">ارتباط مرحله‌ها را<br><span>در نسخهٔ ارائه‌شده بسنجید</span></h2>
+          <p class="product-copy__lede">ارزش بررسی را از جریان واقعی مراجعه بسنجید؛ سپس موضوعاتی را مرور کنید که برای شیوهٔ کار مرکزتان اهمیت دارند.</p>
+          <ol class="product-points">
+            <li><span>۰۱</span><div><h3>پرونده و مستندات ویزیت</h3><p>اطلاعات بیمار و مستندات ویزیت را در فضای کاری پزشک بررسی کنید.</p></div></li>
+            <li><span>۰۲</span><div><h3>ثبت دستی پرداخت و خلاصهٔ مالی</h3><p>دامنهٔ ثبت دستی و خلاصه‌های مالی را بسنجید؛ نه به‌عنوان جایگزین حسابداری.</p></div></li>
+          </ol>
+          <a class="text-action" href="#demo" data-demo-cta>ارزیابی این مسیر در دمو <span aria-hidden="true">↙</span></a>
+        </div>
+
+        <figure class="media-reservation media-reservation--proof" aria-labelledby="proof-media-disclosure" data-reveal>
+          <span class="proof-scene__wash" aria-hidden="true"></span>
+          <div class="media-window media-window--proof" aria-hidden="true">
+            <div class="media-window__chrome"><span></span><span></span><span></span><i></i></div>
+            <div class="media-window__canvas media-window__canvas--proof">
+              <span class="proof-canvas__field"></span>
+              <span class="proof-canvas__ring proof-canvas__ring--one"></span>
+              <span class="proof-canvas__ring proof-canvas__ring--two"></span>
+              <span class="proof-canvas__ribbon"></span>
+              <span class="proof-canvas__shape proof-canvas__shape--one"></span>
+              <span class="proof-canvas__shape proof-canvas__shape--two"></span>
+            </div>
+          </div>
+          <span class="media-glass-accent media-glass-accent--proof" aria-hidden="true"><i></i><i></i></span>
+          <span class="proof-scene__spark" aria-hidden="true"></span>
+          <figcaption class="media-disclosure" id="proof-media-disclosure">تصویر واقعی محصول در این جایگاه قرار می‌گیرد.</figcaption>
+        </figure>
       </div>
     </section>
 
@@ -134,19 +170,19 @@
       <div class="container">
         <div class="section-heading section-heading--split" data-reveal>
           <div>
-            <p class="eyebrow"><span class="eyebrow__spark" aria-hidden="true"></span>از نگاه کلینیک</p>
-            <h2 id="workflow-title">یک مراجعه؛<br><span>پنج گام برای مرور</span></h2>
+            <p class="eyebrow"><span class="eyebrow__spark" aria-hidden="true"></span>فراتر از نوبت‌دهی</p>
+            <h2 id="workflow-title">یک مراجعه؛<br><span>از نوبت تا پرونده</span></h2>
           </div>
           <p>وقتی نوبت، پذیرش و ویزیت جداگانه پیگیری می‌شوند، دیدن ارتباط مراحل به رفت‌وبرگشت بیشتری نیاز دارد. این مسیر را با شیوهٔ کار مرکز خود بسنجید.</p>
         </div>
 
-        <ol class="workflow-track" id="workflow-track" aria-label="پنج گام مسیر مراجعه" data-progress>
+        <ol class="workflow-track" id="workflow-track" aria-label="مسیر پنج‌گامی مراجعه" data-progress>
           <li class="workflow-step" id="stage-appointment" data-reveal>
             <span class="workflow-step__marker">۰۱</span>
             <div class="workflow-step__body">
               <span class="workflow-step__eyebrow">شروع مراجعه</span>
               <h3>نوبت</h3>
-              <p>الگوی شروع مراجعه را با شیوهٔ نوبت‌دهی مرکز خود مرور کنید.</p>
+              <p>الگوی نوبت‌دهی را با روش مرکز خود مرور کنید.</p>
             </div>
           </li>
           <li class="workflow-step" id="stage-reception" data-reveal>
@@ -154,7 +190,7 @@
             <div class="workflow-step__body">
               <span class="workflow-step__eyebrow">ورود</span>
               <h3>پذیرش</h3>
-              <p>ثبت ورود مراجعه را در سناریوی مرکز خود بسنجید؛ دامنهٔ دقیق به نسخهٔ ارائه‌شده وابسته است.</p>
+              <p>ثبت ورود را در نسخهٔ ارائه‌شده ارزیابی کنید.</p>
             </div>
           </li>
           <li class="workflow-step" id="stage-queue" data-reveal>
@@ -162,7 +198,7 @@
             <div class="workflow-step__body">
               <span class="workflow-step__eyebrow">انتظار</span>
               <h3>صف</h3>
-              <p>پیگیری صف و انتظار را با سناریوی مرکز خود مرور کنید.</p>
+              <p>پیگیری صف و انتظار را با سناریوی مرکز بسنجید.</p>
             </div>
           </li>
           <li class="workflow-step" id="stage-visit" data-reveal>
@@ -170,7 +206,7 @@
             <div class="workflow-step__body">
               <span class="workflow-step__eyebrow">فضای کاری پزشک</span>
               <h3>ویزیت</h3>
-              <p>فضای کاری و مستندات ویزیت را در محدودهٔ نسخهٔ ارائه‌شده ارزیابی کنید.</p>
+              <p>مستندات ویزیت را در محدودهٔ نسخهٔ ارائه‌شده بررسی کنید.</p>
             </div>
           </li>
           <li class="workflow-step" id="stage-record" data-reveal>
@@ -182,35 +218,7 @@
             </div>
           </li>
         </ol>
-        <p class="workflow-footnote"><span aria-hidden="true">i</span> این روایت برای ارزیابی است؛ تأیید دامنهٔ هر مرحله به بررسی نسخهٔ ارائه‌شده نیاز دارد.</p>
-      </div>
-    </section>
-
-    <section class="product-proof section-pad" id="product-proof" aria-labelledby="product-title">
-      <div class="container product-layout">
-        <div class="product-copy" data-reveal>
-          <p class="eyebrow eyebrow--light"><span class="eyebrow__spark" aria-hidden="true"></span>مرور محصول در زمینهٔ کار</p>
-          <h2 id="product-title">ارتباط مرحله‌ها را<br><span>در نسخهٔ ارائه‌شده بسنجید</span></h2>
-          <p class="product-copy__lede">ارزش بررسی را از جریان واقعی مراجعه بسنجید؛ سپس موضوعاتی را مرور کنید که برای شیوهٔ کار مرکزتان اهمیت دارند.</p>
-          <ol class="product-points">
-            <li><span>۰۱</span><div><h3>پرونده و مستندات ویزیت</h3><p>اطلاعات بیمار و مستندات ویزیت را در فضای کاری پزشک بررسی کنید.</p></div></li>
-            <li><span>۰۲</span><div><h3>ثبت دستی پرداخت و خلاصهٔ مالی</h3><p>دامنهٔ ثبت دستی و خلاصه‌های مالی را بسنجید؛ نه به‌عنوان جایگزین حسابداری.</p></div></li>
-          </ol>
-          <a class="text-action text-action--light" href="#demo" data-demo-cta>رفتن به درخواست دمو <span aria-hidden="true">↙</span></a>
-        </div>
-
-        <figure class="brand-visual brand-visual--proof" role="img" aria-label="ترکیب انتزاعی هویت بصری CPMS" data-reveal>
-          <div class="proof-art" aria-hidden="true">
-            <span class="proof-art__plane proof-art__plane--back"></span>
-            <span class="proof-art__plane proof-art__plane--front"></span>
-            <span class="proof-art__ring proof-art__ring--one"></span>
-            <span class="proof-art__ring proof-art__ring--two"></span>
-            <span class="proof-art__orb proof-art__orb--one"></span>
-            <span class="proof-art__orb proof-art__orb--two"></span>
-            <span class="proof-art__path"></span>
-            <span class="proof-art__word"><bdi>CPMS</bdi></span>
-          </div>
-        </figure>
+        <p class="workflow-footnote"><span aria-hidden="true">i</span> این مسیر برای ارزیابی است؛ تأیید دامنهٔ هر مرحله به بررسی نسخهٔ ارائه‌شده نیاز دارد.</p>
       </div>
     </section>
 
@@ -282,7 +290,7 @@
             <p>سناریوی کاری، نقش‌های تیم و اولویت‌های مرکز را آماده کنید تا تناسب <bdi>CPMS</bdi> را ارزیابی کنید.</p>
           </div>
           <div class="demo-panel__action">
-            <a class="button button--light" href="#demo-note" data-demo-cta>درخواست دمو <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5 6 10l6.5 5.5M6.5 10h10" /></svg></a>
+            <a class="button button--light" href="#demo-note" data-demo-cta aria-describedby="demo-note">درخواست دمو <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5 6 10l6.5 5.5M6.5 10h10" /></svg></a>
             <p class="demo-note" id="demo-note">این دکمه فقط در همین پیش‌نمایش پیمایش می‌کند؛ اطلاعاتی ارسال نمی‌شود.</p>
           </div>
         </div>
@@ -302,8 +310,8 @@
         </div>
         <nav class="footer-group" aria-label="مرور محصول">
           <h2>مرور محصول</h2>
-          <a href="#workflow">مسیر مراجعه</a>
           <a href="#product-proof">پرونده و مستندات ویزیت</a>
+          <a href="#workflow">مسیر پنج‌گامی مراجعه</a>
         </nav>
         <nav class="footer-group" aria-label="نقش‌های کلینیک">
           <h2>نقش‌های کلینیک</h2>
