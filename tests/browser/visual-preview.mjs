@@ -388,8 +388,10 @@ try {
   await page.keyboard.press('ArrowLeft');
   assert.equal(await page.locator('#tab-sales').getAttribute('aria-selected'), 'true', 'RTL horizontal tab rail responds to ArrowLeft on mobile');
   await page.setViewportSize({ width: 1024, height: 768 });
+  await page.waitForFunction(() => document.querySelector('[role="tablist"]')?.getAttribute('aria-orientation') === 'horizontal');
   assert.equal(await page.locator('[role="tablist"]').getAttribute('aria-orientation'), 'horizontal', 'tablet Settings navigation remains horizontally scrollable');
   await page.setViewportSize({ width: 1440, height: 900 });
+  await page.waitForFunction(() => document.querySelector('[role="tablist"]')?.getAttribute('aria-orientation') === 'vertical');
   assert.equal(await page.locator('[role="tablist"]').getAttribute('aria-orientation'), 'vertical', 'desktop Settings navigation uses a vertical sidebar');
   await page.locator('#tab-sales').focus();
   await page.keyboard.press('ArrowDown');
