@@ -140,7 +140,12 @@ for page_name in PAGES:
     check(audit.forms == 0, f"{page_name}: no real form or submission endpoint")
     if page_name == "index.html":
         check(len(audit.zip_links) == 1, "index.html: exactly one offline bundle link exists in the downloadable source")
-        check(source.count('class="media-disclosure"') == 1, "index.html: exactly one Persian product-media disclosure is visible")
+        check(source.count('class="brand-visual') == 2, "index.html: hero and product section use two abstract brand compositions")
+        check('aria-label="ترکیب انتزاعی مسیر مراجعه در CPMS"' in source and 'aria-label="ترکیب انتزاعی هویت بصری CPMS"' in source, "index.html: both illustrations are accurately identified as abstract brand art")
+        check(source.count('class="workflow-step"') == 5, "index.html: clinic journey contains five separate review stages")
+        for stage in ("نوبت", "پذیرش", "صف", "ویزیت", "پرونده"):
+            check(f"<h3>{stage}</h3>" in source, f"index.html: journey contains the separate {stage} stage")
+        check(not any(term in source for term in ("جایگاه رسانه", "قاب رزروشده", "تصویر واقعی محصول", "رابط واقعی نرم‌افزار")), "index.html: no reserved-media placeholder copy is shown")
         check("کلینیک‌های چندپزشکی و مراکز درمانی" in source and "مطب مستقل یا مجموعهٔ کوچک‌تر" in source, "index.html: existing clinic-fit positioning remains bounded")
     else:
         check(len(audit.zip_links) == 0, "theme-settings.html: no offline bundle link is exposed")

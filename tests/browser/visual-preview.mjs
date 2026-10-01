@@ -134,6 +134,8 @@ async function captureVisualReviewScreenshots(browser) {
   await capturePage.goto(pageUrl(""), { waitUntil: "networkidle" });
   await capturePage.locator("#mobile-navigation > summary").click();
   assert.equal(await capturePage.locator("#mobile-navigation").evaluate((node) => node.open), true, "mobile disclosure opens for screenshot evidence");
+  await capturePage.locator("#mobile-workflows > summary").click();
+  assert.equal(await capturePage.locator(".mobile-workflows__links a").count(), 5, "mobile screenshot evidence includes all five workflow destinations");
   const menuPath = resolve(screenshotDir, "homepage-390x844-menu-open.jpg");
   await capturePage.screenshot({ path: menuPath, type: "jpeg", quality: 90, fullPage: false, animations: "disabled" });
   console.log(`[SCREENSHOT] 390×844 mobile menu: ${menuPath}`);
@@ -190,13 +192,15 @@ try {
   assert.equal(await page.locator('h1').count(), 1, 'homepage has one H1');
   assert.match(await page.locator('h1').innerText(), /مدیریت یکپارچهٔ کلینیک/);
   assert.equal(await page.locator('form').count(), 0, 'homepage has no real form');
-  assert.equal(await page.locator('.reserved-media').count(), 2, 'hero and proof each reserve product media');
-  assert.equal(await page.locator('.reserved-media').first().isVisible(), true, 'hero reserved-media surface is visible');
-  assert.equal(await page.locator('.media-disclosure').count(), 1, 'a single concise disclosure covers all reserved media');
-  assert.match(await page.locator('#media-disclosure').innerText(), /جایگاه رسانه‌اند و رابط واقعی نرم‌افزار را نشان نمی‌دهند/);
+  assert.equal(await page.locator('.brand-visual').count(), 2, 'the hero and product section each use a brand illustration');
+  assert.equal(await page.locator('.brand-visual--hero').isVisible(), true, 'the hero illustration is visible');
+  assert.equal(await page.locator('.brand-visual--hero').getAttribute('aria-label'), 'ترکیب انتزاعی مسیر مراجعه در CPMS');
+  assert.doesNotMatch(await page.locator('body').innerText(), /جایگاه رسانه|قاب رزروشده|تصویر واقعی محصول|رابط واقعی نرم‌افزار/, 'visible copy contains no media placeholders');
   assert.match(await page.locator('.role-fit-note').innerText(), /کلینیک‌های چندپزشکی و مراکز درمانی/);
   assert.match(await page.locator('.role-fit-note').innerText(), /مطب مستقل یا مجموعهٔ کوچک‌تر/);
-  assert.equal(await page.locator('.reserved-media button, .reserved-media input, .reserved-media select, .reserved-media textarea, .reserved-media table, .reserved-media canvas, .reserved-media iframe').count(), 0, 'reserved product media contains no fabricated interface');
+  assert.equal(await page.locator('.brand-visual button, .brand-visual input, .brand-visual select, .brand-visual textarea, .brand-visual table, .brand-visual canvas, .brand-visual iframe').count(), 0, 'brand illustrations contain no fabricated software controls');
+  const workflowLabels = await page.locator('.workflow-step h3').allInnerTexts();
+  assert.deepEqual(workflowLabels, ['نوبت', 'پذیرش', 'صف', 'ویزیت', 'پرونده'], 'the clinic journey is shown as five distinct evaluation steps');
   assert.equal(await page.evaluate(() => document.fonts.check('16px Vazirmatn')), true, 'local Vazirmatn font loads');
 
   const palette = await page.evaluate(() => {
@@ -228,8 +232,8 @@ try {
 
   await page.locator('#desktop-workflows > summary').click();
   assert.equal(await page.locator('#desktop-workflows').evaluate((node) => node.open), true, 'desktop workflow submenu opens');
-  assert.equal(await page.locator('#desktop-workflows .nav-dropdown a').count(), 3, 'desktop workflow submenu only lists the three previewed stages');
-  for (const [target, label] of [['#stage-appointment', 'نوبت'], ['#stage-reception', 'پذیرش و صف'], ['#stage-visit', 'فضای کاری پزشک']]) {
+  assert.equal(await page.locator('#desktop-workflows .nav-dropdown a').count(), 5, 'desktop workflow submenu lists the five review stages');
+  for (const [target, label] of [['#stage-appointment', 'نوبت'], ['#stage-reception', 'پذیرش'], ['#stage-queue', 'صف'], ['#stage-visit', 'ویزیت'], ['#stage-record', 'پرونده']]) {
     const link = page.locator(`#desktop-workflows .nav-dropdown a[href="${target}"]`);
     assert((await link.innerText()).includes(label), `workflow navigation label matches ${target}`);
     assert.equal(await page.locator(target).count(), 1, `workflow destination exists: ${target}`);
@@ -289,6 +293,10 @@ try {
       const headerHeight = await page.locator('#site-header').evaluate((node) => node.getBoundingClientRect().height);
       assert(headerHeight >= 68 && headerHeight <= 72, `desktop header is 68–72px tall (got ${headerHeight}px)`);
     }
+    if (viewport.width === 1024 || viewport.width === 1366 || viewport.width === 1440 || viewport.width === 1920) {
+      const workflowColumns = await page.locator('.workflow-track').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
+      assert.equal(workflowColumns, 5, 'wide workflow uses five connected columns');
+    }
     if (viewport.width === 1440) {
       const columns = await page.locator('.hero-grid').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
       assert.equal(columns, 2, 'desktop hero uses the intended balanced two-column composition');
@@ -307,16 +315,15 @@ try {
       const rect = document.querySelector(selector).getBoundingClientRect();
       return { top: rect.top, bottom: rect.bottom };
     };
-    return { actions: box('.hero-actions'), media: box('.reserved-media--hero'), disclosure: box('#media-disclosure') };
+    return { actions: box('.hero-actions'), visual: box('.brand-visual--hero') };
   });
-  assert(mobileHeroOrder.media.top >= mobileHeroOrder.actions.bottom, 'mobile hero places media after its CTA and secondary link');
-  assert(mobileHeroOrder.disclosure.top >= mobileHeroOrder.media.bottom, 'the single visible media disclosure follows the reserved frame');
+  assert(mobileHeroOrder.visual.top >= mobileHeroOrder.actions.bottom, 'mobile hero places its visual after the CTA and secondary link');
   for (const selector of ['.hero-lede', '.section-heading > p', '.workflow-step p', '.product-copy__lede', '.product-points p', '.role-item__body p', '.role-fit-note p', '.questions-intro > p:not(.eyebrow)', '.question-item p', '.demo-panel__copy > p:last-child', '.footer-brand > p']) await assertFontSize(page, selector, 16, 'mobile body copy');
-  await assertFontSize(page, '.media-disclosure', 13, 'Persian product-media disclosure');
   await page.locator('#mobile-navigation > summary').click();
   assert.equal(await page.locator('#mobile-navigation').evaluate((node) => node.open), true, 'mobile navigation opens');
   await page.locator('#mobile-workflows > summary').click();
   assert.equal(await page.locator('#mobile-workflows').evaluate((node) => node.open), true, 'mobile workflow submenu opens');
+  assert.equal(await page.locator('.mobile-workflows__links a').count(), 5, 'mobile workflow submenu exposes all five steps');
   await page.locator('#mobile-workflows a[href="#stage-visit"]').click();
   assert.equal(new URL(page.url()).hash, '#stage-visit', 'mobile submenu safely targets a workflow stage');
   assert.equal(await page.locator('#mobile-navigation').evaluate((node) => node.open), false, 'mobile navigation closes after selecting a route');

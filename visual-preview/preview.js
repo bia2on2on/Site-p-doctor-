@@ -127,9 +127,10 @@
       });
 
       tablist.addEventListener("keydown", (event) => {
+        syncOrientation();
         const currentIndex = tabs.indexOf(document.activeElement);
         if (currentIndex < 0) return;
-        const vertical = tablist.getAttribute("aria-orientation") === "vertical";
+        const vertical = desktopTabs.matches;
         const rtl = getComputedStyle(tablist).direction === "rtl";
         let nextIndex = currentIndex;
 

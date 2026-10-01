@@ -39,13 +39,15 @@
         <a class="nav-link" href="#questions">پیش از تصمیم</a>
         <details class="nav-disclosure" id="desktop-workflows">
           <summary class="nav-link nav-link--summary">
-            <span>سه مرحله</span>
+            <span>پنج گام</span>
             <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg>
           </summary>
-          <div class="nav-dropdown" aria-label="مرحله‌های مسیر مراجعه">
+          <div class="nav-dropdown" aria-label="پنج گام مسیر مراجعه">
             <a href="#stage-appointment"><span>۰۱</span> نوبت</a>
-            <a href="#stage-reception"><span>۰۲</span> پذیرش و صف</a>
-            <a href="#stage-visit"><span>۰۳</span> فضای کاری پزشک</a>
+            <a href="#stage-reception"><span>۰۲</span> پذیرش</a>
+            <a href="#stage-queue"><span>۰۳</span> صف</a>
+            <a href="#stage-visit"><span>۰۴</span> ویزیت</a>
+            <a href="#stage-record"><span>۰۵</span> پرونده</a>
           </div>
         </details>
       </nav>
@@ -66,11 +68,13 @@
             <a href="#roles">نقش‌های کلینیک</a>
             <a href="#questions">پیش از تصمیم</a>
             <details class="mobile-workflows" id="mobile-workflows">
-              <summary>سه مرحله <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></summary>
+              <summary>پنج گام <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></summary>
               <div class="mobile-workflows__links">
                 <a href="#stage-appointment"><span>۰۱</span> نوبت</a>
-                <a href="#stage-reception"><span>۰۲</span> پذیرش و صف</a>
-                <a href="#stage-visit"><span>۰۳</span> فضای کاری پزشک</a>
+                <a href="#stage-reception"><span>۰۲</span> پذیرش</a>
+                <a href="#stage-queue"><span>۰۳</span> صف</a>
+                <a href="#stage-visit"><span>۰۴</span> ویزیت</a>
+                <a href="#stage-record"><span>۰۵</span> پرونده</a>
               </div>
             </details>
           </nav>
@@ -97,7 +101,7 @@
         </div>
 
         <div class="hero-media">
-          <figure class="reserved-media reserved-media--hero" role="img" aria-label="جایگاه هنری رزروشده برای رسانهٔ محصول" aria-describedby="media-disclosure" data-reveal>
+          <figure class="brand-visual brand-visual--hero" role="img" aria-label="ترکیب انتزاعی مسیر مراجعه در CPMS" data-reveal>
             <div class="hero-art" aria-hidden="true">
               <span class="hero-art__glow hero-art__glow--teal"></span>
               <span class="hero-art__glow hero-art__glow--blue"></span>
@@ -107,15 +111,12 @@
               <span class="hero-art__arc hero-art__arc--one"></span>
               <span class="hero-art__arc hero-art__arc--two"></span>
               <span class="hero-art__wordmark"><bdi>CPMS</bdi></span>
-              <span class="hero-art__microcopy">از نوبت تا ویزیت</span>
-              <span class="hero-art__route"><b>نوبت</b><i></i><b>پذیرش</b><i></i><b>ویزیت</b></span>
+              <span class="hero-art__route"><b>نوبت</b><i></i><b>پذیرش</b><i></i><b>صف</b><i></i><b>ویزیت</b><i></i><b>پرونده</b></span>
               <span class="hero-art__spark hero-art__spark--one"></span>
               <span class="hero-art__spark hero-art__spark--two"></span>
               <span class="hero-art__spark hero-art__spark--three"></span>
             </div>
-            <span class="reserved-media__index" aria-hidden="true">۰۱ <i></i> ۰۳</span>
           </figure>
-          <p class="media-disclosure" id="media-disclosure">قاب‌های تصویری این پیش‌نمایش، جایگاه رسانه‌اند و رابط واقعی نرم‌افزار را نشان نمی‌دهند.</p>
         </div>
       </div>
       <span class="hero-wash" aria-hidden="true"></span>
@@ -134,15 +135,14 @@
         <div class="section-heading section-heading--split" data-reveal>
           <div>
             <p class="eyebrow"><span class="eyebrow__spark" aria-hidden="true"></span>از نگاه کلینیک</p>
-            <h2 id="workflow-title">یک مراجعه؛<br><span>سه ایستگاه برای مرور</span></h2>
+            <h2 id="workflow-title">یک مراجعه؛<br><span>پنج گام برای مرور</span></h2>
           </div>
           <p>وقتی نوبت، پذیرش و ویزیت جداگانه پیگیری می‌شوند، دیدن ارتباط مراحل به رفت‌وبرگشت بیشتری نیاز دارد. این مسیر را با شیوهٔ کار مرکز خود بسنجید.</p>
         </div>
 
-        <ol class="workflow-track" id="workflow-track" aria-label="سه مرحلهٔ مسیر مراجعه" data-progress>
+        <ol class="workflow-track" id="workflow-track" aria-label="پنج گام مسیر مراجعه" data-progress>
           <li class="workflow-step" id="stage-appointment" data-reveal>
             <span class="workflow-step__marker">۰۱</span>
-            <span class="workflow-step__glyph workflow-step__glyph--appointment" aria-hidden="true"><i></i><i></i><i></i></span>
             <div class="workflow-step__body">
               <span class="workflow-step__eyebrow">شروع مراجعه</span>
               <h3>نوبت</h3>
@@ -151,20 +151,34 @@
           </li>
           <li class="workflow-step" id="stage-reception" data-reveal>
             <span class="workflow-step__marker">۰۲</span>
-            <span class="workflow-step__glyph workflow-step__glyph--reception" aria-hidden="true"><i></i><i></i><i></i></span>
             <div class="workflow-step__body">
-              <span class="workflow-step__eyebrow">میانهٔ مسیر</span>
-              <h3>پذیرش و صف</h3>
-              <p>ثبت ورود و پیگیری صف را در سناریوی مرکز بسنجید؛ دامنهٔ دقیق به نسخهٔ ارائه‌شده وابسته است.</p>
+              <span class="workflow-step__eyebrow">ورود</span>
+              <h3>پذیرش</h3>
+              <p>ثبت ورود مراجعه را در سناریوی مرکز خود بسنجید؛ دامنهٔ دقیق به نسخهٔ ارائه‌شده وابسته است.</p>
+            </div>
+          </li>
+          <li class="workflow-step" id="stage-queue" data-reveal>
+            <span class="workflow-step__marker">۰۳</span>
+            <div class="workflow-step__body">
+              <span class="workflow-step__eyebrow">انتظار</span>
+              <h3>صف</h3>
+              <p>پیگیری صف و انتظار را با سناریوی مرکز خود مرور کنید.</p>
             </div>
           </li>
           <li class="workflow-step" id="stage-visit" data-reveal>
-            <span class="workflow-step__marker">۰۳</span>
-            <span class="workflow-step__glyph workflow-step__glyph--visit" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="workflow-step__marker">۰۴</span>
             <div class="workflow-step__body">
-              <span class="workflow-step__eyebrow">ادامهٔ کار</span>
-              <h3>فضای کاری پزشک</h3>
-              <p>فضای کاری و مستندات ویزیت را در محدوده‌ای که ارائه می‌شود ارزیابی کنید.</p>
+              <span class="workflow-step__eyebrow">فضای کاری پزشک</span>
+              <h3>ویزیت</h3>
+              <p>فضای کاری و مستندات ویزیت را در محدودهٔ نسخهٔ ارائه‌شده ارزیابی کنید.</p>
+            </div>
+          </li>
+          <li class="workflow-step" id="stage-record" data-reveal>
+            <span class="workflow-step__marker">۰۵</span>
+            <div class="workflow-step__body">
+              <span class="workflow-step__eyebrow">پیوستگی اطلاعات</span>
+              <h3>پرونده</h3>
+              <p>پروندهٔ بیمار را در محدودهٔ همین کلینیک بررسی کنید.</p>
             </div>
           </li>
         </ol>
@@ -185,7 +199,7 @@
           <a class="text-action text-action--light" href="#demo" data-demo-cta>رفتن به درخواست دمو <span aria-hidden="true">↙</span></a>
         </div>
 
-        <figure class="reserved-media reserved-media--proof" role="img" aria-label="جایگاه هنری رزروشده برای رسانهٔ واقعی محصول" aria-describedby="media-disclosure" data-reveal>
+        <figure class="brand-visual brand-visual--proof" role="img" aria-label="ترکیب انتزاعی هویت بصری CPMS" data-reveal>
           <div class="proof-art" aria-hidden="true">
             <span class="proof-art__plane proof-art__plane--back"></span>
             <span class="proof-art__plane proof-art__plane--front"></span>
@@ -195,11 +209,7 @@
             <span class="proof-art__orb proof-art__orb--two"></span>
             <span class="proof-art__path"></span>
             <span class="proof-art__word"><bdi>CPMS</bdi></span>
-            <span class="proof-art__marker proof-art__marker--one">۰۱</span>
-            <span class="proof-art__marker proof-art__marker--two">۰۲</span>
-            <span class="proof-art__marker proof-art__marker--three">۰۳</span>
           </div>
-          <span class="reserved-media__index" aria-hidden="true">CPMS <i></i> ۰۳ مرحله</span>
         </figure>
       </div>
     </section>
