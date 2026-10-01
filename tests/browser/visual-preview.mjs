@@ -220,7 +220,10 @@ async function captureReferenceParity(browser, screenshotDir) {
         await referencePage.screenshot({ path, type: 'jpeg', quality: 88, fullPage: true, animations: 'disabled', caret: 'hide' });
         console.log(`[REFERENCE-SCREENSHOT] ${viewport.width}×${viewport.height}: ${path}`);
       } catch (error) {
-        console.warn(`[REFERENCE-INSPECTION-UNAVAILABLE ${viewport.width}x${viewport.height}] ${String(error?.message || error).slice(0, 350)}`);
+        const detail = String(error?.message || error).slice(0, 350);
+        const annotation = detail.replaceAll('%', '%25').replaceAll('\r', '%0D').replaceAll('\n', '%0A');
+        console.warn(`[REFERENCE-INSPECTION-UNAVAILABLE ${viewport.width}x${viewport.height}] ${detail}`);
+        console.log(`::notice title=REFERENCE-INSPECTION-UNAVAILABLE-${viewport.width}x${viewport.height}::${annotation}`);
         break;
       }
     }
