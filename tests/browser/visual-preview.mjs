@@ -163,6 +163,26 @@ function visualFingerprint() {
   };
 }
 
+function emitVisualMeasurement(label, viewport, fingerprint) {
+  const geometry = ({ box, style }) => ({ box, display: style?.display, background: style?.background, color: style?.color, font: style?.font, fontSize: style?.fontSize, lineHeight: style?.lineHeight, padding: style?.padding, gap: style?.gap, radius: style?.radius, shadow: style?.shadow, backdrop: style?.backdrop });
+  const measurement = {
+    viewport: fingerprint.viewport,
+    page: fingerprint.page,
+    header: geometry(fingerprint.header),
+    nav: geometry(fingerprint.nav),
+    hero: geometry(fingerprint.hero),
+    heroGrid: geometry(fingerprint.heroGrid),
+    heroCopy: geometry(fingerprint.heroCopy),
+    heroMedia: geometry(fingerprint.heroMedia),
+    h1: geometry(fingerprint.h1),
+    cta: geometry(fingerprint.heroCta),
+    sections: fingerprint.sections,
+    cards: fingerprint.cards.slice(0, 4).map(geometry),
+  };
+  const safeMessage = JSON.stringify(measurement).replaceAll('%', '%25').replaceAll('\r', '%0D').replaceAll('\n', '%0A');
+  console.log(`::notice title=${label}-${viewport.width}x${viewport.height}::${safeMessage}`);
+}
+
 async function captureReferenceParity(browser, screenshotDir) {
   const referenceUrl = process.env.VISUAL_REFERENCE_URL;
   if (!referenceUrl) return;
@@ -186,6 +206,7 @@ async function captureReferenceParity(browser, screenshotDir) {
         await referencePage.waitForTimeout(650);
         const fingerprint = await referencePage.evaluate(visualFingerprint);
         console.log(`[REFERENCE-PARITY ${viewport.width}x${viewport.height}] ${JSON.stringify(fingerprint)}`);
+        emitVisualMeasurement('REFERENCE', viewport, fingerprint);
         await referencePage.evaluate(async () => {
           const step = Math.max(300, Math.floor(innerHeight * 0.72));
           for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
@@ -247,7 +268,9 @@ async function captureVisualReviewScreenshots(browser) {
     await exposeReveals();
     const reveals = await capturePage.evaluate(() => ({ total: document.querySelectorAll("[data-reveal]").length, visible: document.querySelectorAll("[data-reveal].is-visible").length }));
     assert.equal(reveals.visible, reveals.total, `all homepage sections are revealed before ${viewport.width}px screenshot (${JSON.stringify(reveals)})`);
-    console.log(`[CPMS-PARITY ${viewport.width}x${viewport.height}] ${JSON.stringify(await capturePage.evaluate(visualFingerprint))}`);
+    const fingerprint = await capturePage.evaluate(visualFingerprint);
+    console.log(`[CPMS-PARITY ${viewport.width}x${viewport.height}] ${JSON.stringify(fingerprint)}`);
+    emitVisualMeasurement('CPMS', viewport, fingerprint);
     await capturePage.waitForTimeout(850);
     const path = resolve(screenshotDir, `homepage-${viewport.width}x${viewport.height}.jpg`);
     await capturePage.screenshot({ path, type: "jpeg", quality: 88, fullPage: true, animations: "disabled", caret: "hide" });
