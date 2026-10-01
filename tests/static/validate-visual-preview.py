@@ -2,6 +2,7 @@
 """Structural and boundary checks for the isolated visual review preview."""
 from __future__ import annotations
 
+import colorsys
 import hashlib
 import re
 import sys
@@ -146,6 +147,7 @@ for page_name in PAGES:
         check(all(figure.count('class="media-disclosure"') == 1 for figure in media_figures), "index.html: each reserved composition has one concise Persian disclosure")
         check(all("تصویر واقعی محصول در این جایگاه قرار می‌گیرد." in figure for figure in media_figures), "index.html: media disclosures say real product imagery is not present yet")
         check(all(not re.search(r"<(?:img|button|input|select|textarea|table|canvas|iframe)\b", figure, re.I) for figure in media_figures), "index.html: reserved compositions contain no fabricated product UI, screenshots or photography")
+        check("media-stage__chrome" not in source and "media-glass-accent" not in source, "index.html: abstract compositions do not imitate browser chrome or floating product controls")
         check(source.count('class="workflow-step"') == 5, "index.html: clinic journey contains five separate review stages")
         for stage in ("نوبت", "پذیرش", "صف", "ویزیت", "پرونده"):
             check(f"<h3>{stage}</h3>" in source, f"index.html: journey contains the separate {stage} stage")
@@ -192,6 +194,24 @@ js_path = PREVIEW / "preview.js"
 css = css_path.read_text(encoding="utf-8") if css_path.exists() else ""
 js = js_path.read_text(encoding="utf-8") if js_path.exists() else ""
 check(bool(css), "preview.css exists and is not empty")
+check("green" not in css.lower() and "teal" not in css.lower(), "preview palette contains no green/teal styling tokens or terminology")
+
+def is_rejected_green_hue(rgb: tuple[int, int, int]) -> bool:
+    hue, _lightness, saturation = colorsys.rgb_to_hls(*(value / 255 for value in rgb))
+    degrees = hue * 360
+    return 82 <= degrees <= 205 and saturation >= 0.045
+
+rejected_colors: list[str] = []
+for match in re.finditer(r"#[0-9A-Fa-f]{6}\b", css):
+    swatch = match.group(0)
+    rgb = tuple(int(swatch[index:index + 2], 16) for index in (1, 3, 5))
+    if is_rejected_green_hue(rgb):
+        rejected_colors.append(swatch)
+for match in re.finditer(r"\brgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)", css, re.I):
+    rgb = tuple(round(float(match.group(index))) for index in (1, 2, 3))
+    if is_rejected_green_hue(rgb):
+        rejected_colors.append(match.group(0))
+check(not rejected_colors, f"preview palette has no green/cyan hue colors: {rejected_colors[:5]}")
 check(bool(js), "preview.js exists and is not empty")
 check("CPMS visual-review Design System v3" in css, "preview documents the v3 token system and its non-production scope")
 for token in ("--color-canvas", "--color-surface", "--color-ink", "--color-copy", "--color-muted", "--color-primary", "--color-cobalt", "--color-sky", "--color-glass", "--color-success", "--color-warning", "--color-info"):

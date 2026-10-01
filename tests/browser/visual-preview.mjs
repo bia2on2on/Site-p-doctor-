@@ -226,35 +226,36 @@ try {
   assert.match(await page.locator('.role-fit-note').innerText(), /کلینیک‌های چندپزشکی و مراکز درمانی/);
   assert.match(await page.locator('.role-fit-note').innerText(), /مطب مستقل یا مجموعهٔ کوچک‌تر/);
   assert.equal(await page.locator('.media-reservation button, .media-reservation input, .media-reservation select, .media-reservation textarea, .media-reservation table, .media-reservation canvas, .media-reservation iframe, .media-reservation img').count(), 0, 'reserved media uses abstract geometry only, with no fabricated product UI or photography');
+  assert.equal(await page.locator('.media-stage__chrome, .media-glass-accent, .media-glass-orb').count(), 0, 'abstract compositions do not imitate browser chrome or floating product controls');
   const workflowLabels = await page.locator('.workflow-step h3').allInnerTexts();
   assert.deepEqual(workflowLabels, ['نوبت', 'پذیرش', 'صف', 'ویزیت', 'پرونده'], 'the clinic journey is shown as five distinct evaluation steps');
   assert.equal(await page.evaluate(() => document.fonts.check('16px Vazirmatn')), true, 'local Vazirmatn font loads');
 
   const palette = await page.evaluate(() => {
     const styles = getComputedStyle(document.documentElement);
-    return Object.fromEntries(['--color-ink', '--color-copy', '--color-muted', '--color-canvas', '--color-surface', '--color-primary', '--color-primary-hover', '--color-teal-soft', '--color-success', '--color-success-soft', '--color-warning', '--color-info', '--color-warm-soft', '--color-blue-soft', '--color-night'].map((name) => [name, styles.getPropertyValue(name).trim()]));
+    return Object.fromEntries(['--color-ink', '--color-copy', '--color-muted', '--color-canvas', '--color-surface', '--color-primary', '--color-primary-hover', '--color-blue-soft', '--color-success', '--color-success-soft', '--color-warning', '--color-info', '--color-warm-soft', '--color-night'].map((name) => [name, styles.getPropertyValue(name).trim()]));
   });
   for (const [foreground, background, label] of [
-    [palette['--color-ink'], palette['--color-canvas'], 'body text on warm canvas'],
-    [palette['--color-copy'], palette['--color-canvas'], 'supporting copy on warm canvas'],
+    [palette['--color-ink'], palette['--color-canvas'], 'body text on cool canvas'],
+    [palette['--color-copy'], palette['--color-canvas'], 'supporting copy on cool canvas'],
     [palette['--color-muted'], palette['--color-surface'], 'muted text on white surface'],
-    [palette['--color-primary-hover'], palette['--color-canvas'], 'teal links on warm canvas'],
-    [palette['--color-primary-hover'], palette['--color-teal-soft'], 'active tab on soft teal'],
-    [palette['--color-success'], palette['--color-success-soft'], 'active status on soft green'],
-    [palette['--color-copy'], '#EDF1EF', 'inactive status on soft gray'],
+    [palette['--color-primary-hover'], palette['--color-canvas'], 'blue links on cool canvas'],
+    [palette['--color-primary-hover'], palette['--color-blue-soft'], 'active tab on soft blue'],
+    [palette['--color-success'], palette['--color-success-soft'], 'active status on soft blue'],
+    [palette['--color-copy'], '#EEF2F9', 'inactive status on soft blue-gray'],
     [palette['--color-warning'], palette['--color-warm-soft'], 'review status on soft amber'],
     [palette['--color-info'], palette['--color-blue-soft'], 'unverified status on soft blue'],
-    ['#FFFFFF', '#08746F', 'white CTA text on the first teal gradient stop'],
-    ['#FFFFFF', '#075F60', 'white CTA text on the deep teal gradient stop'],
-    ['#FFFFFF', '#164E62', 'white CTA text on the blue-teal gradient stop'],
-    ['#F1F8F5', '#08746F', 'light CTA body text on teal'],
-    ['#F1F8F5', '#075F60', 'light CTA body text on dark teal'],
-    ['#F1F8F5', '#164E62', 'light CTA body text on blue-teal'],
-    ['#E4F4F0', '#08746F', 'light CTA eyebrow on teal'],
-    ['#E4F4F0', '#075F60', 'light CTA eyebrow on dark teal'],
-    ['#E4F4F0', '#164E62', 'light CTA eyebrow on blue-teal'],
-    ['#D5E2E1', palette['--color-night'], 'footer copy on navy'],
-    ['#BDE1D9', palette['--color-night'], 'footer link on navy'],
+    ['#FFFFFF', '#315CFA', 'white CTA text on the first bright-blue gradient stop'],
+    ['#FFFFFF', '#2144D8', 'white CTA text on the deep-blue gradient stop'],
+    ['#FFFFFF', '#3928BE', 'white CTA text on the indigo gradient stop'],
+    ['#F2F6FF', '#315CFA', 'light CTA body text on bright blue'],
+    ['#F2F6FF', '#2144D8', 'light CTA body text on deep blue'],
+    ['#F2F6FF', '#3928BE', 'light CTA body text on indigo'],
+    ['#EAF0FF', '#315CFA', 'light CTA eyebrow on bright blue'],
+    ['#EAF0FF', '#2144D8', 'light CTA eyebrow on deep blue'],
+    ['#EAF0FF', '#3928BE', 'light CTA eyebrow on indigo'],
+    ['#D5D9E2', palette['--color-night'], 'footer copy on navy'],
+    ['#BDC7E1', palette['--color-night'], 'footer link on navy'],
   ]) assertContrast(foreground, background, label);
 
   if (process.env.VISUAL_REVIEW_SCREENSHOTS === "1") await captureVisualReviewScreenshots(browser);
