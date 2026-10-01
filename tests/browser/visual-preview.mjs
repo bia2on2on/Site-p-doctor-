@@ -91,6 +91,51 @@ async function assertNoOverflow(page, label) {
   assert(metrics.body <= metrics.viewport + 1, `${label}: body overflows horizontally (${JSON.stringify(metrics)})`);
 }
 
+async function captureVisualReviewScreenshots(browser) {
+  const screenshotDir = resolve(import.meta.dirname, "artifacts/visual-preview/screenshots");
+  mkdirSync(screenshotDir, { recursive: true });
+  const capturePage = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  watch(capturePage);
+
+  const viewports = [
+    { width: 390, height: 844 },
+    { width: 768, height: 1024 },
+    { width: 1024, height: 768 },
+    { width: 1366, height: 768 },
+    { width: 1440, height: 900 },
+  ];
+
+  for (const viewport of viewports) {
+    await capturePage.setViewportSize(viewport);
+    const response = await capturePage.goto(pageUrl(""), { waitUntil: "networkidle" });
+    assert.equal(response?.status(), 200, `screenshot source returns HTTP 200 at ${viewport.width}px`);
+    await capturePage.evaluate(() => document.fonts.ready);
+    await capturePage.evaluate(async () => {
+      const step = Math.max(240, Math.floor(window.innerHeight * 0.72));
+      const bottom = document.documentElement.scrollHeight;
+      for (let y = 0; y < bottom; y += step) {
+        window.scrollTo(0, y);
+        await new Promise((resolveFrame) => requestAnimationFrame(() => requestAnimationFrame(resolveFrame)));
+      }
+      window.scrollTo(0, 0);
+      await new Promise((resolveFrame) => requestAnimationFrame(() => requestAnimationFrame(resolveFrame)));
+    });
+    await capturePage.waitForTimeout(650);
+    const path = resolve(screenshotDir, `homepage-${viewport.width}x${viewport.height}.jpg`);
+    await capturePage.screenshot({ path, type: "jpeg", quality: 90, fullPage: true, animations: "disabled" });
+    console.log(`[SCREENSHOT] ${viewport.width}×${viewport.height}: ${path}`);
+  }
+
+  await capturePage.setViewportSize({ width: 390, height: 844 });
+  await capturePage.goto(pageUrl(""), { waitUntil: "networkidle" });
+  await capturePage.locator("#mobile-navigation > summary").click();
+  assert.equal(await capturePage.locator("#mobile-navigation").evaluate((node) => node.open), true, "mobile disclosure opens for screenshot evidence");
+  const menuPath = resolve(screenshotDir, "homepage-390x844-menu-open.jpg");
+  await capturePage.screenshot({ path: menuPath, type: "jpeg", quality: 90, fullPage: false, animations: "disabled" });
+  console.log(`[SCREENSHOT] 390×844 mobile menu: ${menuPath}`);
+  await capturePage.close();
+}
+
 async function assertFontSize(page, selector, minimum, label) {
   const sizes = await page.locator(selector).evaluateAll((nodes) => nodes.map((node) => Number.parseFloat(getComputedStyle(node).fontSize)));
   assert(sizes.length > 0, `${label}: selector matched at least one element (${selector})`);
@@ -175,6 +220,8 @@ try {
     ['#D4E0E1', palette['--color-night'], 'footer copy on navy'],
   ]) assertContrast(foreground, background, label);
 
+  if (process.env.VISUAL_REVIEW_SCREENSHOTS === "1") await captureVisualReviewScreenshots(browser);
+
   await page.locator('#desktop-workflows > summary').click();
   assert.equal(await page.locator('#desktop-workflows').evaluate((node) => node.open), true, 'desktop workflow submenu opens');
   assert.equal(await page.locator('#desktop-workflows .nav-dropdown a').count(), 3, 'desktop workflow submenu only lists the three previewed stages');
@@ -218,6 +265,7 @@ try {
     { width: 320, height: 720 },
     { width: 390, height: 844 },
     { width: 768, height: 1024 },
+    { width: 1024, height: 768 },
     { width: 1366, height: 768 },
     { width: 1440, height: 900 },
     { width: 1920, height: 1080 },

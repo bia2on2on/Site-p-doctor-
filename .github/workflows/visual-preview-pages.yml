@@ -134,7 +134,17 @@ jobs:
           cd tests/browser
           npx playwright install --with-deps chromium
 
-      - name: Test the published Pages site
+      - name: Test the published Pages site and capture responsive review evidence
         env:
           VISUAL_PREVIEW_BASE_URL: ${{ needs.deploy.outputs.page_url }}
+          VISUAL_REVIEW_SCREENSHOTS: '1'
         run: node tests/browser/visual-preview.mjs
+
+      - name: Upload responsive visual review screenshots
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: visual-review-${{ github.sha }}
+          path: tests/browser/artifacts/visual-preview/screenshots/
+          if-no-files-found: warn
+          retention-days: 14
