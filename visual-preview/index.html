@@ -34,8 +34,8 @@
 
       <nav class="desktop-nav" aria-label="ناوبری اصلی">
         <a class="nav-link" href="#product-proof">مرور محصول</a>
-        <a class="nav-link" href="#workflow">مسیر مراجعه</a>
         <a class="nav-link" href="#roles">نقش‌های کلینیک</a>
+        <a class="nav-link" href="#workflow">مسیر مراجعه</a>
         <a class="nav-link" href="#questions">پیش از تصمیم</a>
         <details class="nav-disclosure" id="desktop-workflows">
           <summary class="nav-link nav-link--summary">
@@ -64,8 +64,8 @@
         <div class="mobile-navigation__panel">
           <nav class="mobile-nav-links" aria-label="ناوبری موبایل">
             <a href="#product-proof">مرور محصول</a>
-            <a href="#workflow">مسیر مراجعه</a>
             <a href="#roles">نقش‌های کلینیک</a>
+            <a href="#workflow">مسیر مراجعه</a>
             <a href="#questions">پیش از تصمیم</a>
             <details class="mobile-workflows" id="mobile-workflows">
               <summary>پنج گام <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></summary>
@@ -136,28 +136,63 @@
           <p class="eyebrow"><span class="eyebrow__spark" aria-hidden="true"></span>مرور محصول در متن مسیر</p>
           <h2 id="product-title">ارتباط مرحله‌ها را<br><span>در نسخهٔ ارائه‌شده بسنجید</span></h2>
           <p class="product-copy__lede">ارزش بررسی را از جریان واقعی مراجعه بسنجید؛ سپس موضوعاتی را مرور کنید که برای شیوهٔ کار مرکزتان اهمیت دارند.</p>
-          <ol class="product-points">
-            <li><span>۰۱</span><div><h3>پرونده و مستندات ویزیت</h3><p>اطلاعات بیمار و مستندات ویزیت را در فضای کاری پزشک بررسی کنید.</p></div></li>
-            <li><span>۰۲</span><div><h3>ثبت دستی پرداخت و خلاصهٔ مالی</h3><p>دامنهٔ ثبت دستی و خلاصه‌های مالی را بسنجید؛ نه به‌عنوان جایگزین حسابداری.</p></div></li>
-          </ol>
-          <a class="text-action" href="#demo" data-demo-cta>ارزیابی این مسیر در دمو <span aria-hidden="true">↙</span></a>
         </div>
+        <ol class="product-points product-feature-grid" aria-label="محورهای ارزیابی مسیر مراجعه" data-reveal>
+          <li><span>۰۱</span><div><h3>نوبت</h3><p>الگوی نوبت‌دهی را با روش مرکز خود مرور کنید.</p></div></li>
+          <li><span>۰۲</span><div><h3>پذیرش</h3><p>ثبت ورود را در نسخهٔ ارائه‌شده ارزیابی کنید.</p></div></li>
+          <li><span>۰۳</span><div><h3>صف</h3><p>پیگیری صف و انتظار را با سناریوی مرکز بسنجید.</p></div></li>
+          <li><span>۰۴</span><div><h3>ویزیت</h3><p>مستندات ویزیت را در محدودهٔ نسخهٔ ارائه‌شده بررسی کنید.</p></div></li>
+          <li><span>۰۵</span><div><h3>پرونده</h3><p>پروندهٔ بیمار را در محدودهٔ همین کلینیک بررسی کنید.</p></div></li>
+          <li><span>۰۶</span><div><h3>ثبت دستی پرداخت و خلاصهٔ مالی</h3><p>دامنهٔ ثبت دستی و خلاصه‌های مالی را بسنجید؛ نه به‌عنوان جایگزین حسابداری.</p></div></li>
+        </ol>
+        <a class="text-action product-evaluation-link" href="#demo" data-demo-cta>ارزیابی این مسیر در دمو <span aria-hidden="true">↙</span></a>
+      </div>
+    </section>
 
-        <figure class="media-reservation media-reservation--proof" aria-labelledby="proof-media-disclosure" data-reveal>
-          <span class="proof-scene__wash" aria-hidden="true"></span>
-          <div class="media-stage media-stage--proof" aria-hidden="true">
-            <div class="media-stage__canvas media-stage__canvas--proof">
-              <span class="proof-canvas__field"></span>
-              <span class="proof-canvas__ring proof-canvas__ring--one"></span>
-              <span class="proof-canvas__ring proof-canvas__ring--two"></span>
-              <span class="proof-canvas__ribbon"></span>
-              <span class="proof-canvas__shape proof-canvas__shape--one"></span>
-              <span class="proof-canvas__shape proof-canvas__shape--two"></span>
-            </div>
+    <section class="roles-section section-pad" id="roles" aria-labelledby="roles-title">
+      <div class="container">
+        <div class="section-heading section-heading--split" data-reveal>
+          <div>
+            <p class="eyebrow"><span class="eyebrow__spark" aria-hidden="true"></span>یک مسیر، سه نگاه</p>
+            <h2 id="roles-title">تجربه را با<br><span>نقش‌های واقعی تیم بسنجید</span></h2>
           </div>
-          <span class="proof-scene__spark" aria-hidden="true"></span>
-          <figcaption class="media-disclosure" id="proof-media-disclosure">تصویر واقعی محصول در این جایگاه قرار می‌گیرد.</figcaption>
-        </figure>
+          <p>مرور مشترک مسیر مراجعه کمک می‌کند هر نقش، موضوع مرتبط با کار روزانهٔ خود را ارزیابی کند؛ بدون فرض دربارهٔ دسترسی یا قابلیت‌های تأییدنشده.</p>
+        </div>
+        <div class="role-journey" aria-label="سه نقش در مسیر ارزیابی کلینیک">
+          <article class="role-item" id="role-reception" data-reveal>
+            <span class="role-item__index">۰۱</span>
+            <div class="role-item__body"><h3>پذیرش</h3><p>مسیر ورود مراجعه و انتظار را با سناریوی واقعی کلینیک مرور کنید.</p></div>
+          </article>
+          <article class="role-item" id="role-doctor" data-reveal>
+            <span class="role-item__index">۰۲</span>
+            <div class="role-item__body"><h3>پزشک</h3><p>فضای کاری و مستندات ویزیت را در نسخهٔ ارائه‌شده بسنجید.</p></div>
+          </article>
+          <article class="role-item" id="role-management" data-reveal>
+            <span class="role-item__index">۰۳</span>
+            <div class="role-item__body"><h3>مدیریت کلینیک</h3><p>هماهنگی مرحله‌ها را با شیوهٔ کار تیم خود ارزیابی کنید.</p></div>
+          </article>
+        </div>
+        <div class="role-showcase">
+          <div class="role-fit-note" data-reveal>
+            <span class="role-fit-note__label">تناسب با مرکز</span>
+            <p>تمرکز ارزیابی بر کلینیک‌های چندپزشکی و مراکز درمانی است؛ تناسب برای مطب مستقل یا مجموعهٔ کوچک‌تر به نیاز و شیوهٔ کار آن بستگی دارد.</p>
+          </div>
+          <figure class="media-reservation media-reservation--proof" aria-labelledby="proof-media-disclosure" data-reveal>
+            <span class="proof-scene__wash" aria-hidden="true"></span>
+            <div class="media-stage media-stage--proof" aria-hidden="true">
+              <div class="media-stage__canvas media-stage__canvas--proof">
+                <span class="proof-canvas__field"></span>
+                <span class="proof-canvas__ring proof-canvas__ring--one"></span>
+                <span class="proof-canvas__ring proof-canvas__ring--two"></span>
+                <span class="proof-canvas__ribbon"></span>
+                <span class="proof-canvas__shape proof-canvas__shape--one"></span>
+                <span class="proof-canvas__shape proof-canvas__shape--two"></span>
+              </div>
+            </div>
+            <span class="proof-scene__spark" aria-hidden="true"></span>
+            <figcaption class="media-disclosure" id="proof-media-disclosure">تصویر واقعی محصول در این جایگاه قرار می‌گیرد.</figcaption>
+          </figure>
+        </div>
       </div>
     </section>
 
@@ -214,36 +249,6 @@
           </li>
         </ol>
         <p class="workflow-footnote"><span aria-hidden="true">i</span> این مسیر برای ارزیابی است؛ تأیید دامنهٔ هر مرحله به بررسی نسخهٔ ارائه‌شده نیاز دارد.</p>
-      </div>
-    </section>
-
-    <section class="roles-section section-pad" id="roles" aria-labelledby="roles-title">
-      <div class="container">
-        <div class="section-heading section-heading--split" data-reveal>
-          <div>
-            <p class="eyebrow"><span class="eyebrow__spark" aria-hidden="true"></span>یک مسیر، سه نگاه</p>
-            <h2 id="roles-title">تجربه را با<br><span>نقش‌های واقعی تیم بسنجید</span></h2>
-          </div>
-          <p>مرور مشترک مسیر مراجعه کمک می‌کند هر نقش، موضوع مرتبط با کار روزانهٔ خود را ارزیابی کند؛ بدون فرض دربارهٔ دسترسی یا قابلیت‌های تأییدنشده.</p>
-        </div>
-        <div class="role-journey" aria-label="سه نقش در مسیر ارزیابی کلینیک">
-          <article class="role-item" id="role-reception" data-reveal>
-            <span class="role-item__index">۰۱</span>
-            <div class="role-item__body"><h3>پذیرش</h3><p>مسیر ورود مراجعه و انتظار را با سناریوی واقعی کلینیک مرور کنید.</p></div>
-          </article>
-          <article class="role-item" id="role-doctor" data-reveal>
-            <span class="role-item__index">۰۲</span>
-            <div class="role-item__body"><h3>پزشک</h3><p>فضای کاری و مستندات ویزیت را در نسخهٔ ارائه‌شده بسنجید.</p></div>
-          </article>
-          <article class="role-item" id="role-management" data-reveal>
-            <span class="role-item__index">۰۳</span>
-            <div class="role-item__body"><h3>مدیریت کلینیک</h3><p>هماهنگی مرحله‌ها را با شیوهٔ کار تیم خود ارزیابی کنید.</p></div>
-          </article>
-        </div>
-        <div class="role-fit-note" data-reveal>
-          <span class="role-fit-note__label">تناسب با مرکز</span>
-          <p>تمرکز ارزیابی بر کلینیک‌های چندپزشکی و مراکز درمانی است؛ تناسب برای مطب مستقل یا مجموعهٔ کوچک‌تر به نیاز و شیوهٔ کار آن بستگی دارد.</p>
-        </div>
       </div>
     </section>
 

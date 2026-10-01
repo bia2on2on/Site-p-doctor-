@@ -360,8 +360,12 @@ try {
   assert.equal(await page.locator('h1').count(), 1, 'homepage has one H1');
   assert.match(await page.locator('h1').innerText(), /مدیریت یکپارچهٔ کلینیک/);
   assert.equal(await page.locator('form').count(), 0, 'homepage has no real form');
-  assert.equal(await page.locator('.media-reservation').count(), 2, 'hero and product proof each reserve a large replaceable media frame');
+  assert.equal(await page.locator('.media-reservation').count(), 2, 'hero and role showcase each reserve a large replaceable media frame');
   assert.equal(await page.locator('.media-reservation--hero').isVisible(), true, 'the hero media frame is visible');
+  assert.equal(await page.locator('#product-proof .media-reservation').count(), 0, 'the feature grid stays clear of an unrelated media frame');
+  assert.equal(await page.locator('#roles .media-reservation--proof').count(), 1, 'the secondary abstract-media slot is composed with the role section');
+  assert.deepEqual(await page.locator('main > section').evaluateAll((nodes) => nodes.map((node) => node.id || node.classList[0])), ['home', 'value-strip', 'product-proof', 'roles', 'workflow', 'questions', 'demo'], 'section sequence follows the reference composition where CPMS has a truthful equivalent');
+  assert.deepEqual(await page.locator('.product-feature-grid h3').allInnerTexts(), ['نوبت', 'پذیرش', 'صف', 'ویزیت', 'پرونده', 'ثبت دستی پرداخت و خلاصهٔ مالی'], 'feature cards contain only the five truthful journey stages plus the existing manual-finance boundary');
   assert.deepEqual(await page.locator('.media-disclosure').allInnerTexts(), ['تصویر واقعی محصول در این جایگاه قرار می‌گیرد.', 'تصویر واقعی محصول در این جایگاه قرار می‌گیرد.'], 'each reserved composition has exactly one concise Persian disclosure');
   assert.match(await page.locator('.media-reservation--hero').getAttribute('aria-labelledby'), /hero-media-disclosure/);
   assert.match(await page.locator('.media-reservation--proof').getAttribute('aria-labelledby'), /proof-media-disclosure/);
@@ -468,6 +472,11 @@ try {
   for (const viewport of viewportMatrix) {
     await page.setViewportSize(viewport);
     await assertNoOverflow(page, `homepage ${viewport.width}×${viewport.height}`);
+    const featureColumns = await page.locator('.product-feature-grid').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
+    const expectedFeatureColumns = viewport.width <= 520 ? 1 : viewport.width <= 960 ? 2 : 3;
+    assert.equal(featureColumns, expectedFeatureColumns, `truthful feature grid adapts at ${viewport.width}px`);
+    const roleShowcaseColumns = await page.locator('.role-showcase').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
+    assert.equal(roleShowcaseColumns, viewport.width <= 960 ? 1 : 2, `role/media showcase adapts at ${viewport.width}px`);
     if (viewport.width === 768 || viewport.width === 1024) {
       const headerHeight = await page.locator('#site-header').evaluate((node) => node.getBoundingClientRect().height);
       assert(headerHeight >= 60 && headerHeight <= 64, `tablet compact header is 60–64px tall (got ${headerHeight}px)`);

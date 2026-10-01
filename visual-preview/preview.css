@@ -3016,3 +3016,88 @@ body {
   .hero-copy h1 { font-size: clamp(1.8rem, 7vw, 2.05rem); }
   .text-action { padding-inline: 10px; font-size: 13px; }
 }
+
+/* Match the reference's feature-first composition with CPMS-only evaluation topics. */
+.product-layout {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+}
+
+.product-copy {
+  width: min(100%, 960px);
+  margin-inline: auto;
+}
+
+.product-points.product-feature-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.product-feature-grid li {
+  min-height: 100%;
+  align-content: start;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(255, 255, 255, 0.96);
+  border-radius: 20px;
+  box-shadow: 0 13px 32px rgba(29, 66, 139, 0.075), inset 0 1px 0 rgba(255, 255, 255, 0.97);
+  transition: transform 190ms ease-out, box-shadow 190ms ease-out, border-color 190ms ease-out;
+}
+
+.product-feature-grid li > span {
+  display: grid;
+  width: 31px;
+  height: 31px;
+  place-items: center;
+  color: #0B759B;
+  background: var(--color-aqua-soft);
+  border-radius: 50%;
+}
+
+.product-feature-grid h3 { font-size: 16px; }
+.product-feature-grid p { max-width: none; font-size: 15px; line-height: 1.78; }
+.product-evaluation-link { justify-self: start; }
+
+.role-showcase {
+  display: grid;
+  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+  align-items: stretch;
+  gap: 16px;
+  margin-block-start: 18px;
+}
+
+.role-showcase .role-fit-note {
+  display: flex;
+  max-width: none;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 12px;
+  margin: 0;
+  padding: clamp(20px, 2.6vw, 32px);
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(255, 255, 255, 0.96);
+  border-radius: 20px;
+  box-shadow: 0 13px 32px rgba(29, 66, 139, 0.075), inset 0 1px 0 rgba(255, 255, 255, 0.97);
+}
+
+.role-showcase .role-fit-note p { max-width: 540px; margin: 0; }
+.role-showcase .media-reservation--proof { height: 100%; min-height: 320px; }
+
+@media (max-width: 960px) {
+  .product-points.product-feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .role-showcase { grid-template-columns: minmax(0, 1fr); }
+  .role-showcase .role-fit-note { padding: 20px; }
+}
+
+@media (max-width: 520px) {
+  .product-points.product-feature-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .product-feature-grid li { padding: 15px; border-radius: 17px; }
+  .role-showcase { gap: 12px; }
+  .role-showcase .role-fit-note { padding: 16px; border-radius: 17px; }
+  .role-showcase .media-reservation--proof { min-height: 240px; }
+}
