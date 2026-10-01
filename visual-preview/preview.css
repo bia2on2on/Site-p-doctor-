@@ -978,7 +978,7 @@ svg {
 
 .product-points li > span { color: var(--color-primary); font-size: 13px; font-weight: 700; }
 .product-points h3 { margin: 0; color: var(--color-ink); font-size: 16px; line-height: 1.6; }
-.product-points p { max-width: 440px; margin: 4px 0 0; color: var(--color-copy); font-size: 15px; line-height: 1.8; }
+.product-points p { max-width: 440px; margin: 4px 0 0; color: var(--color-copy); font-size: 16px; line-height: 1.8; }
 
 .media-reservation--proof {
   min-height: 355px;
@@ -1220,7 +1220,7 @@ svg {
 .role-item + .role-item { border-inline-start: 1px solid rgba(16, 45, 58, 0.13); }
 .role-item__index { color: var(--color-primary); font-size: 14px; font-weight: 700; }
 .role-item__body h3 { margin: 0; color: var(--color-ink); font-size: 18px; line-height: 1.55; }
-.role-item__body p { margin: 6px 0 0; color: var(--color-copy); font-size: 15px; line-height: 1.85; }
+.role-item__body p { margin: 6px 0 0; color: var(--color-copy); font-size: 16px; line-height: 1.85; }
 .role-item__link { padding-block-start: 1px; color: rgba(8, 116, 111, 0.76); font-size: 16px; }
 
 .role-fit-note {
@@ -1243,7 +1243,7 @@ svg {
   line-height: 1.6;
 }
 
-.role-fit-note p { margin: 1px 0 0; color: var(--color-copy); font-size: 15px; line-height: 1.85; }
+.role-fit-note p { margin: 1px 0 0; color: var(--color-copy); font-size: 16px; line-height: 1.85; }
 
 /* Quiet FAQ: native disclosures, no repeated question cards. */
 .questions-section { background: var(--color-canvas); }
@@ -1374,7 +1374,7 @@ svg {
 .brand--footer .brand__mark { background: linear-gradient(145deg, #238D82, #176777); box-shadow: none; }
 .brand--footer .brand__copy strong { color: var(--color-white); }
 .brand--footer .brand__copy > span { color: #CFDFDE; }
-.footer-brand > p { max-width: 355px; margin: 13px 0 0; color: #D5E2E1; font-size: 15px; line-height: 1.85; }
+.footer-brand > p { max-width: 355px; margin: 13px 0 0; color: #D5E2E1; font-size: 16px; line-height: 1.85; }
 .footer-group { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
 .footer-group h2 { margin: 2px 0 5px; color: var(--color-white); font-size: 14px; font-weight: 700; }
 
@@ -2115,7 +2115,7 @@ svg {
   .product-copy__lede { margin-block: 9px 17px; font-size: 16px; }
   .product-points li { grid-template-columns: 31px minmax(0, 1fr); gap: 8px; padding-block: 13px; }
   .product-points h3 { font-size: 15px; }
-  .product-points p { font-size: 15px; }
+  .product-points p { font-size: 16px; }
   .media-reservation--proof { width: 100%; min-height: 230px; aspect-ratio: 1.26 / 1; padding: 12px; border-radius: 24px; }
   .media-window--proof { width: 91%; }
   .media-glass-accent--proof { inset-block-start: 18%; inset-inline-start: 2%; width: 58px; height: 36px; gap: 4px; }
@@ -2141,7 +2141,7 @@ svg {
   .role-item__body p { margin-block-start: 4px; font-size: 16px; line-height: 1.76; }
   .role-item__link { font-size: 14px; }
   .role-fit-note { flex-direction: column; gap: 7px; margin-block-start: 15px; }
-  .role-fit-note p { font-size: 15px; line-height: 1.8; }
+  .role-fit-note p { font-size: 16px; line-height: 1.8; }
 
   .questions-layout { gap: 19px; }
   .questions-intro > p:not(.eyebrow) { margin-block: 9px 6px; font-size: 16px; }
