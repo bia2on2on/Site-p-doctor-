@@ -194,6 +194,12 @@ js_path = PREVIEW / "preview.js"
 css = css_path.read_text(encoding="utf-8") if css_path.exists() else ""
 js = js_path.read_text(encoding="utf-8") if js_path.exists() else ""
 check(bool(css), "preview.css exists and is not empty")
+# Raw source-transfer budget for the Pages site; the downloadable ZIP is separate.
+preview_payload_files = [css_path, js_path, *(PREVIEW / name for name in PAGES)]
+preview_payload_files += [PREVIEW / "assets" / "fonts" / name for name in ("Vazirmatn-Regular.woff2", "Vazirmatn-Bold.woff2", "OFL.txt")]
+preview_payload_size = sum(path.stat().st_size for path in preview_payload_files if path.is_file())
+check(css_path.stat().st_size <= 110_000, f"preview CSS stays within the 110 KB raw-size budget ({css_path.stat().st_size:,} bytes)")
+check(preview_payload_size <= 275_000, f"deployed preview assets stay within the 275 KB raw-size budget ({preview_payload_size:,} bytes)")
 check("green" not in css.lower() and "teal" not in css.lower(), "preview palette contains no green/teal styling tokens or terminology")
 
 def is_rejected_green_hue(rgb: tuple[int, int, int]) -> bool:

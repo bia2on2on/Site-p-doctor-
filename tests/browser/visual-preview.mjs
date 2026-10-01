@@ -230,15 +230,17 @@ try {
   const glassMotion = await page.evaluate(() => {
     const heroCard = getComputedStyle(document.querySelector('.hero-copy'));
     const mediaStage = getComputedStyle(document.querySelector('.media-stage'));
+    const repeatedCardFilters = ['.value-item', '.workflow-step', '.media-disclosure'].map((selector) => getComputedStyle(document.querySelector(selector)).backdropFilter);
     const durations = mediaStage.transitionDuration.split(',').map((value) => {
       const trimmed = value.trim();
       const number = Number.parseFloat(trimmed);
       return trimmed.endsWith('ms') ? number : number * 1000;
     });
-    return { backdropFilter: heroCard.backdropFilter, maxTransitionMs: Math.max(...durations) };
+    return { backdropFilter: heroCard.backdropFilter, repeatedCardFilters, maxTransitionMs: Math.max(...durations) };
   });
   assert.match(glassMotion.backdropFilter, /blur\(/, 'copy is presented on a true frosted-glass card');
-  assert(glassMotion.maxTransitionMs <= 500, `glass micro-interactions remain short (${glassMotion.maxTransitionMs}ms max)`);
+  assert(glassMotion.repeatedCardFilters.every((filter) => filter === 'none'), 'repeated cards avoid costly backdrop filters');
+  assert(glassMotion.maxTransitionMs <= 400, `glass micro-interactions remain short (${glassMotion.maxTransitionMs}ms max)`);
   const workflowLabels = await page.locator('.workflow-step h3').allInnerTexts();
   assert.deepEqual(workflowLabels, ['نوبت', 'پذیرش', 'صف', 'ویزیت', 'پرونده'], 'the clinic journey is shown as five distinct evaluation steps');
   assert.equal(await page.evaluate(() => document.fonts.check('16px Vazirmatn')), true, 'local Vazirmatn font loads');
@@ -389,6 +391,8 @@ try {
   assert.equal(await page.locator('a[href$=".zip"]').count(), 0, 'Theme Settings page has no offline package link');
   assert.equal(await page.locator('h1').count(), 1, 'Theme Settings preview has one H1');
   assert.equal(await page.locator('[role="tab"]').count(), 6, 'Theme Settings preview has six sections');
+  const settingsCardFilters = await page.locator('.settings-card').evaluateAll((nodes) => nodes.map((node) => getComputedStyle(node).backdropFilter));
+  assert(settingsCardFilters.length > 0 && settingsCardFilters.every((filter) => filter === 'none'), 'repeated Settings cards avoid costly backdrop filters');
   assert.equal(await page.locator('[role="tablist"]').getAttribute('aria-orientation'), 'horizontal', 'mobile Settings navigation uses a horizontal scroll rail');
   assert.equal(await page.locator('#panel-general').isVisible(), true, 'general panel starts selected');
   assert.equal(await page.locator('#panel-contact').isVisible(), false, 'inactive tab panel is hidden after enhancement');
