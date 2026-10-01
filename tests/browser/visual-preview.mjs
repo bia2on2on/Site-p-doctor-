@@ -97,7 +97,16 @@ try {
   watch(page);
   let response = await page.goto(pageUrl(''), { waitUntil: 'networkidle' });
   assert.equal(response.status(), 200, 'homepage preview returns HTTP 200');
-  for (const asset of ['preview.css', 'preview.js', 'assets/fonts/Vazirmatn-Regular.woff2', 'assets/fonts/Vazirmatn-Bold.woff2', 'koorosh-design-preview.zip']) {
+  if (requestedBase) {
+    assert.equal(await page.locator('a[href$=".zip"]').count(), 0, 'published homepage has no offline package link');
+  }
+  const requiredAssets = ['preview.css', 'preview.js', 'assets/fonts/Vazirmatn-Regular.woff2', 'assets/fonts/Vazirmatn-Bold.woff2', 'assets/fonts/OFL.txt'];
+  if (!requestedBase) requiredAssets.push('koorosh-design-preview.zip');
+  else {
+    const packageResponse = await page.request.get(pageUrl('koorosh-design-preview.zip'));
+    assert.equal(packageResponse.status(), 404, 'published Pages site does not expose the offline ZIP package');
+  }
+  for (const asset of requiredAssets) {
     const assetResponse = await page.request.get(pageUrl(asset));
     assert.equal(assetResponse.status(), 200, `published preview asset returns HTTP 200: ${asset}`);
   }
@@ -179,6 +188,9 @@ try {
   assert.equal(await page.locator('html').getAttribute('lang'), 'fa');
   assert.equal(await page.locator('html').getAttribute('dir'), 'rtl');
   assert.match(await page.locator('.admin-review-banner').innerText(), /پیش‌نمایش طراحی — نسخه نهایی سایت نیست/);
+  if (requestedBase) {
+    assert.equal(await page.locator('a[href$=".zip"]').count(), 0, 'published Theme Settings page has no offline package link');
+  }
   assert.equal(await page.locator('h1').count(), 1, 'Theme Settings preview has one H1');
   assert.equal(await page.locator('[role="tab"]').count(), 6, 'Theme Settings preview has six sections');
   assert.equal(await page.locator('#panel-general').isVisible(), true, 'general panel starts selected');

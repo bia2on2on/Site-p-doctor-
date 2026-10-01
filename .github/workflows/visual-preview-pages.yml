@@ -40,11 +40,11 @@ jobs:
           install -m 0644 visual-preview/theme-settings.html "$site/theme-settings.html"
           install -m 0644 visual-preview/preview.css "$site/preview.css"
           install -m 0644 visual-preview/preview.js "$site/preview.js"
-          install -m 0644 visual-preview/koorosh-design-preview.zip "$site/koorosh-design-preview.zip"
           install -m 0644 visual-preview/assets/fonts/OFL.txt "$site/assets/fonts/OFL.txt"
           install -m 0644 visual-preview/assets/fonts/Vazirmatn-Bold.woff2 "$site/assets/fonts/Vazirmatn-Bold.woff2"
           install -m 0644 visual-preview/assets/fonts/Vazirmatn-Regular.woff2 "$site/assets/fonts/Vazirmatn-Regular.woff2"
           python3 - "$site" <<'PY'
+          import re
           import sys
           from pathlib import Path
 
@@ -54,7 +54,6 @@ jobs:
               "theme-settings.html",
               "preview.css",
               "preview.js",
-              "koorosh-design-preview.zip",
               "assets/fonts/OFL.txt",
               "assets/fonts/Vazirmatn-Bold.woff2",
               "assets/fonts/Vazirmatn-Regular.woff2",
@@ -65,6 +64,18 @@ jobs:
 
           for name in ("index.html", "theme-settings.html"):
               text = (root / name).read_text(encoding="utf-8")
+              zip_link = re.compile(
+                  r"""<a\b(?=[^>]*\bhref=["'][^"']*\.zip(?:[?#][^"']*)?["'])[^>]*>.*?</a>""",
+                  re.IGNORECASE | re.DOTALL,
+              )
+              text, removed = zip_link.subn("", text, count=1)
+              if removed != 1:
+                  raise SystemExit(f"{name} should have exactly one offline package link removed")
+              if zip_link.search(text):
+                  raise SystemExit(f"{name} still contains a ZIP download link")
+              if "koorosh-design-preview.zip" in text.lower():
+                  raise SystemExit(f"{name} still references the offline package")
+              (root / name).write_text(text, encoding="utf-8")
               if '<meta name="robots" content="noindex,nofollow">' not in text:
                   raise SystemExit(f"{name} is missing the required noindex,nofollow marker")
               if "پیش‌نمایش طراحی — نسخه نهایی سایت نیست" not in text:
@@ -77,7 +88,7 @@ jobs:
           css = (root / "preview.css").read_text(encoding="utf-8")
           if any(marker in css.lower() for marker in ('url(/', 'url("/', "url('/")):
               raise SystemExit("preview.css contains a root-relative asset path")
-          print("Pages staging contains exactly the allowlisted interactive preview and local font assets.")
+          print("Pages staging contains only allowlisted preview pages, interactive assets, and local fonts; no ZIP package or download links.")
           PY
           echo "site=$site" >> "$GITHUB_OUTPUT"
 
