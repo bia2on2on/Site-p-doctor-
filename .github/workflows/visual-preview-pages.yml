@@ -1,0 +1,129 @@
+name: Publish isolated visual preview to GitHub Pages
+
+on:
+  push:
+    branches:
+      - arena/01a0f43b-site-p-doctor
+
+permissions:
+  contents: read
+
+concurrency:
+  group: koorosh-visual-preview-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Stage isolated design-preview site
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - name: Check out the exact pushed PR head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Configure GitHub Pages
+        id: pages
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+
+      - name: Stage only the visual-preview runtime
+        id: stage
+        shell: bash
+        run: |
+          set -euo pipefail
+          site="$(mktemp -d "$RUNNER_TEMP/koorosh-preview-pages.XXXXXX")"
+          mkdir -p "$site/assets/fonts"
+          install -m 0644 visual-preview/index.html "$site/index.html"
+          install -m 0644 visual-preview/theme-settings.html "$site/theme-settings.html"
+          install -m 0644 visual-preview/preview.css "$site/preview.css"
+          install -m 0644 visual-preview/preview.js "$site/preview.js"
+          install -m 0644 visual-preview/koorosh-design-preview.zip "$site/koorosh-design-preview.zip"
+          install -m 0644 visual-preview/assets/fonts/OFL.txt "$site/assets/fonts/OFL.txt"
+          install -m 0644 visual-preview/assets/fonts/Vazirmatn-Bold.woff2 "$site/assets/fonts/Vazirmatn-Bold.woff2"
+          install -m 0644 visual-preview/assets/fonts/Vazirmatn-Regular.woff2 "$site/assets/fonts/Vazirmatn-Regular.woff2"
+          python3 - "$site" <<'PY'
+          import sys
+          from pathlib import Path
+
+          root = Path(sys.argv[1])
+          expected = {
+              "index.html",
+              "theme-settings.html",
+              "preview.css",
+              "preview.js",
+              "koorosh-design-preview.zip",
+              "assets/fonts/OFL.txt",
+              "assets/fonts/Vazirmatn-Bold.woff2",
+              "assets/fonts/Vazirmatn-Regular.woff2",
+          }
+          actual = {path.relative_to(root).as_posix() for path in root.rglob("*") if path.is_file()}
+          if actual != expected:
+              raise SystemExit(f"Pages staging inventory mismatch; extra={sorted(actual - expected)}, missing={sorted(expected - actual)}")
+
+          for name in ("index.html", "theme-settings.html"):
+              text = (root / name).read_text(encoding="utf-8")
+              if '<meta name="robots" content="noindex,nofollow">' not in text:
+                  raise SystemExit(f"{name} is missing the required noindex,nofollow marker")
+              if "پیش‌نمایش طراحی — نسخه نهایی سایت نیست" not in text:
+                  raise SystemExit(f"{name} is missing the visible Persian design-preview notice")
+              if 'rel="canonical"' in text.lower() or "rel='canonical'" in text.lower():
+                  raise SystemExit(f"{name} must not expose a canonical URL")
+              if any(marker in text.lower() for marker in ('href="/', 'src="/', "href='/", "src='/")):
+                  raise SystemExit(f"{name} contains a root-relative path that would escape the project Pages base path")
+
+          css = (root / "preview.css").read_text(encoding="utf-8")
+          if any(marker in css.lower() for marker in ('url(/', 'url("/', "url('/")):
+              raise SystemExit("preview.css contains a root-relative asset path")
+          print("Pages staging contains exactly the allowlisted interactive preview and local font assets.")
+          PY
+          echo "site=$site" >> "$GITHUB_OUTPUT"
+
+      - name: Upload the isolated static site
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
+        with:
+          path: ${{ steps.stage.outputs.site }}
+
+  deploy:
+    name: Deploy preview to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy Pages artifact
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+
+  verify-published:
+    name: Verify published preview URL in Chromium
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the deployed source revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Install locked browser-test dependencies
+        run: npm ci --prefix tests/browser --no-fund --no-audit
+
+      - name: Install Chromium
+        run: |
+          cd tests/browser
+          npx playwright install --with-deps chromium
+
+      - name: Test the published Pages site
+        env:
+          VISUAL_PREVIEW_BASE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: node tests/browser/visual-preview.mjs

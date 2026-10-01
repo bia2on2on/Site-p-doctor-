@@ -17,7 +17,10 @@ const mime = {
   '.md': 'text/markdown; charset=utf-8',
 };
 
-const server = createServer((request, response) => {
+const requestedBase = process.env.VISUAL_PREVIEW_BASE_URL;
+let server = null;
+let base;
+if (!requestedBase) server = createServer((request, response) => {
   const pathname = decodeURIComponent(new URL(request.url || '/', 'http://127.0.0.1').pathname);
   if (pathname === '/favicon.ico') {
     response.writeHead(204);
@@ -44,22 +47,41 @@ const server = createServer((request, response) => {
   createReadStream(filename).pipe(response);
 });
 
-await new Promise((resolveListen, reject) => {
-  server.once('error', reject);
-  server.listen(0, '127.0.0.1', resolveListen);
-});
-const address = server.address();
-const base = `http://127.0.0.1:${address.port}`;
+if (requestedBase) {
+  const configuredUrl = new URL(requestedBase);
+  assert(['http:', 'https:'].includes(configuredUrl.protocol), 'published preview URL must use HTTP(S)');
+  assert.equal(configuredUrl.username, '', 'published preview URL has no embedded credentials');
+  assert.equal(configuredUrl.password, '', 'published preview URL has no embedded credentials');
+  assert.equal(configuredUrl.search, '', 'published preview URL has no query string');
+  assert.equal(configuredUrl.hash, '', 'published preview URL has no fragment');
+  base = `${configuredUrl.origin}${configuredUrl.pathname.replace(/\/+$/, '')}`;
+} else {
+  await new Promise((resolveListen, reject) => {
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', resolveListen);
+  });
+  const address = server.address();
+  base = `http://127.0.0.1:${address.port}`;
+}
+const baseUrl = new URL(base);
+const basePath = `${baseUrl.pathname.replace(/\/+$/, '')}/`;
+const pageUrl = (path) => new URL(path.replace(/^\/+/, ''), `${base}/`).href;
 let browser;
-const diagnostics = { consoleErrors: [], pageErrors: [], failedRequests: [], badResponses: [], externalRequests: [] };
+const diagnostics = { consoleErrors: [], pageErrors: [], failedRequests: [], badResponses: [], externalRequests: [], outOfBaseRequests: [] };
 
 function watch(page) {
   page.on('console', (message) => { if (message.type() === 'error') diagnostics.consoleErrors.push(message.text()); });
   page.on('pageerror', (error) => diagnostics.pageErrors.push(error.message));
   page.on('requestfailed', (request) => diagnostics.failedRequests.push(`${request.url()}: ${request.failure()?.errorText || 'failed'}`));
-  page.on('response', (response) => { if (response.status() >= 400) diagnostics.badResponses.push(`${response.status()} ${response.url()}`); });
+  page.on('response', (response) => {
+    const responseUrl = new URL(response.url());
+    if (response.status() >= 400 && responseUrl.pathname !== '/favicon.ico') diagnostics.badResponses.push(`${response.status()} ${response.url()}`);
+  });
   page.on('request', (request) => {
-    if (/^https?:/i.test(request.url()) && !request.url().startsWith(base)) diagnostics.externalRequests.push(request.url());
+    if (!/^https?:/i.test(request.url())) return;
+    const requestUrl = new URL(request.url());
+    if (requestUrl.origin !== baseUrl.origin) diagnostics.externalRequests.push(request.url());
+    else if (!requestUrl.pathname.startsWith(basePath) && requestUrl.pathname !== '/favicon.ico') diagnostics.outOfBaseRequests.push(request.url());
   });
 }
 
@@ -73,12 +95,17 @@ try {
   browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 1366, height: 900 } });
   watch(page);
-  let response = await page.goto(`${base}/index.html`, { waitUntil: 'networkidle' });
+  let response = await page.goto(pageUrl(''), { waitUntil: 'networkidle' });
   assert.equal(response.status(), 200, 'homepage preview returns HTTP 200');
+  for (const asset of ['preview.css', 'preview.js', 'assets/fonts/Vazirmatn-Regular.woff2', 'assets/fonts/Vazirmatn-Bold.woff2', 'koorosh-design-preview.zip']) {
+    const assetResponse = await page.request.get(pageUrl(asset));
+    assert.equal(assetResponse.status(), 200, `published preview asset returns HTTP 200: ${asset}`);
+  }
   await page.evaluate(() => document.fonts.ready);
   assert.equal(await page.locator('html').getAttribute('lang'), 'fa');
   assert.equal(await page.locator('html').getAttribute('dir'), 'rtl');
   assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'), 'noindex,nofollow');
+  assert.match(await page.locator('#preview-notice').innerText(), /پیش‌نمایش طراحی — نسخه نهایی سایت نیست/);
   assert.equal(await page.locator('h1').count(), 1, 'homepage has one H1');
   assert.match(await page.locator('h1').innerText(), /مدیریت کلینیک/);
   assert.equal(await page.locator('form').count(), 0, 'homepage has no real form');
@@ -124,7 +151,7 @@ try {
   }
 
   await page.setViewportSize({ width: 390, height: 844 });
-  response = await page.goto(`${base}/index.html`, { waitUntil: 'networkidle' });
+  response = await page.goto(pageUrl(''), { waitUntil: 'networkidle' });
   assert.equal(response.status(), 200);
   await page.locator('#mobile-navigation > summary').click();
   assert.equal(await page.locator('#mobile-navigation').evaluate((node) => node.open), true, 'mobile navigation opens');
@@ -146,9 +173,12 @@ try {
     await assertNoOverflow(page, `homepage responsive check ${width}px`);
   }
 
-  response = await page.goto(`${base}/theme-settings.html`, { waitUntil: 'networkidle' });
+  response = await page.goto(pageUrl('theme-settings.html'), { waitUntil: 'networkidle' });
   assert.equal(response.status(), 200, 'Theme Settings preview returns HTTP 200');
   assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'), 'noindex,nofollow');
+  assert.equal(await page.locator('html').getAttribute('lang'), 'fa');
+  assert.equal(await page.locator('html').getAttribute('dir'), 'rtl');
+  assert.match(await page.locator('.admin-review-banner').innerText(), /پیش‌نمایش طراحی — نسخه نهایی سایت نیست/);
   assert.equal(await page.locator('h1').count(), 1, 'Theme Settings preview has one H1');
   assert.equal(await page.locator('[role="tab"]').count(), 6, 'Theme Settings preview has six sections');
   assert.equal(await page.locator('#panel-general').isVisible(), true, 'general panel starts selected');
@@ -184,7 +214,7 @@ try {
   const reducedContext = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
   const reducedPage = await reducedContext.newPage();
   watch(reducedPage);
-  await reducedPage.goto(`${base}/index.html`, { waitUntil: 'networkidle' });
+  await reducedPage.goto(pageUrl(''), { waitUntil: 'networkidle' });
   assert.equal(await reducedPage.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches), true);
   assert.equal(await reducedPage.locator('html').evaluate((node) => node.classList.contains('has-motion')), false, 'reduced motion avoids adding reveal animations');
   assert.equal(await reducedPage.locator('.workflow-track').evaluate((node) => getComputedStyle(node).opacity), '1', 'content remains visible with reduced motion');
@@ -193,11 +223,11 @@ try {
   const noJsContext = await browser.newContext({ viewport: { width: 390, height: 844 }, javaScriptEnabled: false, reducedMotion: 'reduce' });
   const noJsPage = await noJsContext.newPage();
   watch(noJsPage);
-  await noJsPage.goto(`${base}/index.html`, { waitUntil: 'networkidle' });
+  await noJsPage.goto(pageUrl(''), { waitUntil: 'networkidle' });
   assert.equal(await noJsPage.locator('#mobile-navigation').evaluate((node) => node.open), false);
   await noJsPage.locator('#mobile-navigation > summary').click();
   assert.equal(await noJsPage.locator('#mobile-navigation').evaluate((node) => node.open), true, 'native mobile disclosure works without JavaScript');
-  await noJsPage.goto(`${base}/theme-settings.html`, { waitUntil: 'networkidle' });
+  await noJsPage.goto(pageUrl('theme-settings.html'), { waitUntil: 'networkidle' });
   assert.equal(await noJsPage.locator('#panel-general').isVisible(), true, 'no-JavaScript Settings fallback shows the first section');
   assert.equal(await noJsPage.locator('#panel-status').isVisible(), true, 'no-JavaScript Settings fallback keeps every panel readable');
   await noJsPage.locator('#tab-sales').click();
@@ -207,6 +237,7 @@ try {
   assert.deepEqual(diagnostics.externalRequests, [], `no external requests: ${diagnostics.externalRequests.join(', ')}`);
   assert.deepEqual(diagnostics.failedRequests, [], `no failed requests: ${diagnostics.failedRequests.join(', ')}`);
   assert.deepEqual(diagnostics.badResponses, [], `no broken local responses: ${diagnostics.badResponses.join(', ')}`);
+  assert.deepEqual(diagnostics.outOfBaseRequests, [], `no same-origin requests escape the Pages base path: ${diagnostics.outOfBaseRequests.join(', ')}`);
   assert.deepEqual(diagnostics.consoleErrors, [], `no browser console errors: ${diagnostics.consoleErrors.join(' | ')}`);
   assert.deepEqual(diagnostics.pageErrors, [], `no browser page errors: ${diagnostics.pageErrors.join(' | ')}`);
 
@@ -223,5 +254,5 @@ try {
   process.exitCode = 1;
 } finally {
   if (browser) await browser.close();
-  await new Promise((resolveClose, rejectClose) => server.close((error) => error ? rejectClose(error) : resolveClose()));
+  if (server?.listening) await new Promise((resolveClose, rejectClose) => server.close((error) => error ? rejectClose(error) : resolveClose()));
 }
