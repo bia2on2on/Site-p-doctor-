@@ -165,27 +165,24 @@ function visualFingerprint() {
 }
 
 function emitVisualMeasurement(label, viewport, fingerprint) {
-  const geometry = (element) => {
-    if (!element) return null;
-    const { box, style } = element;
-    return { box, display: style?.display, background: style?.background, color: style?.color, fontSize: style?.fontSize, lineHeight: style?.lineHeight, padding: style?.padding, gap: style?.gap, radius: style?.radius, shadow: style?.shadow, backdrop: style?.backdrop };
-  };
-  const documentSummary = (value) => value && ({ title: value.title, url: value.url, topFrame: value.topFrame, textLength: value.bodyTextLength, h1: value.h1Count, headers: value.headerCount, sections: value.sectionCount, iframes: value.iframeCount, width: value.width, height: value.height, pageHeight: value.pageHeight, scrollWidth: value.scrollWidth });
+  const box = (element) => element?.box || null;
+  const compactStyle = (element, keys) => element && Object.fromEntries(keys.filter((key) => element.style?.[key] !== undefined).map((key) => [key, element.style[key]]));
+  const document = fingerprint.document;
   const measurement = {
-    document: documentSummary(fingerprint.document),
-    contentFrame: documentSummary(fingerprint.frameSummary),
+    frame: document && { top: document.topFrame, textLength: document.bodyTextLength, h1: document.h1Count, headers: document.headerCount, sections: document.sectionCount, iframes: document.iframeCount },
     viewport: fingerprint.viewport,
     page: fingerprint.page,
-    header: geometry(fingerprint.header),
-    nav: geometry(fingerprint.nav),
-    hero: geometry(fingerprint.hero),
-    heroGrid: geometry(fingerprint.heroGrid),
-    heroCopy: geometry(fingerprint.heroCopy),
-    heroMedia: geometry(fingerprint.heroMedia),
-    h1: geometry(fingerprint.h1),
-    cta: geometry(fingerprint.heroCta),
-    sections: fingerprint.sections.slice(0, 10).map(({ box, background, paddingBlock }) => ({ box, background, paddingBlock })),
-    cards: fingerprint.cards.slice(0, 1).map((card) => ({ box: card.box, background: card.style?.background, radius: card.style?.radius, shadow: card.style?.shadow, backdrop: card.style?.backdrop })),
+    header: box(fingerprint.header),
+    nav: { box: box(fingerprint.nav), ...compactStyle(fingerprint.nav, ['background', 'radius', 'backdrop']) },
+    hero: { box: box(fingerprint.hero), ...compactStyle(fingerprint.hero, ['padding']) },
+    grid: { box: box(fingerprint.heroGrid), ...compactStyle(fingerprint.heroGrid, ['gap']) },
+    copy: box(fingerprint.heroCopy),
+    media: box(fingerprint.heroMedia),
+    h1: { box: box(fingerprint.h1), ...compactStyle(fingerprint.h1, ['color', 'fontSize', 'lineHeight']) },
+    cta: { box: box(fingerprint.heroCta), ...compactStyle(fingerprint.heroCta, ['background', 'color', 'radius']) },
+    sectionCount: fingerprint.sectionCount,
+    sections: fingerprint.sections.slice(0, 10).map(({ box: sectionBox }) => ({ y: sectionBox.y, h: sectionBox.height })),
+    card: fingerprint.cards[0] && { box: fingerprint.cards[0].box, background: fingerprint.cards[0].style?.background, radius: fingerprint.cards[0].style?.radius, backdrop: fingerprint.cards[0].style?.backdrop },
   };
   const safeMessage = JSON.stringify(measurement).replaceAll('%', '%25').replaceAll('\r', '%0D').replaceAll('\n', '%0A');
   console.log(`::notice title=${label}-${viewport.width}x${viewport.height}::${safeMessage}`);
@@ -302,6 +299,7 @@ async function captureVisualReviewScreenshots(browser) {
     assert.equal(reveals.visible, reveals.total, `all homepage sections are revealed before ${viewport.width}px screenshot (${JSON.stringify(reveals)})`);
     const fingerprint = await capturePage.evaluate(visualFingerprint);
     console.log(`[CPMS-PARITY ${viewport.width}x${viewport.height}] ${JSON.stringify(fingerprint)}`);
+    emitVisualMeasurement('CPMS', viewport, fingerprint);
     await capturePage.waitForTimeout(850);
     const path = resolve(screenshotDir, `homepage-${viewport.width}x${viewport.height}.jpg`);
     await capturePage.screenshot({ path, type: "jpeg", quality: 88, fullPage: true, animations: "disabled", caret: "hide" });
@@ -389,7 +387,7 @@ try {
   assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'), 'noindex,nofollow');
   assert.match(await page.locator('#preview-notice').innerText(), /پیش‌نمایش طراحی — نسخه نهایی سایت نیست/);
   assert.equal(await page.locator('h1').count(), 1, 'homepage has one H1');
-  assert.match(await page.locator('h1').innerText(), /مدیریت یکپارچهٔ کلینیک/);
+  assert.match(await page.locator('h1').innerText(), /مسیر مراجعهٔ کلینیک را بسنجید/);
   assert.equal(await page.locator('form').count(), 0, 'homepage has no real form');
   assert.equal(await page.locator('.media-reservation').count(), 2, 'hero and role showcase each reserve a large replaceable media frame');
   assert.equal(await page.locator('.media-reservation--hero').isVisible(), true, 'the hero media frame is visible');
@@ -510,15 +508,15 @@ try {
     assert.equal(roleShowcaseColumns, viewport.width <= 960 ? 1 : 2, `role/media showcase adapts at ${viewport.width}px`);
     if (viewport.width === 768 || viewport.width === 1024) {
       const headerHeight = await page.locator('#site-header').evaluate((node) => node.getBoundingClientRect().height);
-      assert(headerHeight >= 60 && headerHeight <= 64, `tablet compact header is 60–64px tall (got ${headerHeight}px)`);
+      assert(headerHeight >= 92 && headerHeight <= 94, `tablet/reference header is 92–94px tall (got ${headerHeight}px)`);
       const heroColumns = await page.locator('.hero-grid').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
-      assert.equal(heroColumns, 1, 'tablet hero uses its own single-column composition');
+      assert.equal(heroColumns, viewport.width === 768 ? 1 : 2, 'tablet hero columns follow the measured reference composition');
       const workflowColumns = await page.locator('.workflow-track').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
       assert.equal(workflowColumns, 1, 'tablet workflow uses open editorial timeline rows');
     }
     if (viewport.width === 1366 || viewport.width === 1440 || viewport.width === 1920) {
       const headerHeight = await page.locator('#site-header').evaluate((node) => node.getBoundingClientRect().height);
-      assert(headerHeight >= 68 && headerHeight <= 72, `desktop header is 68–72px tall (got ${headerHeight}px)`);
+      assert(headerHeight >= 92 && headerHeight <= 94, `desktop/reference header is 92–94px tall (got ${headerHeight}px)`);
       const workflowColumns = await page.locator('.workflow-track').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
       assert.equal(workflowColumns, 5, 'desktop workflow uses five connected stages');
       const heroColumns = await page.locator('.hero-grid').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
@@ -530,7 +528,7 @@ try {
   response = await page.goto(pageUrl(''), { waitUntil: 'networkidle' });
   assert.equal(response.status(), 200);
   const mobileHeaderHeight = await page.locator('#site-header').evaluate((node) => node.getBoundingClientRect().height);
-  assert(mobileHeaderHeight >= 60 && mobileHeaderHeight <= 64, `mobile header is 60–64px tall (got ${mobileHeaderHeight}px)`);
+  assert(mobileHeaderHeight >= 106 && mobileHeaderHeight <= 107, `mobile/reference header is 106–107px tall (got ${mobileHeaderHeight}px)`);
   assert.equal(await page.locator('.header-cta').isVisible(), true, 'mobile header retains the Demo CTA');
   assert.equal(await page.locator('.mobile-navigation').isVisible(), true, 'mobile header exposes its disclosure menu');
   const mobileHeroOrder = await page.evaluate(() => {

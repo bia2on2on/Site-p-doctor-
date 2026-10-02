@@ -140,8 +140,23 @@ function phpFilesInMuDir() {
 }
 
 async function getDemoHtml() {
-  const res = await fetch(`${base}/demo/`);
-  return { status: res.status, html: await res.text() };
+  const url = `${base}/demo/`;
+  let lastError;
+  // A GET is safe to retry if wp-env briefly drops its host-port connection.
+  // Keep POST submissions single-shot below so a lost response can never
+  // duplicate even the intercepted test mail handoff.
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
+    try {
+      const res = await fetch(url);
+      return { status: res.status, html: await res.text() };
+    } catch (error) {
+      lastError = error;
+      if (attempt < 5) await new Promise((resolve) => setTimeout(resolve, 250 * (2 ** (attempt - 1))));
+    }
+  }
+  const cause = lastError?.cause;
+  const detail = [lastError?.message || String(lastError), cause?.code, cause?.message].filter(Boolean).join(' — ');
+  throw new Error(`GET ${url} failed after 5 attempts: ${detail}`, { cause: lastError });
 }
 
 function extractNonce(html) {
