@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="نمونهٔ تعاملیِ تجربهٔ کاربری مدیریتی برای تنظیمات کوروش؛ بدون ذخیرهٔ گزینه‌ها.">
+  <title>پیش‌نمایش تنظیمات کوروش</title>
+  <link rel="preload" href="assets/fonts/Vazirmatn-Arabic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/Vazirmatn-Latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="preview.css">
+  <script src="preview.js" defer></script>
+</head>
+<body class="settings-preview">
+  <a class="skip-link" href="#settings-main">رفتن به محتوای تنظیمات</a>
+
+  <header class="admin-topbar">
+    <div class="admin-topbar__inner">
+      <a class="admin-identity" href="index.html" aria-label="بازگشت به پیش‌نمایش صفحهٔ اصلی">
+        <span class="admin-identity__mark" aria-hidden="true">ک</span>
+        <span class="admin-identity__copy"><strong>کوروش</strong><span>پیش‌نمایش مدیریتی</span></span>
+      </a>
+      <div class="admin-topbar__crumbs" aria-label="مسیر صفحه">
+        <span>مدیریت سایت</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" /></svg><strong>تنظیمات کوروش</strong>
+      </div>
+      <a class="admin-topbar__back" href="index.html"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5 6 10l6.5 5.5M6.5 10h10" /></svg><span>صفحهٔ اصلی پیش‌نمایش</span></a>
+    </div>
+  </header>
+
+  <main class="settings-main" id="settings-main">
+    <div class="container settings-container">
+      <div class="admin-review-banner" id="preview-notice" role="note">
+        <span class="admin-review-banner__mark" aria-hidden="true"></span>
+        <strong>پیش‌نمایش طراحی — نسخه نهایی سایت نیست</strong>
+        <a href="index.html">بازگشت به صفحهٔ اصلی</a>
+      </div>
+
+      <div class="settings-page-heading">
+        <div>
+          <p class="eyebrow"><span class="eyebrow__dot" aria-hidden="true"></span>مدیریت تنظیمات عملیاتی</p>
+          <h1>تنظیمات کوروش</h1>
+          <p>بخش‌های مستقل و روشن؛ تنظیم محتوای صفحات و ظاهر سایت همچنان در ابزارهای اصلی خودش انجام می‌شود.</p>
+        </div>
+        <span class="prototype-label"><span class="prototype-label__dot" aria-hidden="true"></span>نمونهٔ تعاملی</span>
+      </div>
+
+      <div class="settings-layout" data-settings-tabs>
+        <aside class="settings-sidebar" aria-label="ناوبری تنظیمات">
+          <div class="settings-sidebar__brand">
+            <span class="settings-sidebar__mark" aria-hidden="true">ک</span>
+            <span><strong>پنل کوروش</strong><small>تنظیمات سایت</small></span>
+          </div>
+          <p class="settings-sidebar__caption">بخش‌ها</p>
+          <nav class="settings-tabs" role="tablist" aria-label="بخش‌های تنظیمات" aria-orientation="vertical">
+            <a class="settings-tab is-active" id="tab-general" href="#panel-general" role="tab" aria-controls="panel-general" aria-selected="true" tabindex="0"><span class="settings-tab__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M3 4.5h14v11H3zM6 8h8M6 11h5" /></svg></span><span>عمومی</span></a>
+            <a class="settings-tab" id="tab-contact" href="#panel-contact" role="tab" aria-controls="panel-contact" aria-selected="false" tabindex="0"><span class="settings-tab__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><rect x="3" y="4.5" width="14" height="11" rx="1.5" /><path d="m4 6 6 4.5L16 6" /></svg></span><span>اطلاعات تماس</span></a>
+            <a class="settings-tab" id="tab-sales" href="#panel-sales" role="tab" aria-controls="panel-sales" aria-selected="false" tabindex="0"><span class="settings-tab__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M4 5h12v10H4zM7 8h6M7 11h4" /><path d="M6 3v2M14 3v2" /></svg></span><span>فروش و درخواست دمو</span></a>
+            <a class="settings-tab" id="tab-shell" href="#panel-shell" role="tab" aria-controls="panel-shell" aria-selected="false" tabindex="0"><span class="settings-tab__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M3 5h14M3 10h14M3 15h14" /><circle cx="6" cy="5" r="1" /><circle cx="13" cy="10" r="1" /><circle cx="9" cy="15" r="1" /></svg></span><span>هدر و فوتر</span></a>
+            <a class="settings-tab" id="tab-social" href="#panel-social" role="tab" aria-controls="panel-social" aria-selected="false" tabindex="0"><span class="settings-tab__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" /><path d="M7 10h6M10 7v6" /></svg></span><span>شبکه‌های اجتماعی</span></a>
+            <a class="settings-tab" id="tab-status" href="#panel-status" role="tab" aria-controls="panel-status" aria-selected="false" tabindex="0"><span class="settings-tab__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 2.8 16 5v4.2c0 3.6-2.4 6.2-6 8-3.6-1.8-6-4.4-6-8V5l6-2.2Z" /><path d="M10 7v3.4M10 13.2h.01" /></svg></span><span>وضعیت سایت</span></a>
+          </nav>
+          <div class="settings-sidebar__note"><span aria-hidden="true">i</span><p>این پنل نمونه است؛ هیچ تغییری ثبت یا ارسال نمی‌شود.</p></div>
+        </aside>
+
+        <div class="settings-content">
+          <section class="settings-panel" id="panel-general" role="tabpanel" aria-labelledby="tab-general" tabindex="0">
+            <div class="settings-panel__heading">
+              <div><span class="panel-eyebrow">هویت و مالکیت</span><h2>عمومی</h2><p>هویت پایه از تنظیمات خود وردپرس خوانده می‌شود؛ این‌جا گزینهٔ تکراری ساخته نشده است.</p></div>
+              <span class="panel-meta"><span class="panel-meta__dot"></span>بخش راهنما</span>
+            </div>
+            <article class="settings-card">
+              <div class="settings-card__heading"><span class="settings-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16v13H4zM8 10h8M8 13.5h5" /><path d="M7 3.5h10" /></svg></span><div><h3>هویت سایت</h3><p>این موارد در ابزار استاندارد وردپرس مدیریت می‌شوند.</p></div></div>
+              <div class="identity-list">
+                <div class="identity-row"><span>عنوان سایت</span><strong>از تنظیمات عمومی وردپرس خوانده می‌شود</strong><span class="identity-source">وردپرس</span></div>
+                <div class="identity-row"><span>توضیح کوتاه</span><strong>از تنظیمات عمومی وردپرس خوانده می‌شود</strong><span class="identity-source">وردپرس</span></div>
+                <div class="identity-row"><span>لوگوی سایت</span><strong>از تنظیمات هویت سایت مدیریت می‌شود</strong><span class="identity-source">وردپرس</span></div>
+                <div class="identity-row"><span>نمادک سایت</span><strong>از تنظیمات هویت سایت مدیریت می‌شود</strong><span class="identity-source">وردپرس</span></div>
+              </div>
+            </article>
+            <div class="ownership-grid">
+              <article class="ownership-card"><span class="ownership-card__number">۰۱</span><div><h3>محتوا و طراحی</h3><p>چیدمان صفحات، متن، رنگ و تایپوگرافی در Elementor ویرایش می‌شوند.</p></div></article>
+              <article class="ownership-card ownership-card--accent"><span class="ownership-card__number">۰۲</span><div><h3>تنظیمات کوروش</h3><p>اطلاعات تماس، چند کنترل پوسته و وضعیت‌های قابل مشاهده را مدیریت می‌کند.</p></div></article>
+            </div>
+            <div class="settings-callout"><span class="settings-callout__icon" aria-hidden="true">i</span><p>این صفحه جایگزین Elementor نیست؛ هر ابزار فقط تنظیمات مربوط به خودش را نگه می‌دارد.</p></div>
+          </section>
+
+          <section class="settings-panel" id="panel-contact" role="tabpanel" aria-labelledby="tab-contact" tabindex="0">
+            <div class="settings-panel__heading">
+              <div><span class="panel-eyebrow">راه‌های ارتباط عمومی</span><h2>اطلاعات تماس</h2><p>نشانی عمومی در صفحهٔ تماس نمایش داده می‌شود؛ تلفن و نشانی متنی اختیاری‌اند.</p></div>
+              <span class="panel-meta"><span class="panel-meta__dot"></span>سه فیلد</span>
+            </div>
+            <article class="settings-card">
+              <div class="settings-card__heading"><span class="settings-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2" /><path d="m5 7 7 5.5L19 7" /></svg></span><div><h3>اطلاعات تماس عمومی</h3><p>فقط اطلاعات مجاز و واقعی را وارد کنید.</p></div></div>
+              <div class="field-stack">
+                <label class="preview-field" for="contact-email"><span class="preview-field__label">ایمیل عمومی / کسب‌وکار</span><input id="contact-email" type="email" value="biatoweb@gmail.com" maxlength="100" dir="ltr" autocomplete="off" aria-describedby="contact-email-help"><small id="contact-email-help">نشانی مجاز فعلی؛ هویت ثبتی شرکت را نشان نمی‌دهد.</small></label>
+                <label class="preview-field" for="contact-phone"><span class="preview-field__label">تلفن کسب‌وکار <em>اختیاری</em></span><input id="contact-phone" type="tel" value="" maxlength="30" dir="ltr" autocomplete="off" aria-describedby="contact-phone-help"><small id="contact-phone-help">اگر تنظیم نشود، ردیفی برای تلفن در صفحهٔ تماس نمایش داده نمی‌شود.</small></label>
+                <label class="preview-field" for="contact-address"><span class="preview-field__label">نشانی / موقعیت <em>اختیاری</em></span><textarea id="contact-address" rows="3" maxlength="200" aria-describedby="contact-address-help"></textarea><small id="contact-address-help">اگر تنظیم نشود، نشانی‌ای در سایت نمایش داده نمی‌شود.</small></label>
+              </div>
+            </article>
+            <div class="settings-callout settings-callout--quiet"><span class="settings-callout__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 2.8 16 5v4.2c0 3.6-2.4 6.2-6 8-3.6-1.8-6-4.4-6-8V5l6-2.2Z" /></svg></span><p>اطلاعات تماس در متن‌های حقوقی یا محتوای صفحات Elementor به‌صورت خودکار درج نمی‌شود.</p></div>
+          </section>
+
+          <section class="settings-panel" id="panel-sales" role="tabpanel" aria-labelledby="tab-sales" tabindex="0">
+            <div class="settings-panel__heading">
+              <div><span class="panel-eyebrow">درخواست دمو و مشاوره</span><h2>فروش و درخواست دمو</h2><p>کنترل ارسال دو لایه است؛ این پیش‌نمایش به هیچ مسیر دریافت پیام متصل نیست.</p></div>
+              <span class="panel-meta panel-meta--warning"><span class="panel-meta__dot"></span>ارسال واقعی ندارد</span>
+            </div>
+            <div class="gate-grid">
+              <article class="gate-card"><span class="gate-card__label">کلید ارسال در سطح سایت</span><strong class="status-chip status-chip--inactive"><span></span>غیرفعال</strong><p>پیش‌فرض این کلید خاموش است.</p></article>
+              <article class="gate-card"><span class="gate-card__label">اجازهٔ محیط برای ارسال</span><strong class="status-chip status-chip--review"><span></span>نیازمند بررسی</strong><p>این اجازه را مالک محیط تعیین می‌کند، نه این صفحه.</p></article>
+              <article class="gate-card gate-card--combined"><span class="gate-card__label">وضعیت این نمونه</span><strong class="status-chip status-chip--inactive"><span></span>غیرفعال</strong><p>ارسال واقعی به هر دو شرط مستقل نیاز دارد.</p></article>
+            </div>
+            <article class="settings-card">
+              <div class="settings-card__heading"><span class="settings-card__icon settings-card__icon--blue" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2" /><path d="m6 7 6 5 6-5M8 15h8" /></svg></span><div><h3>گیرندهٔ مجاز درخواست</h3><p>تنظیم نشانی، تحویل به صندوق ورودی را تضمین نمی‌کند.</p></div></div>
+              <label class="preview-field" for="lead-recipient"><span class="preview-field__label">ایمیل دریافت‌کنندهٔ درخواست دمو</span><input id="lead-recipient" type="email" value="biatoweb@gmail.com" maxlength="100" dir="ltr" autocomplete="off" aria-describedby="lead-recipient-help"><small id="lead-recipient-help">نشانی مجاز فعلی؛ در این نمونه هیچ درخواستی دریافت یا ارسال نمی‌شود.</small></label>
+            </article>
+            <div class="settings-callout settings-callout--warning"><span class="settings-callout__icon" aria-hidden="true">!</span><p>فعال‌بودن کلید سایت به‌تنهایی کافی نیست. اجازهٔ محیط و کنترل سایت باید هر دو برقرار باشند؛ رسیدن پیام به صندوق ورودی جداگانه تأیید نشده است.</p></div>
+          </section>
+
+          <section class="settings-panel" id="panel-shell" role="tabpanel" aria-labelledby="tab-shell" tabindex="0">
+            <div class="settings-panel__heading">
+              <div><span class="panel-eyebrow">پوستهٔ جایگزین</span><h2>هدر و فوتر</h2><p>این کنترل‌ها فقط برای پوستهٔ جایگزین کوروش هستند؛ چیدمان دیداری در Elementor انجام می‌شود.</p></div>
+              <span class="panel-meta"><span class="panel-meta__dot"></span>کنترل محدود</span>
+            </div>
+            <article class="settings-card">
+              <div class="settings-card__heading"><span class="settings-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5h16M4 12h16M4 18.5h16" /><circle cx="7" cy="5.5" r="1.5" /><circle cx="16" cy="12" r="1.5" /></svg></span><div><h3>هدر جایگزین کوروش</h3><p>پیش‌فرض‌های نمونهٔ کنترل پوسته؛ تغییرها در این صفحه ذخیره نمی‌شوند.</p></div></div>
+              <div class="toggle-list">
+                <label class="toggle-row" for="show-site-title"><span class="toggle-row__copy"><strong>نمایش عنوان سایت در هدر جایگزین</strong><small>اگر لوگو یا عنوان فعال نباشد، پیوند هویت سایت نمایش داده نمی‌شود.</small></span><input id="show-site-title" type="checkbox" checked><span class="toggle-visual" aria-hidden="true"></span></label>
+                <label class="toggle-row" for="show-header-cta"><span class="toggle-row__copy"><strong>نمایش دکمهٔ درخواست دمو در هدر جایگزین</strong><small>مقصد دکمه، مسیر درخواست دمو / مشاوره است.</small></span><input id="show-header-cta" type="checkbox" checked><span class="toggle-visual" aria-hidden="true"></span></label>
+              </div>
+              <label class="preview-field preview-field--compact" for="header-cta-label"><span class="preview-field__label">برچسب دکمهٔ هدر <em>اختیاری</em></span><input id="header-cta-label" type="text" maxlength="40" value="" placeholder="درخواست دمو / مشاوره" aria-describedby="header-cta-help"><small id="header-cta-help">خالی‌گذاشتن، برچسب پیش‌فرض را نگه می‌دارد.</small></label>
+            </article>
+            <article class="settings-card settings-card--footer">
+              <div class="settings-card__heading"><span class="settings-card__icon settings-card__icon--blue" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5h16M4 18.5h16M6 10h5M6 13.5h8" /></svg></span><div><h3>فوتر و جایگاه منو</h3><p>این پنل گزینهٔ جداگانه‌ای برای محتوای فوتر نمی‌سازد.</p></div></div>
+              <div class="footer-ownership"><div><span>چیدمان و ظاهر فوتر</span><strong>Elementor و ابزار ساخت پوسته</strong></div><div><span>پیوندهای منوی فوتر</span><strong>جایگاه‌های منوی وردپرس</strong></div></div>
+            </article>
+            <div class="settings-callout"><span class="settings-callout__icon" aria-hidden="true">i</span><p>اگر Elementor Pro هدر یا فوتر را رندر کند، آن پوسته اولویت دارد. پذیرش روی میزبان جداگانه نیازمند تأیید است.</p></div>
+          </section>
+
+          <section class="settings-panel" id="panel-social" role="tabpanel" aria-labelledby="tab-social" tabindex="0">
+            <div class="settings-panel__heading">
+              <div><span class="panel-eyebrow">نشانی پروفایل‌های واقعی</span><h2>شبکه‌های اجتماعی</h2><p>فقط نشانی حساب‌هایی را وارد کنید که واقعاً متعلق به کسب‌وکار هستند.</p></div>
+              <span class="panel-meta"><span class="panel-meta__dot"></span>اختیاری</span>
+            </div>
+            <article class="settings-card">
+              <div class="settings-card__heading"><span class="settings-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M8 12h8M12 8v8" /></svg></span><div><h3>پیوندهای اجتماعی</h3><p>فیلدهای خالی، پیوند یا آیکونی در سایت ایجاد نمی‌کنند.</p></div></div>
+              <div class="field-stack">
+                <label class="preview-field" for="social-instagram"><span class="preview-field__label">اینستاگرام</span><input id="social-instagram" type="url" value="" dir="ltr" autocomplete="off" aria-describedby="social-instagram-help"><small id="social-instagram-help">نشانی پروفایل واقعی؛ در این نمونه حسابی معرفی نشده است.</small></label>
+                <label class="preview-field" for="social-linkedin"><span class="preview-field__label">لینکدین</span><input id="social-linkedin" type="url" value="" dir="ltr" autocomplete="off" aria-describedby="social-linkedin-help"><small id="social-linkedin-help">نشانی صفحه یا پروفایل واقعی، در صورت وجود.</small></label>
+                <label class="preview-field" for="social-telegram"><span class="preview-field__label">تلگرام</span><input id="social-telegram" type="url" value="" dir="ltr" autocomplete="off" aria-describedby="social-telegram-help"><small id="social-telegram-help">نشانی واقعی؛ در این پیش‌نمایش پیوندی درج نشده است.</small></label>
+              </div>
+            </article>
+            <div class="settings-callout settings-callout--quiet"><span class="settings-callout__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 2.8 16 5v4.2c0 3.6-2.4 6.2-6 8-3.6-1.8-6-4.4-6-8V5l6-2.2Z" /></svg></span><p>تا زمانی که یک نشانی واقعی ثبت نشود، فضای خالی یا شبکهٔ اجتماعی ساختگی در فوتر نمایش داده نمی‌شود.</p></div>
+          </section>
+
+          <section class="settings-panel" id="panel-status" role="tabpanel" aria-labelledby="tab-status" tabindex="0">
+            <div class="settings-panel__heading">
+              <div><span class="panel-eyebrow">گزارش فقط‌خواندنی</span><h2>وضعیت سایت</h2><p>وضعیت‌ها محدود به شواهد قابل مشاهده‌اند؛ هیچ‌کدام به‌تنهایی آمادگی انتشار را تأیید نمی‌کند.</p></div>
+              <span class="panel-meta panel-meta--warning"><span class="panel-meta__dot"></span>بدون تأیید انتشار</span>
+            </div>
+            <div class="status-honesty"><span class="status-honesty__icon" aria-hidden="true">!</span><p><strong>این بخش فقط نمونهٔ تجربهٔ کاربری است.</strong> وضعیت‌های زیر به سرویس واقعی متصل نیستند و نشان‌دهندهٔ آزمون تحویل یا پذیرش میزبان نیستند.</p></div>
+            <div class="status-summary-grid">
+              <article class="status-summary-card"><span class="status-summary-card__symbol status-summary-card__symbol--inactive" aria-hidden="true"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" /><path d="M6 14 14 6" /></svg></span><span>ارسال درخواست دمو</span><strong class="status-chip status-chip--inactive"><span></span>غیرفعال</strong><small>در این نمونه هیچ درخواستی ارسال نمی‌شود.</small></article>
+              <article class="status-summary-card"><span class="status-summary-card__symbol status-summary-card__symbol--review" aria-hidden="true"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" /><path d="M10 6.5v4l2.5 1.5" /></svg></span><span>تحویل به صندوق ورودی</span><strong class="status-chip status-chip--review"><span></span>نیازمند بررسی</strong><small>تنظیم نشانی به‌معنی دریافت پیام نیست.</small></article>
+              <article class="status-summary-card"><span class="status-summary-card__symbol status-summary-card__symbol--unverified" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 2.8 16 5v4.2c0 3.6-2.4 6.2-6 8-3.6-1.8-6-4.4-6-8V5l6-2.2Z" /><path d="M10 7v3.4M10 13.2h.01" /></svg></span><span>رسانهٔ واقعی محصول</span><strong class="status-chip status-chip--unverified"><span></span>تأیید نشده</strong><small>تصویر تأییدشده در این پیش‌نمایش موجود نیست.</small></article>
+            </div>
+            <article class="settings-card status-list-card">
+              <div class="settings-card__heading"><span class="settings-card__icon settings-card__icon--blue" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 12.5h8M8 16h5" /></svg></span><div><h3>موارد نیازمند شواهد</h3><p>وضعیت هر مورد با برچسب روشن و توضیح کوتاه همراه است.</p></div></div>
+              <div class="status-list">
+                <div class="status-row"><div><strong>پذیرش Elementor Pro روی میزبان</strong><small>نصب‌بودن به‌تنهایی، پذیرش را ثابت نمی‌کند.</small></div><span class="status-chip status-chip--unverified"><span></span>تأیید نشده</span></div>
+                <div class="status-row"><div><strong>مالکیت کنسول جست‌وجوی گوگل</strong><small>شواهد تأیید مالکیت در این پنل وجود ندارد.</small></div><span class="status-chip status-chip--unverified"><span></span>تأیید نشده</span></div>
+                <div class="status-row"><div><strong>تحویل پیام به صندوق ورودی</strong><small>رسیدن ایمیل به صندوق ورودی بررسی یا تضمین نمی‌شود.</small></div><span class="status-chip status-chip--review"><span></span>نیازمند بررسی</span></div>
+                <div class="status-row"><div><strong>نمایه‌سازی این پیش‌نمایش</strong><small>این سند با دستور noindex و nofollow علامت‌گذاری شده است.</small></div><span class="status-chip status-chip--inactive"><span></span>غیرفعال</span></div>
+              </div>
+            </article>
+            <p class="status-legend"><span class="status-chip status-chip--active"><span></span>فعال</span><span class="status-chip status-chip--inactive"><span></span>غیرفعال</span><span class="status-chip status-chip--review"><span></span>نیازمند بررسی</span><span class="status-chip status-chip--unverified"><span></span>تأیید نشده</span></p>
+          </section>
+
+          <div class="settings-save-bar">
+            <p><strong>نمونهٔ تعاملی</strong><span>ورودی‌ها فقط برای بررسی ظاهر هستند؛ ذخیره‌سازی واقعی انجام نمی‌شود.</span></p>
+            <button type="button" disabled>ذخیره‌سازی در این نمونه غیرفعال است</button>
+          </div>
+        </div>
+      </div>
+
+      <footer class="settings-footer"><span>نمونهٔ مدیریتی کوروش · برای بازبینی تجربهٔ کاربری</span><a href="index.html">بازگشت به صفحهٔ اصلی پیش‌نمایش <span aria-hidden="true">↙</span></a></footer>
+    </div>
+  </main>
+
+  <div class="interaction-toast" id="preview-toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+</body>
+</html>

@@ -151,6 +151,12 @@ else
 	ko "design token validation failed (tests/static/validate-tokens.mjs)"
 fi
 
+if PYTHONDONTWRITEBYTECODE=1 python3 "$root/tests/static/validate-visual-preview.py"; then
+	ok "isolated interactive HTML preview, noindex, local assets and download bundle"
+else
+	ko "visual preview validation failed (tests/static/validate-visual-preview.py)"
+fi
+
 # ---- 6. Host evidence, honesty sentinels, CI/host version parity --------------
 if node "$root/tests/static/validate-manifest.mjs"; then
 	ok "host evidence, sentinels and CI/host version parity validated (tests/static/validate-manifest.mjs)"
@@ -331,6 +337,12 @@ if node --check "$root/tests/browser/theme-settings.mjs"; then
 	ok "theme-settings.mjs module syntax (node --check)"
 else
 	ko "theme-settings.mjs syntax check failed"
+fi
+
+if node --check "$root/tests/browser/visual-preview.mjs"; then
+	ok "visual-preview.mjs Playwright syntax (node --check)"
+else
+	ko "visual-preview.mjs syntax check failed"
 fi
 
 if node --check "$root/tests/wp-env/reference-host-compatibility.mjs"; then

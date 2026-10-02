@@ -73,6 +73,9 @@ jobs:
           cd tests/browser
           npx playwright install --with-deps chromium
 
+      - name: Test isolated interactive HTML design preview
+        run: node tests/browser/visual-preview.mjs
+
       - name: Reconstruct native Free homepage and capture browser evidence
         run: node tests/browser/homepage.mjs
 
