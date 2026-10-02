@@ -25,6 +25,18 @@ jobs:
         with:
           ref: ${{ github.sha }}
 
+      - name: Set up Node.js for the ZIP-derived build
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22.16.0
+
+      - name: Fetch the owner ZIP and verify its reproducible preview build
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin main --depth=1
+          python3 scripts/build-zip-preview.py --check
+
       - name: Configure GitHub Pages
         id: pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
@@ -41,8 +53,8 @@ jobs:
           install -m 0644 visual-preview/preview.css "$site/preview.css"
           install -m 0644 visual-preview/preview.js "$site/preview.js"
           install -m 0644 visual-preview/assets/fonts/OFL.txt "$site/assets/fonts/OFL.txt"
-          install -m 0644 visual-preview/assets/fonts/Vazirmatn-Bold.woff2 "$site/assets/fonts/Vazirmatn-Bold.woff2"
-          install -m 0644 visual-preview/assets/fonts/Vazirmatn-Regular.woff2 "$site/assets/fonts/Vazirmatn-Regular.woff2"
+          install -m 0644 visual-preview/assets/fonts/Vazirmatn-Arabic.woff2 "$site/assets/fonts/Vazirmatn-Arabic.woff2"
+          install -m 0644 visual-preview/assets/fonts/Vazirmatn-Latin.woff2 "$site/assets/fonts/Vazirmatn-Latin.woff2"
           python3 - "$site" <<'PY'
           import re
           import sys
@@ -55,8 +67,8 @@ jobs:
               "preview.css",
               "preview.js",
               "assets/fonts/OFL.txt",
-              "assets/fonts/Vazirmatn-Bold.woff2",
-              "assets/fonts/Vazirmatn-Regular.woff2",
+              "assets/fonts/Vazirmatn-Arabic.woff2",
+              "assets/fonts/Vazirmatn-Latin.woff2",
           }
           actual = {path.relative_to(root).as_posix() for path in root.rglob("*") if path.is_file()}
           if actual != expected:
@@ -76,8 +88,8 @@ jobs:
               if "koorosh-design-preview.zip" in text.lower():
                   raise SystemExit(f"{name} still references the offline package")
               (root / name).write_text(text, encoding="utf-8")
-              if '<meta name="robots" content="noindex,nofollow">' not in text:
-                  raise SystemExit(f"{name} is missing the required noindex,nofollow marker")
+              if not re.search(r"<meta\s+name=[\"']robots[\"']\s+content=[\"']noindex,nofollow[\"']\s*/?>", text, re.IGNORECASE):
+                raise SystemExit(f"{name} is missing the required noindex,nofollow marker")
               if "پیش‌نمایش طراحی — نسخه نهایی سایت نیست" not in text:
                   raise SystemExit(f"{name} is missing the visible Persian design-preview notice")
               if 'rel="canonical"' in text.lower() or "rel='canonical'" in text.lower():
@@ -137,8 +149,6 @@ jobs:
       - name: Test the published Pages site and capture responsive review evidence
         env:
           VISUAL_PREVIEW_BASE_URL: ${{ needs.deploy.outputs.page_url }}
-          VISUAL_REFERENCE_URL: https://01a0f849-cd20-76e1-a6de-cd79f231f369.arena.site/
-          VISUAL_REVIEW_SCREENSHOTS: '1'
         run: node tests/browser/visual-preview.mjs
 
       - name: Upload responsive visual review screenshots

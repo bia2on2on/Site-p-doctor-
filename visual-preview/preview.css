@@ -1,17 +1,19 @@
 @font-face {
   font-family: "Vazirmatn";
-  src: url("assets/fonts/Vazirmatn-Regular.woff2") format("woff2");
+  src: url("assets/fonts/Vazirmatn-Arabic.woff2") format("woff2-variations");
   font-style: normal;
-  font-weight: 400;
+  font-weight: 100 900;
   font-display: swap;
+  unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC,U+102E0-102FB,U+10E60-10E7E,U+10EC2-10EC4,U+10EFC-10EFF,U+1EE00-1EE03,U+1EE05-1EE1F,U+1EE21-1EE22,U+1EE24,U+1EE27,U+1EE29-1EE32,U+1EE34-1EE37,U+1EE39,U+1EE3B,U+1EE42,U+1EE47,U+1EE49,U+1EE4B,U+1EE4D-1EE4F,U+1EE51-1EE52,U+1EE54,U+1EE57,U+1EE59,U+1EE5B,U+1EE5D,U+1EE5F,U+1EE61-1EE62,U+1EE64,U+1EE67-1EE6A,U+1EE6C-1EE72,U+1EE74-1EE77,U+1EE79-1EE7C,U+1EE7E,U+1EE80-1EE89,U+1EE8B-1EE9B,U+1EEA1-1EEA3,U+1EEA5-1EEA9,U+1EEAB-1EEBB,U+1EEF0-1EEF1;
 }
 
 @font-face {
   font-family: "Vazirmatn";
-  src: url("assets/fonts/Vazirmatn-Bold.woff2") format("woff2");
+  src: url("assets/fonts/Vazirmatn-Latin.woff2") format("woff2-variations");
   font-style: normal;
-  font-weight: 700;
+  font-weight: 100 900;
   font-display: swap;
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
 }
 
 /*
@@ -23,28 +25,28 @@
   color-scheme: light;
   --color-canvas: #F5F7FB;
   --color-surface: #FFFFFF;
-  --color-surface-soft: #EDF3FF;
+  --color-surface-soft: #ECF8F1;
   --color-ink: #13223E;
   --color-copy: #384A66;
   --color-muted: #5A6B86;
-  --color-primary: #315CFA;
-  --color-primary-hover: #1F3FBF;
-  --color-cobalt: #315CFA;
-  --color-sky: #79B8FF;
-  --color-aqua: #18B7D9;
-  --color-aqua-soft: #E8F8FC;
-  --color-line: #DCE5F4;
-  --color-line-strong: #A8B7D0;
+  --color-primary: #10B981;
+  --color-primary-hover: #059669;
+  --color-cobalt: #1F7DF0;
+  --color-sky: #7DD3FC;
+  --color-aqua: #10B981;
+  --color-aqua-soft: #ECFDF5;
+  --color-line: #DCEAE2;
+  --color-line-strong: #A9C2B4;
   --color-white: #FFFFFF;
-  --color-blue-soft: #EAF0FF;
+  --color-blue-soft: #EAF8F0;
   --color-warm-soft: #FFF3D8;
-  --color-success: #2B51B6;
+  --color-success: #15805D;
   --color-warning: #775000;
-  --color-info: #3D50A1;
+  --color-info: #256FA8;
   --color-night: #101A34;
   --color-night-raised: #1B2A4B;
   --color-night-copy: #E0E8F7;
-  --color-success-soft: #E9EEFF;
+  --color-success-soft: #E8F8EF;
   --color-glass: rgba(255, 255, 255, 0.76);
   --color-glass-line: rgba(255, 255, 255, 0.82);
 
@@ -65,7 +67,7 @@
   --radius-lg: 19px;
   --radius-xl: 25px;
   --content: 1280px;
-  --focus: 0 0 0 3px rgba(49, 92, 250, 0.22);
+  --focus: 0 0 0 3px rgba(16, 185, 129, 0.22);
 
   --shadow-soft: 0 2px 9px rgba(19, 34, 62, 0.05);
   --shadow-raised: 0 14px 36px rgba(19, 34, 62, 0.10);
@@ -2961,3 +2963,19 @@ body {
 }
 @media (max-width:400px){.media-reservation--hero{top:30px}
 }
+
+
+/* ZIP-derived mint/emerald palette alignment for the retained six-section Settings prototype. */
+.settings-preview {
+  background: radial-gradient(ellipse at 7% 7%, rgba(16,185,129,.08), transparent 29%), linear-gradient(145deg, #F7FBF8, #EEF8F2);
+}
+.admin-topbar__inner { box-shadow: 0 10px 28px rgba(22,101,68,.08); }
+.admin-review-banner { background: rgba(236,253,245,.88); border-color: rgba(16,185,129,.18); }
+.admin-review-banner__mark, .eyebrow__dot { background: var(--color-primary); }
+.prototype-label { color: #047857; background: rgba(236,253,245,.88); border-color: rgba(16,185,129,.19); }
+.settings-tab.is-active { color: #047857; background: rgba(236,253,245,.92); border-color: rgba(16,185,129,.24); }
+.settings-tab.is-active .settings-tab__icon { background: linear-gradient(145deg, #10B981, #1F7DF0); border-color: transparent; }
+.settings-tab__icon { color: #059669; background: #ECFDF5; border-color: rgba(16,185,129,.16); }
+.settings-callout__icon { background: linear-gradient(145deg, #10B981, #1F7DF0); }
+.status-chip--active { color: #047857; background: #E8F8EF; border-color: #C8E8D6; }
+.status-summary-card__symbol--inactive { color: #4B6380; background: #EEF3FA; }
